@@ -24,9 +24,33 @@ public class GlobalConstants {
    */
   public static final String OK = "OK";
   /**
+   * 增加方法
+   */
+  public static final String OPERATE_TYPE_INSERT = "insert";
+  /**
+   * 更新方法
+   */
+  public static final String OPERATE_TYPE_UPDATE = "update";
+  /**
+   * 升序
+   */
+  public static final String ORDER_ASC = "ASC";
+  /**
+   * 降序
+   */
+  public static final String ORDER_DESC = "DESC";
+  /**
    * 问号
    */
   public static final String QUERY_MARK = "?";
+  /**
+   * 空格
+   */
+  public static final String SPACE = " ";
+  /**
+   * 下划线
+   */
+  public static final String UNDER_LINE = "_";
   /**
    * 常量:未知
    */

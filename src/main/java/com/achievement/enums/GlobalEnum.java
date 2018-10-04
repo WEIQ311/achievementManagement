@@ -37,6 +37,16 @@ public enum GlobalEnum {
   SemesterNameInUsed("该学期\"%s\"在学年\"%s\"中已经存在!"),
   TeacherNumInUsed("教师编码\"%s\"已经被教师\"%s\"使用!"),
   SubjectNameInUsed("学科\"%s\"已经被使用!"),
+  ClassIdEmpty("班级ID为空!"),
+  StudentIdEmpty("学生ID为空!"),
+  SubjectIdEmpty("学科ID为空!"),
+  TeacherIdEmpty("教师ID为空!"),
+  SemesterIdEmpty("学期ID为空!"),
+  ClassInfoEmpty("班级ID\"%s\"不存在,请检查!"),
+  StudentInfoEmpty("学生ID\"%s\"不存在,请检查!"),
+  SubjectInfoEmpty("学科ID\"%s\"不存在,请检查!"),
+  TeacherInfoEmpty("教师ID\"%s\"不存在,请检查!"),
+  SemesterInfoEmpty("学期ID\"%s\"不存在,请检查!"),
   ;
   private String message;
 

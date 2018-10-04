@@ -77,7 +77,8 @@ public class ScoreInfoController {
    * 根据条件分页查询
    *
    * @param scoreInfo 查询参数
-   * @param pageNum   开始页数    * @param pageSize  每页显示的数据条数
+   * @param pageNum   开始页数
+   * @param pageSize  每页显示的数据条数
    * @return ResultEntity
    */
   @RequestMapping(value = "/listByPage", method = RequestMethod.GET)

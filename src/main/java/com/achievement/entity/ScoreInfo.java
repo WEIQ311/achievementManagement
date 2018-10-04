@@ -1,5 +1,6 @@
 package com.achievement.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,6 +34,16 @@ public class ScoreInfo implements Serializable {
    */
   private Date insertTime;
   /**
+   * 排序字段
+   */
+  @JsonIgnore
+  private String orderColumn;
+  /**
+   * 排序方向
+   */
+  @JsonIgnore
+  private String orderDirection;
+  /**
    * 备注
    */
   @Length(max = 4000, message = "备注不能多于4000个字符")
@@ -60,6 +71,7 @@ public class ScoreInfo implements Serializable {
   /**
    * 学生ID
    */
+  @NotBlank(message = "学生ID不能为空!")
   private String studentId;
   /**
    * 科目ID

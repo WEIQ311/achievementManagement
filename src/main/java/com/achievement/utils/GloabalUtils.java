@@ -2,6 +2,7 @@ package com.achievement.utils;
 
 import com.achievement.enums.GlobalEnum;
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,6 +16,32 @@ import static com.achievement.constants.GlobalConstants.*;
  * @author weiQiang
  */
 public class GloabalUtils {
+  /**
+   * java字段转数据库字段
+   *
+   * @param column 排序字段
+   * @return String
+   */
+  public static String changeColumn(String column, String direction) {
+    if (StringUtils.isNotBlank(column)) {
+      StringBuilder columnBuilder = new StringBuilder();
+      char[] chars = column.toCharArray();
+      for (char aChar : chars) {
+        if (Character.isUpperCase(aChar)) {
+          columnBuilder.append(UNDER_LINE);
+          columnBuilder.append(String.valueOf(aChar).toLowerCase());
+        } else {
+          columnBuilder.append(String.valueOf(aChar));
+        }
+      }
+      if (StringUtils.isBlank(direction)) {
+        direction = ORDER_ASC;
+      }
+      return columnBuilder.toString() + SPACE + direction;
+    }
+    return "";
+  }
+
   /**
    * 转换异常信息
    *
@@ -141,5 +168,4 @@ public class GloabalUtils {
   public synchronized static String ordinaryId(Integer count) {
     return DateFormatUtils.format(new Date(), DATE_TIME_FORMATTER) + RandomStringUtils.randomNumeric(count);
   }
-
 }
