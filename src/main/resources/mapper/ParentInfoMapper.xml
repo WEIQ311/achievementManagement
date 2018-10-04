@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.achievement.mapper.ParentInfoMapper">
+
+  <resultMap type="com.achievement.entity.ParentInfo" id="ParentInfoMap">
+    <result property="parentId" column="parent_id" jdbcType="VARCHAR"/>
+    <result property="insertTime" column="insert_time" jdbcType="TIMESTAMP"/>
+    <result property="parentName" column="parent_name" jdbcType="VARCHAR"/>
+    <result property="remark" column="remark" jdbcType="VARCHAR"/>
+    <result property="status" column="status" jdbcType="INTEGER"/>
+    <result property="telPhone" column="tel_phone" jdbcType="VARCHAR"/>
+    <result property="txQq" column="tx_qq" jdbcType="VARCHAR"/>
+    <result property="txWx" column="tx_wx" jdbcType="VARCHAR"/>
+    <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    <result property="xlWb" column="xl_wb" jdbcType="VARCHAR"/>
+  </resultMap>
+
+  <!--列集合-->
+  <sql id="BASE_COLUMN">
+      parent_id, insert_time, parent_name, remark, status, tel_phone, tx_qq, tx_wx, update_time, xl_wb    </sql>
+  <!--表名-->
+  <sql id="BASE_TABLE">
+		achievement.parent_info
+	</sql>
+
+
+  <!--通过实体作为筛选条件查询-->
+  <select id="list" resultMap="ParentInfoMap">
+    select
+    <include refid="BASE_COLUMN"/>
+    from
+    <include refid="BASE_TABLE"/>
+    <where>
+      <if test="parentId != null and parentId != ''">
+        and parent_id = #{parentId}
+      </if>
+      <if test="insertTime != null">
+        and insert_time = #{insertTime}
+      </if>
+      <if test="parentName != null and parentName != ''">
+        and parent_name = #{parentName}
+      </if>
+      <if test="remark != null and remark != ''">
+        and remark = #{remark}
+      </if>
+      <if test="status != null">
+        and status = #{status}
+      </if>
+      <if test="telPhone != null and telPhone != ''">
+        and tel_phone = #{telPhone}
+      </if>
+      <if test="txQq != null and txQq != ''">
+        and tx_qq = #{txQq}
+      </if>
+      <if test="txWx != null and txWx != ''">
+        and tx_wx = #{txWx}
+      </if>
+      update_time = SYSDATE(),
+      <if test="xlWb != null and xlWb != ''">
+        and xl_wb = #{xlWb}
+      </if>
+    </where>
+  </select>
+
+  <!--新增所有列-->
+  <insert id="insert" keyProperty="parentId" useGeneratedKeys="true" parameterType="java.util.List">
+    insert into
+    <include refid="BASE_TABLE"/>
+    (<include refid="BASE_COLUMN"/>)
+    VALUES
+    <foreach collection="list" item="item" index="index" separator=",">
+      (
+      #{item.parentId}, #{item.insertTime}, #{item.parentName}, #{item.remark}, #{item.status}, #{item.telPhone},
+      #{item.txQq}, #{item.txWx}, #{item.updateTime}, #{item.xlWb} )
+    </foreach>
+  </insert>
+
+
+  <!--通过主键修改数据-->
+  <update id="update" parameterType="java.util.List">
+    <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+      UPDATE
+      <include refid="BASE_TABLE"/>
+      <set>
+        <if test="item.parentName != null and item.parentName != ''">
+          parent_name = #{item.parentName},
+        </if>
+        <if test="item.remark != null and item.remark != ''">
+          remark = #{item.remark},
+        </if>
+        <if test="item.status != null">
+          status = #{item.status},
+        </if>
+        <if test="item.telPhone != null and item.telPhone != ''">
+          tel_phone = #{item.telPhone},
+        </if>
+        <if test="item.txQq != null and item.txQq != ''">
+          tx_qq = #{item.txQq},
+        </if>
+        <if test="item.txWx != null and item.txWx != ''">
+          tx_wx = #{item.txWx},
+        </if>
+        <if test="item.xlWb != null and item.xlWb != ''">
+          xl_wb = #{item.xlWb}
+        </if>
+        update_time = SYSDATE()
+      </set>
+      where parent_id = #{parentId}
+    </foreach>
+  </update>
+
+  <!--通过主键删除-->
+  <delete id="delete">
+    delete from
+    <include refid="BASE_TABLE"/>
+    where parent_id in
+    <foreach collection="list" item="item" index="no" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </delete>
+
+</mapper>
+

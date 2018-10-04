@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.achievement.mapper.ScoreInfoMapper">
+
+  <resultMap type="com.achievement.entity.ScoreInfo" id="ScoreInfoMap">
+    <result property="scoreId" column="score_id" jdbcType="VARCHAR"/>
+    <result property="classId" column="class_id" jdbcType="VARCHAR"/>
+    <result property="insertTime" column="insert_time" jdbcType="TIMESTAMP"/>
+    <result property="remark" column="remark" jdbcType="VARCHAR"/>
+    <result property="scoreNumber" column="score_number" jdbcType="VARCHAR"/>
+    <result property="semesterId" column="semester_id" jdbcType="VARCHAR"/>
+    <result property="status" column="status" jdbcType="INTEGER"/>
+    <result property="studentId" column="student_id" jdbcType="VARCHAR"/>
+    <result property="subjectId" column="subject_id" jdbcType="VARCHAR"/>
+    <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+  </resultMap>
+
+  <!--列集合-->
+  <sql id="BASE_COLUMN">
+      score_id, class_id, insert_time, remark, score_number, semester_id, status, student_id, subject_id, update_time    </sql>
+  <!--表名-->
+  <sql id="BASE_TABLE">
+		achievement.score_info
+	</sql>
+
+
+  <!--通过实体作为筛选条件查询-->
+  <select id="list" resultMap="ScoreInfoMap">
+    select
+    <include refid="BASE_COLUMN"/>
+    from
+    <include refid="BASE_TABLE"/>
+    <where>
+      <if test="scoreId != null and scoreId != ''">
+        and score_id = #{scoreId}
+      </if>
+      <if test="classId != null and classId != ''">
+        and class_id = #{classId}
+      </if>
+      <if test="insertTime != null">
+        and insert_time = #{insertTime}
+      </if>
+      <if test="remark != null and remark != ''">
+        and remark = #{remark}
+      </if>
+      <if test="scoreNumber != null and scoreNumber != ''">
+        and score_number = #{scoreNumber}
+      </if>
+      <if test="semesterId != null and semesterId != ''">
+        and semester_id = #{semesterId}
+      </if>
+      <if test="status != null">
+        and status = #{status}
+      </if>
+      <if test="studentId != null and studentId != ''">
+        and student_id = #{studentId}
+      </if>
+      <if test="subjectId != null and subjectId != ''">
+        and subject_id = #{subjectId}
+      </if>
+      <if test="updateTime != null">
+        and update_time = #{updateTime}
+      </if>
+    </where>
+  </select>
+
+  <!--新增所有列-->
+  <insert id="insert" keyProperty="scoreId" useGeneratedKeys="true" parameterType="java.util.List">
+    insert into
+    <include refid="BASE_TABLE"/>
+    (<include refid="BASE_COLUMN"/>)
+    VALUES
+    <foreach collection="list" item="item" index="index" separator=",">
+      (
+      #{item.scoreId}, #{item.classId}, #{item.insertTime}, #{item.remark}, #{item.scoreNumber}, #{item.semesterId},
+      #{item.status}, #{item.studentId}, #{item.subjectId}, #{item.updateTime} )
+    </foreach>
+  </insert>
+
+
+  <!--通过主键修改数据-->
+  <update id="update" parameterType="java.util.List">
+    <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+      UPDATE
+      <include refid="BASE_TABLE"/>
+      <set>
+        <if test="item.classId != null and item.classId != ''">
+          class_id = #{item.classId},
+        </if>
+        <if test="item.remark != null and item.remark != ''">
+          remark = #{item.remark},
+        </if>
+        <if test="item.scoreNumber != null and item.scoreNumber != ''">
+          score_number = #{item.scoreNumber},
+        </if>
+        <if test="item.semesterId != null and item.semesterId != ''">
+          semester_id = #{item.semesterId},
+        </if>
+        <if test="item.status != null">
+          status = #{item.status},
+        </if>
+        <if test="item.studentId != null and item.studentId != ''">
+          student_id = #{item.studentId},
+        </if>
+        <if test="item.subjectId != null and item.subjectId != ''">
+          subject_id = #{item.subjectId},
+        </if>
+        update_time = SYSDATE()
+      </set>
+      where score_id = #{item.scoreId}
+    </foreach>
+  </update>
+
+  <!--通过主键删除-->
+  <delete id="delete">
+    delete from
+    <include refid="BASE_TABLE"/>
+    where score_id in
+    <foreach collection="list" item="item" index="no" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </delete>
+
+</mapper>
+

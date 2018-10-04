@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    sql-script-encoding: UTF-8
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/achievement?useUnicode=true&characterEncoding=utf-8&useSSL=true&allowMultiQueries=true
+    username: root
+    password: root
+    initial-size: 10
+    maximum-pool-size: 35
+    test-while-idle: true
+    type: com.alibaba.druid.pool.DruidDataSource
+  social:
+    auto-connection-views: true
+
+mybatis:
+  type-aliases-package: com.achievement.entity
+  mapper-locations: classpath*:mapper/*.xml
+  check-config-location: true
+  config-location: classpath:mybatis/mybatis-config.xml
+
+
+
+
+
+
+
+
+
+

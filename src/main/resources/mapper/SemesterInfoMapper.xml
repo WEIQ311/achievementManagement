@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.achievement.mapper.SemesterInfoMapper">
+
+  <resultMap type="com.achievement.entity.SemesterInfo" id="SemesterInfoMap">
+    <result property="semesterId" column="semester_id" jdbcType="VARCHAR"/>
+    <result property="insertTime" column="insert_time" jdbcType="TIMESTAMP"/>
+    <result property="remark" column="remark" jdbcType="VARCHAR"/>
+    <result property="semesterName" column="semester_name" jdbcType="VARCHAR"/>
+    <result property="status" column="status" jdbcType="INTEGER"/>
+    <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    <result property="yearId" column="year_id" jdbcType="VARCHAR"/>
+  </resultMap>
+
+  <!--列集合-->
+  <sql id="BASE_COLUMN">
+      semester_id, insert_time, remark, semester_name, status, update_time, year_id    </sql>
+  <!--表名-->
+  <sql id="BASE_TABLE">
+		achievement.semester_info
+	</sql>
+
+
+  <!--通过实体作为筛选条件查询-->
+  <select id="list" resultMap="SemesterInfoMap">
+    select
+    <include refid="BASE_COLUMN"/>
+    from
+    <include refid="BASE_TABLE"/>
+    <where>
+      <if test="semesterId != null and semesterId != ''">
+        and semester_id = #{semesterId}
+      </if>
+      <if test="insertTime != null">
+        and insert_time = #{insertTime}
+      </if>
+      <if test="remark != null and remark != ''">
+        and remark = #{remark}
+      </if>
+      <if test="semesterName != null and semesterName != ''">
+        and semester_name = #{semesterName}
+      </if>
+      <if test="status != null">
+        and status = #{status}
+      </if>
+      <if test="updateTime != null">
+        and update_time = #{updateTime}
+      </if>
+      <if test="yearId != null and yearId != ''">
+        and year_id = #{yearId}
+      </if>
+    </where>
+  </select>
+
+  <!--新增所有列-->
+  <insert id="insert" keyProperty="semesterId" useGeneratedKeys="true" parameterType="java.util.List">
+    insert into
+    <include refid="BASE_TABLE"/>
+    (<include refid="BASE_COLUMN"/>)
+    VALUES
+    <foreach collection="list" item="item" index="index" separator=",">
+      (
+      #{item.semesterId}, #{item.insertTime}, #{item.remark}, #{item.semesterName}, #{item.status}, #{item.updateTime},
+      #{item.yearId} )
+    </foreach>
+  </insert>
+
+
+  <!--通过主键修改数据-->
+  <update id="update" parameterType="java.util.List">
+    <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+      UPDATE
+      <include refid="BASE_TABLE"/>
+      <set>
+        <if test="item.remark != null and item.remark != ''">
+          remark = #{item.remark},
+        </if>
+        <if test="item.semesterName != null and item.semesterName != ''">
+          semester_name = #{item.semesterName},
+        </if>
+        <if test="item.status != null">
+          status = #{item.status},
+        </if>
+        <if test="item.yearId != null and item.yearId != ''">
+          year_id = #{item.yearId}
+        </if>
+        update_time = SYSDATE(),
+      </set>
+      where semester_id = #{item.semesterId}
+    </foreach>
+  </update>
+
+  <!--通过主键删除-->
+  <delete id="delete">
+    delete from
+    <include refid="BASE_TABLE"/>
+    where semester_id in
+    <foreach collection="list" item="item" index="no" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </delete>
+
+</mapper>
+

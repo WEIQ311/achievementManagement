@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.achievement.mapper.SchoolInfoMapper">
+
+  <resultMap type="com.achievement.entity.SchoolInfo" id="SchoolInfoMap">
+    <result property="scId" column="sc_id" jdbcType="VARCHAR"/>
+    <result property="insertTime" column="insert_time" jdbcType="TIMESTAMP"/>
+    <result property="name" column="name" jdbcType="VARCHAR"/>
+    <result property="remark" column="remark" jdbcType="VARCHAR"/>
+    <result property="status" column="status" jdbcType="INTEGER"/>
+    <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+  </resultMap>
+
+  <!--列集合-->
+  <sql id="BASE_COLUMN">
+      sc_id, insert_time, name, remark, status, update_time    </sql>
+  <!--表名-->
+  <sql id="BASE_TABLE">
+		achievement.school_info
+	</sql>
+
+
+  <!--通过实体作为筛选条件查询-->
+  <select id="list" resultMap="SchoolInfoMap">
+    select
+    <include refid="BASE_COLUMN"/>
+    from
+    <include refid="BASE_TABLE"/>
+    <where>
+      <if test="scId != null and scId != ''">
+        and sc_id = #{scId}
+      </if>
+      <if test="insertTime != null">
+        and insert_time = #{insertTime}
+      </if>
+      <if test="name != null and name != ''">
+        and name = #{name}
+      </if>
+      <if test="remark != null and remark != ''">
+        and remark = #{remark}
+      </if>
+      <if test="status != null">
+        and status = #{status}
+      </if>
+      <if test="updateTime != null">
+        and update_time = #{updateTime}
+      </if>
+    </where>
+  </select>
+
+  <!--新增所有列-->
+  <insert id="insert" keyProperty="scId" useGeneratedKeys="true" parameterType="java.util.List">
+    insert into
+    <include refid="BASE_TABLE"/>
+    (<include refid="BASE_COLUMN"/>)
+    VALUES
+    <foreach collection="list" item="item" index="index" separator=",">
+      (
+      #{item.scId}, #{item.insertTime}, #{item.name}, #{item.remark}, #{item.status}, #{item.updateTime} )
+    </foreach>
+  </insert>
+
+
+  <!--通过主键修改数据-->
+  <update id="update" parameterType="java.util.List">
+    <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+      UPDATE
+      <include refid="BASE_TABLE"/>
+      <set>
+        <if test="item.name != null and item.name != ''">
+          name = #{item.name},
+        </if>
+        <if test="item.remark != null and item.remark != ''">
+          remark = #{item.remark},
+        </if>
+        <if test="item.status != null">
+          status = #{item.status},
+        </if>
+        update_time = SYSDATE()
+      </set>
+      where sc_id = #{item.scId}
+    </foreach>
+  </update>
+
+  <!--通过主键删除-->
+  <delete id="delete">
+    delete from
+    <include refid="BASE_TABLE"/>
+    where sc_id in
+    <foreach collection="list" item="item" index="no" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </delete>
+
+</mapper>
+
