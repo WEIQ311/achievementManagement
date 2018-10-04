@@ -18,12 +18,3 @@ mybatis:
   check-config-location: true
   config-location: classpath:mybatis/mybatis-config.xml
 
-
-
-
-
-
-
-
-
-

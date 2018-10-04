@@ -18,7 +18,7 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
   profiles:
     active: prod
-#    include: druid
+  #    include: druid
   thymeleaf:
     cache: false
     encoding: UTF-8
@@ -33,4 +33,6 @@ server:
     context-path: /${spring.application.name}
   tomcat:
     basedir: ${user.home}/${spring.application.name}/tomcat
+
+
 
