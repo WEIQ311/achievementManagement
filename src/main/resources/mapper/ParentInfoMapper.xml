@@ -70,8 +70,8 @@
     VALUES
     <foreach collection="list" item="item" index="index" separator=",">
       (
-      #{item.parentId}, #{item.insertTime}, #{item.parentName}, #{item.remark}, #{item.status}, #{item.telPhone},
-      #{item.txQq}, #{item.txWx}, #{item.updateTime}, #{item.xlWb} )
+      #{item.parentId}, SYSDATE(), #{item.parentName}, #{item.remark}, #{item.status}, #{item.telPhone},
+      #{item.txQq}, #{item.txWx}, SYSDATE(), #{item.xlWb} )
     </foreach>
   </insert>
 
@@ -103,7 +103,12 @@
         <if test="item.xlWb != null and item.xlWb != ''">
           xl_wb = #{item.xlWb}
         </if>
-        update_time = SYSDATE()
+        <if test="item.updateTime==null">
+          update_time = SYSDATE(),
+        </if>
+        <if test="item.updateTime != null">
+          update_time = #{item.updateTime},
+        </if>
       </set>
       where parent_id = #{parentId}
     </foreach>

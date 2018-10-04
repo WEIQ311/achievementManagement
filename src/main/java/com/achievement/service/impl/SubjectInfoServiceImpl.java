@@ -17,6 +17,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -76,7 +77,16 @@ public class SubjectInfoServiceImpl implements SubjectInfoService {
     if (null == subjectInfoList || subjectInfoList.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
-    subjectInfoList.stream().forEach(subjectInfo -> subjectInfo.setSubjectId("subject_" + GloabalUtils.ordinaryId()));
+    Map<String, SubjectInfo> subjectInfoMap = convertRecordToMap(SubjectInfo.builder().build()).values().stream()
+        .filter(info -> StringUtils.isNotBlank(info.getSubjectName()))
+        .collect(Collectors.toMap(SubjectInfo::getSubjectName, Function.identity(), (oldValue, newValue) -> newValue));
+    subjectInfoList.stream().forEach(subjectInfo -> {
+      String subjectName = subjectInfo.getSubjectName();
+      if (subjectInfoMap.containsKey(subjectName)) {
+        GloabalUtils.convertMessage(GlobalEnum.SubjectNameInUsed, subjectName);
+      }
+      subjectInfo.setSubjectId("subject_" + GloabalUtils.ordinaryId());
+    });
     Integer insertCount = subjectInfoMapper.insert(subjectInfoList);
     if (insertCount > 0) {
       return ResultUtil.success(GlobalEnum.InsertSuccess, subjectInfoList);
@@ -124,6 +134,19 @@ public class SubjectInfoServiceImpl implements SubjectInfoService {
     if (null == subjectInfoList || subjectInfoList.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
+    Map<String, SubjectInfo> subjectInfoMap = convertRecordToMap(SubjectInfo.builder().build()).values().stream()
+        .filter(info -> StringUtils.isNotBlank(info.getSubjectName()))
+        .collect(Collectors.toMap(SubjectInfo::getSubjectName, Function.identity(), (oldValue, newValue) -> newValue));
+    subjectInfoList.stream().forEach(subjectInfo -> {
+      String subjectId = subjectInfo.getSubjectId();
+      if (StringUtils.isBlank(subjectId)) {
+        GloabalUtils.convertMessage(GlobalEnum.PkIdEmpty);
+      }
+      String subjectName = subjectInfo.getSubjectName();
+      if (subjectInfoMap.containsKey(subjectName) && !Objects.equals(subjectId, subjectInfoMap.get(subjectName).getSubjectId())) {
+        GloabalUtils.convertMessage(GlobalEnum.SubjectNameInUsed, subjectName);
+      }
+    });
     Integer updateCount = subjectInfoMapper.update(subjectInfoList);
     if (updateCount > 0) {
       return ResultUtil.success(GlobalEnum.UpdateSuccess, subjectInfoList);

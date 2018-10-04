@@ -1,5 +1,6 @@
 package com.achievement.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,6 +9,7 @@ import org.hibernate.validator.constraints.Length;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 学期
@@ -52,4 +54,13 @@ public class SemesterInfo implements Serializable {
    * 学年ID
    */
   private String yearId;
+  /**
+   * 学年ID集合
+   */
+  @JsonIgnore
+  private List<String> yearIds;
+  /**
+   * 学年信息
+   */
+  private YearInfo yearInfo;
 }

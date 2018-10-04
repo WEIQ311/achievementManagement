@@ -18,7 +18,7 @@ public interface BaseInfoService<T, E extends Serializable> {
    * 对象信息Map
    *
    * @param record 查询参数
-   * @return ResultEntity
+   * @return Map
    */
   Map<E, T> convertRecordToMap(T record);
 

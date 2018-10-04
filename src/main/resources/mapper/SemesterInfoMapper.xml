@@ -49,6 +49,12 @@
       <if test="yearId != null and yearId != ''">
         and year_id = #{yearId}
       </if>
+      <if test="yearIds != null and yearIds.size >0 ">
+        and year_id in
+        <foreach collection="yearIds" item="yearId" index="no" open="(" separator="," close=")">
+          #{yearId}
+        </foreach>
+      </if>
     </where>
   </select>
 
@@ -60,8 +66,8 @@
     VALUES
     <foreach collection="list" item="item" index="index" separator=",">
       (
-      #{item.semesterId}, #{item.insertTime}, #{item.remark}, #{item.semesterName}, #{item.status}, #{item.updateTime},
-      #{item.yearId} )
+      #{item.semesterId}, SYSDATE(), #{item.remark}, #{item.semesterName},
+      #{item.status}, SYSDATE(), #{item.yearId} )
     </foreach>
   </insert>
 
@@ -84,7 +90,12 @@
         <if test="item.yearId != null and item.yearId != ''">
           year_id = #{item.yearId}
         </if>
-        update_time = SYSDATE(),
+        <if test="item.updateTime==null">
+          update_time = SYSDATE(),
+        </if>
+        <if test="item.updateTime != null">
+          update_time = #{item.updateTime},
+        </if>
       </set>
       where semester_id = #{item.semesterId}
     </foreach>

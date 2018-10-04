@@ -1,5 +1,6 @@
 package com.achievement.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,6 +9,7 @@ import org.hibernate.validator.constraints.Length;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 班级
@@ -36,6 +38,15 @@ public class ClassInfo implements Serializable {
    * 年级ID
    */
   private String gradeId;
+  /**
+   * 年级ID集合
+   */
+  @JsonIgnore
+  private List<String> gradeIds;
+  /**
+   * 年级信息
+   */
+  private GradeInfo gradeInfo;
   /**
    * 创建时间
    */

@@ -48,6 +48,12 @@
       <if test="updateTime != null">
         and update_time = #{updateTime}
       </if>
+      <if test="gradeIds !=null and gradeIds.size>0 ">
+        and grade_id in
+        <foreach collection="classIds" item="gradeId" index="no" open="(" separator="," close=")">
+          #{gradeId}
+        </foreach>
+      </if>
     </where>
   </select>
 
@@ -87,7 +93,12 @@
         <if test="item.status != null">
           status = #{item.status},
         </if>
-        update_time = SYSDATE()
+        <if test="item.updateTime==null">
+          update_time = SYSDATE(),
+        </if>
+        <if test="item.updateTime != null">
+          update_time = #{item.updateTime},
+        </if>
       </set>
       where class_id = #{item.classId}
     </foreach>

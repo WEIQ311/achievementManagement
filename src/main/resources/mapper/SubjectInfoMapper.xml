@@ -79,7 +79,10 @@
           subject_name = #{item.subjectName},
         </if>
         <if test="item.updateTime==null">
-          UPDATE_TIME = SYSDATE(),
+          update_time = SYSDATE(),
+        </if>
+        <if test="item.updateTime != null">
+          update_time = #{item.updateTime},
         </if>
       </set>
       where subject_id = #{item.subjectId}

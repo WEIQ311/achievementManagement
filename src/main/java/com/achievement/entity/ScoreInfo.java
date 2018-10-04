@@ -24,8 +24,9 @@ import java.util.Date;
 public class ScoreInfo implements Serializable {
   private static final long serialVersionUID = 311146311988636636L;
   /**
-   * 班级主键
+   * 班级ID
    */
+  @NotBlank(message = "班级ID不能为空!")
   private String classId;
   /**
    * 创建时间
@@ -39,7 +40,6 @@ public class ScoreInfo implements Serializable {
   /**
    * 主键
    */
-
   private String scoreId;
   /**
    * 成绩
@@ -50,6 +50,7 @@ public class ScoreInfo implements Serializable {
   /**
    * 学期ID
    */
+  @NotBlank(message = "学期ID不能为空!")
   private String semesterId;
   /**
    * 状态
@@ -63,7 +64,13 @@ public class ScoreInfo implements Serializable {
   /**
    * 科目ID
    */
+  @NotBlank(message = "科目ID不能为空!")
   private String subjectId;
+  /**
+   * 教师ID
+   */
+  @NotBlank(message = "教师ID不能为空!")
+  private String teacherId;
   /**
    * 更新时间
    */

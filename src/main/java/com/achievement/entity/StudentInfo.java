@@ -1,5 +1,6 @@
 package com.achievement.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,6 +9,7 @@ import org.hibernate.validator.constraints.Length;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 学生
@@ -22,6 +24,15 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class StudentInfo implements Serializable {
   private static final long serialVersionUID = 4799337404652386960L;
+  /**
+   * 班级ID
+   */
+  private String classId;
+  /**
+   * 班级ID集合
+   */
+  @JsonIgnore
+  private List<String> classIds;
   /**
    * 创建时间
    */
@@ -48,13 +59,17 @@ public class StudentInfo implements Serializable {
   /**
    * 主键
    */
-
   private String studentId;
   /**
    * 学生姓名
    */
   @Length(max = 500, message = "学生姓名不能多于500个字符")
   private String studentName;
+  /**
+   * 学号
+   */
+  @Length(max = 500, message = "学生学号不能多于500个字符")
+  private String studentNum;
   /**
    * 电话号码
    */

@@ -17,6 +17,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -76,7 +77,17 @@ public class SchoolInfoServiceImpl implements SchoolInfoService {
     if (null == schoolInfoList || schoolInfoList.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
-    schoolInfoList.stream().forEach(schoolInfo -> schoolInfo.setScId("sc_" + GloabalUtils.ordinaryId()));
+    Map<String, SchoolInfo> schoolInfoMap = convertRecordToMap(SchoolInfo.builder().build());
+    schoolInfoList.stream().forEach(schoolInfo -> {
+      String name = schoolInfo.getName();
+      long doubleCount = schoolInfoMap.values().stream()
+          .filter(info -> Objects.equals(name, info.getName()))
+          .count();
+      if (doubleCount > 0) {
+        GloabalUtils.convertMessage(GlobalEnum.SchoolNameInUsed, name);
+      }
+      schoolInfo.setScId("sc_" + GloabalUtils.ordinaryId());
+    });
     Integer insertCount = schoolInfoMapper.insert(schoolInfoList);
     if (insertCount > 0) {
       return ResultUtil.success(GlobalEnum.InsertSuccess, schoolInfoList);
@@ -124,6 +135,20 @@ public class SchoolInfoServiceImpl implements SchoolInfoService {
     if (null == schoolInfoList || schoolInfoList.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
+    Map<String, SchoolInfo> schoolInfoMap = convertRecordToMap(SchoolInfo.builder().build());
+    schoolInfoList.stream().forEach(schoolInfo -> {
+      String scId = schoolInfo.getScId();
+      String name = schoolInfo.getName();
+      if (StringUtils.isBlank(scId)) {
+        GloabalUtils.convertMessage(GlobalEnum.PkIdEmpty);
+      }
+      long doubleCount = schoolInfoMap.values().stream()
+          .filter(info -> Objects.equals(name, info.getName()) && !Objects.equals(scId, info.getScId()))
+          .count();
+      if (doubleCount > 0) {
+        GloabalUtils.convertMessage(GlobalEnum.SchoolNameInUsed, name);
+      }
+    });
     Integer updateCount = schoolInfoMapper.update(schoolInfoList);
     if (updateCount > 0) {
       return ResultUtil.success(GlobalEnum.UpdateSuccess, schoolInfoList);

@@ -56,7 +56,7 @@
     VALUES
     <foreach collection="list" item="item" index="index" separator=",">
       (
-      #{item.scId}, #{item.insertTime}, #{item.name}, #{item.remark}, #{item.status}, #{item.updateTime} )
+      #{item.scId}, SYSDATE(), #{item.name}, #{item.remark}, #{item.status}, SYSDATE() )
     </foreach>
   </insert>
 
@@ -76,7 +76,12 @@
         <if test="item.status != null">
           status = #{item.status},
         </if>
-        update_time = SYSDATE()
+        <if test="item.updateTime==null">
+          update_time = SYSDATE(),
+        </if>
+        <if test="item.updateTime != null">
+          update_time = #{item.updateTime},
+        </if>
       </set>
       where sc_id = #{item.scId}
     </foreach>

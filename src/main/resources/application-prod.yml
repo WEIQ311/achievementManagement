@@ -18,3 +18,9 @@ mybatis:
   check-config-location: true
   config-location: classpath:mybatis/mybatis-config.xml
 
+achievement:
+  delete:
+    #    删除成绩
+    score: false
+
+

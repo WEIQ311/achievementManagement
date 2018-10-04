@@ -124,6 +124,12 @@ public class ParentInfoServiceImpl implements ParentInfoService {
     if (null == parentInfoList || parentInfoList.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
+    parentInfoList.stream().forEach(parentInfo -> {
+      String parentId = parentInfo.getParentId();
+      if (StringUtils.isBlank(parentId)) {
+        GloabalUtils.convertMessage(GlobalEnum.PkIdEmpty);
+      }
+    });
     Integer updateCount = parentInfoMapper.update(parentInfoList);
     if (updateCount > 0) {
       return ResultUtil.success(GlobalEnum.UpdateSuccess, parentInfoList);

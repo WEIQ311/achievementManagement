@@ -1,5 +1,6 @@
 package com.achievement;
 
+import com.achievement.service.StudentInfoService;
 import com.achievement.service.SubjectInfoService;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,4 +18,6 @@ public abstract class BaseTest {
 
   @Resource
   public SubjectInfoService subjectInfoService;
+  @Resource
+  public StudentInfoService studentInfoService;
 }

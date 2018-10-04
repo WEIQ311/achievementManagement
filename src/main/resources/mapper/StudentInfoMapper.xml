@@ -4,27 +4,29 @@
 
   <resultMap type="com.achievement.entity.StudentInfo" id="StudentInfoMap">
     <result property="studentId" column="student_id" jdbcType="VARCHAR"/>
-    <result property="insertTime" column="insert_time" jdbcType="TIMESTAMP"/>
-    <result property="phoneUrl" column="phone_url" jdbcType="VARCHAR"/>
-    <result property="remark" column="remark" jdbcType="VARCHAR"/>
-    <result property="sex" column="sex" jdbcType="VARCHAR"/>
-    <result property="status" column="status" jdbcType="INTEGER"/>
+    <result property="classId" column="class_id" jdbcType="VARCHAR"/>
+    <result property="studentNum" column="student_num" jdbcType="VARCHAR"/>
     <result property="studentName" column="student_name" jdbcType="VARCHAR"/>
+    <result property="phoneUrl" column="phone_url" jdbcType="VARCHAR"/>
+    <result property="sex" column="sex" jdbcType="VARCHAR"/>
     <result property="telPhone" column="tel_phone" jdbcType="VARCHAR"/>
     <result property="txQq" column="tx_qq" jdbcType="VARCHAR"/>
     <result property="txWx" column="tx_wx" jdbcType="VARCHAR"/>
-    <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
     <result property="xlWb" column="xl_wb" jdbcType="VARCHAR"/>
+    <result property="remark" column="remark" jdbcType="VARCHAR"/>
+    <result property="status" column="status" jdbcType="INTEGER"/>
+    <result property="insertTime" column="insert_time" jdbcType="TIMESTAMP"/>
+    <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
   </resultMap>
 
   <!--列集合-->
   <sql id="BASE_COLUMN">
-      student_id, insert_time, phone_url, remark, sex, status, student_name, tel_phone, tx_qq, tx_wx, update_time, xl_wb    </sql>
+      STUDENT_ID, INSERT_TIME, PHONE_URL, REMARK, SEX, STATUS, STUDENT_NAME, TEL_PHONE, TX_QQ, TX_WX, UPDATE_TIME, XL_WB,CLASS_ID,STUDENT_NUM
+   </sql>
   <!--表名-->
   <sql id="BASE_TABLE">
 		achievement.student_info
 	</sql>
-
 
   <!--通过实体作为筛选条件查询-->
   <select id="list" resultMap="StudentInfoMap">
@@ -69,6 +71,18 @@
       <if test="xlWb != null and xlWb != ''">
         and xl_wb = #{xlWb}
       </if>
+      <if test="classId != null and classId != ''">
+        and class_id = #{classId}
+      </if>
+      <if test="studentNum != null and studentNum != ''">
+        and student_num = #{studentNum}
+      </if>
+      <if test="classIds !=null and classIds.size>0 ">
+        and class_id in
+        <foreach collection="classIds" item="classId" index="no" open="(" separator="," close=")">
+          #{classId}
+        </foreach>
+      </if>
     </where>
   </select>
 
@@ -80,8 +94,10 @@
     VALUES
     <foreach collection="list" item="item" index="index" separator=",">
       (
-      #{item.studentId}, #{item.insertTime}, #{item.phoneUrl}, #{item.remark}, #{item.sex}, #{item.status},
-      #{item.studentName}, #{item.telPhone}, #{item.txQq}, #{item.txWx}, #{item.updateTime}, #{item.xlWb} )
+      #{item.studentId}, SYSDATE(), #{item.phoneUrl}, #{item.remark}, #{item.sex}, #{item.status},
+      #{item.studentName}, #{item.telPhone}, #{item.txQq}, #{item.txWx}, SYSDATE(), #{item.xlWb},
+      #{item.classId},#{item.studentNum}
+      )
     </foreach>
   </insert>
 
@@ -120,9 +136,20 @@
           tx_wx = #{item.txWx},
         </if>
         <if test="item.xlWb != null and item.xlWb != ''">
-          xl_wb = #{item.xlWb}
+          xl_wb = #{item.xlWb},
         </if>
-        update_time = SYSDATE(),
+        <if test="item.classId != null and item.classId != ''">
+          class_id = #{item.classId},
+        </if>
+        <if test="item.studentNum != null and item.studentNum != ''">
+          student_num = #{item.studentNum},
+        </if>
+        <if test="item.updateTime==null">
+          update_time = SYSDATE(),
+        </if>
+        <if test="item.updateTime != null">
+          update_time = #{item.updateTime},
+        </if>
       </set>
       where student_id = #{studentId}
     </foreach>

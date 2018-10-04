@@ -4,6 +4,7 @@
 
   <resultMap type="com.achievement.entity.TeacherInfo" id="TeacherInfoMap">
     <result property="teacherId" column="teacher_id" jdbcType="VARCHAR"/>
+    <result property="teacherNum" column="teacher_num" jdbcType="VARCHAR"/>
     <result property="insertTime" column="insert_time" jdbcType="TIMESTAMP"/>
     <result property="phoneUrl" column="phone_url" jdbcType="VARCHAR"/>
     <result property="remark" column="remark" jdbcType="VARCHAR"/>
@@ -19,7 +20,8 @@
 
   <!--列集合-->
   <sql id="BASE_COLUMN">
-      teacher_id, insert_time, phone_url, remark, sex, status, teacher_name, tel_phone, tx_qq, tx_wx, update_time, xl_wb    </sql>
+      teacher_id,teacher_num, insert_time, phone_url, remark, sex, status, teacher_name, tel_phone, tx_qq, tx_wx, update_time, xl_wb
+  </sql>
   <!--表名-->
   <sql id="BASE_TABLE">
 		achievement.teacher_info
@@ -69,6 +71,9 @@
       <if test="xlWb != null and xlWb != ''">
         and xl_wb = #{xlWb}
       </if>
+      <if test="teacherNum != null and teacherNum != ''">
+        and teacher_num = #{teacherNum}
+      </if>
     </where>
   </select>
 
@@ -80,8 +85,9 @@
     VALUES
     <foreach collection="list" item="item" index="index" separator=",">
       (
-      #{item.teacherId}, #{item.insertTime}, #{item.phoneUrl}, #{item.remark}, #{item.sex}, #{item.status},
-      #{item.teacherName}, #{item.telPhone}, #{item.txQq}, #{item.txWx}, #{item.updateTime}, #{item.xlWb} )
+      #{item.teacherId},#{item.teacherNum}, SYSDATE(), #{item.phoneUrl}, #{item.remark}, #{item.sex},
+      #{item.status},
+      #{item.teacherName}, #{item.telPhone}, #{item.txQq}, #{item.txWx}, SYSDATE(), #{item.xlWb} )
     </foreach>
   </insert>
 
@@ -120,9 +126,17 @@
           tx_wx = #{item.txWx},
         </if>
         <if test="item.xlWb != null and item.xlWb != ''">
-          xl_wb = #{item.xlWb}
+          xl_wb = #{item.xlWb},
         </if>
-        update_time = SYSDATE(),
+        <if test="item.teacherNum != null and item.teacherNum != ''">
+          teacher_num = #{item.teacherNum},
+        </if>
+        <if test="item.updateTime==null">
+          update_time = SYSDATE(),
+        </if>
+        <if test="item.updateTime != null">
+          update_time = #{item.updateTime},
+        </if>
       </set>
       where teacher_id = #{item.teacherId}
     </foreach>

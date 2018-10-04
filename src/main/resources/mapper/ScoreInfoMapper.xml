@@ -12,12 +12,13 @@
     <result property="status" column="status" jdbcType="INTEGER"/>
     <result property="studentId" column="student_id" jdbcType="VARCHAR"/>
     <result property="subjectId" column="subject_id" jdbcType="VARCHAR"/>
+    <result property="teacherId" column="teacher_id" jdbcType="VARCHAR"/>
     <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
   </resultMap>
 
   <!--列集合-->
   <sql id="BASE_COLUMN">
-      score_id, class_id, insert_time, remark, score_number, semester_id, status, student_id, subject_id, update_time    </sql>
+      score_id, class_id, teacher_id,insert_time, remark, score_number, semester_id, status, student_id, subject_id, update_time    </sql>
   <!--表名-->
   <sql id="BASE_TABLE">
 		achievement.score_info
@@ -58,6 +59,9 @@
       <if test="subjectId != null and subjectId != ''">
         and subject_id = #{subjectId}
       </if>
+      <if test="teacherId != null and teacherId != ''">
+        and teacher_id = #{teacherId}
+      </if>
       <if test="updateTime != null">
         and update_time = #{updateTime}
       </if>
@@ -72,8 +76,8 @@
     VALUES
     <foreach collection="list" item="item" index="index" separator=",">
       (
-      #{item.scoreId}, #{item.classId}, #{item.insertTime}, #{item.remark}, #{item.scoreNumber}, #{item.semesterId},
-      #{item.status}, #{item.studentId}, #{item.subjectId}, #{item.updateTime} )
+      #{item.scoreId}, #{item.classId},#{item.teacherId},SYSDATE(), #{item.remark}, #{item.scoreNumber},
+      #{item.semesterId}, #{item.status}, #{item.studentId}, #{item.subjectId}, SYSDATE() )
     </foreach>
   </insert>
 
@@ -105,7 +109,15 @@
         <if test="item.subjectId != null and item.subjectId != ''">
           subject_id = #{item.subjectId},
         </if>
-        update_time = SYSDATE()
+        <if test="item.teacherId != null and item.teacherId != ''">
+          teacher_id = #{item.teacherId},
+        </if>
+        <if test="item.updateTime==null">
+          update_time = SYSDATE(),
+        </if>
+        <if test="item.updateTime != null">
+          update_time = #{item.updateTime},
+        </if>
       </set>
       where score_id = #{item.scoreId}
     </foreach>

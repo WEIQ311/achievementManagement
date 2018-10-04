@@ -1,8 +1,10 @@
 package com.achievement.service.impl;
 
+import com.achievement.entity.ClassInfo;
 import com.achievement.entity.GradeInfo;
 import com.achievement.enums.GlobalEnum;
 import com.achievement.mapper.GradeInfoMapper;
+import com.achievement.service.ClassInfoService;
 import com.achievement.service.GradeInfoService;
 import com.achievement.utils.GloabalUtils;
 import com.achievement.utils.ResultUtil;
@@ -10,6 +12,7 @@ import com.achievement.vo.ResultEntity;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +20,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -28,6 +32,8 @@ import java.util.stream.Collectors;
  */
 @Service("gradeInfoService")
 public class GradeInfoServiceImpl implements GradeInfoService {
+  @Autowired
+  private ClassInfoService classInfoService;
   @Resource
   private GradeInfoMapper gradeInfoMapper;
 
@@ -57,6 +63,10 @@ public class GradeInfoServiceImpl implements GradeInfoService {
     if (null == gradeIds || gradeIds.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
+    Map<String, ClassInfo> classInfoMap = classInfoService.convertRecordToMap(ClassInfo.builder().gradeIds(gradeIds).build());
+    if (null != classInfoMap && classInfoMap.size() > 0) {
+      GloabalUtils.convertMessage(GlobalEnum.GradeNameInClass);
+    }
     List<GradeInfo> gradeInfoList = new ArrayList<GradeInfo>() {{
       gradeIds.forEach(gradeId -> GradeInfo.builder().gradeId(gradeId).build());
     }};
@@ -76,7 +86,16 @@ public class GradeInfoServiceImpl implements GradeInfoService {
     if (null == gradeInfoList || gradeInfoList.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
-    gradeInfoList.stream().forEach(gradeInfo -> gradeInfo.setGradeId("grade_" + GloabalUtils.ordinaryId()));
+    Map<String, GradeInfo> gradeInfoMap = convertRecordToMap(GradeInfo.builder().build()).values().stream()
+        .filter(gradeInfo -> StringUtils.isNotBlank(gradeInfo.getGradeName()))
+        .collect(Collectors.toMap(GradeInfo::getGradeName, Function.identity(), (oldValue, newValue) -> newValue));
+    gradeInfoList.stream().forEach(gradeInfo -> {
+      String gradeName = gradeInfo.getGradeName();
+      if (gradeInfoMap.containsKey(gradeName)) {
+        GloabalUtils.convertMessage(GlobalEnum.GradeNameInUsed, gradeName);
+      }
+      gradeInfo.setGradeId("grade_" + GloabalUtils.ordinaryId());
+    });
     Integer insertCount = gradeInfoMapper.insert(gradeInfoList);
     if (insertCount > 0) {
       return ResultUtil.success(GlobalEnum.InsertSuccess, gradeInfoList);
@@ -124,6 +143,19 @@ public class GradeInfoServiceImpl implements GradeInfoService {
     if (null == gradeInfoList || gradeInfoList.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
+    Map<String, GradeInfo> gradeInfoMap = convertRecordToMap(GradeInfo.builder().build()).values().stream()
+        .filter(gradeInfo -> StringUtils.isNotBlank(gradeInfo.getGradeName()))
+        .collect(Collectors.toMap(GradeInfo::getGradeName, Function.identity(), (oldValue, newValue) -> newValue));
+    gradeInfoList.stream().forEach(gradeInfo -> {
+      String gradeId = gradeInfo.getGradeId();
+      if (StringUtils.isBlank(gradeId)) {
+        GloabalUtils.convertMessage(GlobalEnum.PkIdEmpty);
+      }
+      String gradeName = gradeInfo.getGradeName();
+      if (gradeInfoMap.containsKey(gradeName) && !Objects.equals(gradeId, gradeInfoMap.get(gradeName).getGradeId())) {
+        GloabalUtils.convertMessage(GlobalEnum.GradeNameInUsed, gradeName);
+      }
+    });
     Integer updateCount = gradeInfoMapper.update(gradeInfoList);
     if (updateCount > 0) {
       return ResultUtil.success(GlobalEnum.UpdateSuccess, gradeInfoList);

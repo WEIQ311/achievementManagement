@@ -17,6 +17,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -76,7 +77,17 @@ public class TeacherInfoServiceImpl implements TeacherInfoService {
     if (null == teacherInfoList || teacherInfoList.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
-    teacherInfoList.stream().forEach(teacherInfo -> teacherInfo.setTeacherId("teacher_" + GloabalUtils.ordinaryId()));
+    Map<String, TeacherInfo> teacherInfoMap = convertRecordToMap(TeacherInfo.builder().build()).values().stream()
+        .filter(info -> StringUtils.isNotBlank(info.getTeacherNum()))
+        .collect(Collectors.toMap(TeacherInfo::getTeacherNum, Function.identity(), (oldValue, newValue) -> newValue));
+    teacherInfoList.stream().forEach(teacherInfo -> {
+      String teacherNum = teacherInfo.getTeacherNum();
+      if (teacherInfoMap.containsKey(teacherNum)) {
+        String teacherName = teacherInfoMap.get(teacherNum).getTeacherName();
+        GloabalUtils.convertMessage(GlobalEnum.TeacherNumInUsed, teacherName, teacherNum);
+      }
+      teacherInfo.setTeacherId("teacher_" + GloabalUtils.ordinaryId());
+    });
     Integer insertCount = teacherInfoMapper.insert(teacherInfoList);
     if (insertCount > 0) {
       return ResultUtil.success(GlobalEnum.InsertSuccess, teacherInfoList);
@@ -124,6 +135,20 @@ public class TeacherInfoServiceImpl implements TeacherInfoService {
     if (null == teacherInfoList || teacherInfoList.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
+    Map<String, TeacherInfo> teacherInfoMap = convertRecordToMap(TeacherInfo.builder().build()).values().stream()
+        .filter(info -> StringUtils.isNotBlank(info.getTeacherNum()))
+        .collect(Collectors.toMap(TeacherInfo::getTeacherNum, Function.identity(), (oldValue, newValue) -> newValue));
+    teacherInfoList.stream().forEach(teacherInfo -> {
+      String teacherId = teacherInfo.getTeacherId();
+      if (StringUtils.isBlank(teacherId)) {
+        GloabalUtils.convertMessage(GlobalEnum.PkIdEmpty);
+      }
+      String teacherNum = teacherInfo.getTeacherNum();
+      if (teacherInfoMap.containsKey(teacherNum) && !Objects.equals(teacherId, teacherInfoMap.get(teacherNum).getTeacherId())) {
+        String teacherName = teacherInfoMap.get(teacherNum).getTeacherName();
+        GloabalUtils.convertMessage(GlobalEnum.TeacherNumInUsed, teacherName, teacherNum);
+      }
+    });
     Integer updateCount = teacherInfoMapper.update(teacherInfoList);
     if (updateCount > 0) {
       return ResultUtil.success(GlobalEnum.UpdateSuccess, teacherInfoList);

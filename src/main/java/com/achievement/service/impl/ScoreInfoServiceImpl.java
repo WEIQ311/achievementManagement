@@ -3,13 +3,15 @@ package com.achievement.service.impl;
 import com.achievement.entity.ScoreInfo;
 import com.achievement.enums.GlobalEnum;
 import com.achievement.mapper.ScoreInfoMapper;
-import com.achievement.service.ScoreInfoService;
+import com.achievement.service.*;
 import com.achievement.utils.GloabalUtils;
 import com.achievement.utils.ResultUtil;
 import com.achievement.vo.ResultEntity;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +32,19 @@ import java.util.stream.Collectors;
 public class ScoreInfoServiceImpl implements ScoreInfoService {
   @Resource
   private ScoreInfoMapper scoreInfoMapper;
+  @Value("${achievement.delete.score}")
+  private boolean deleteScore;
+
+  @Autowired
+  private ClassInfoService classInfoService;
+  @Autowired
+  private StudentInfoService studentInfoService;
+  @Autowired
+  private SubjectInfoService subjectInfoService;
+  @Autowired
+  private TeacherInfoService teacherInfoService;
+  @Autowired
+  private SemesterInfoService semesterInfoService;
 
   /**
    * 成绩(ScoreInfo)信息Map
@@ -56,6 +71,9 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
   public ResultEntity delete(List<String> scoreIds) {
     if (null == scoreIds || scoreIds.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
+    }
+    if (!deleteScore) {
+      return ResultUtil.error(GlobalEnum.DeleteNoSupport);
     }
     List<ScoreInfo> scoreInfoList = new ArrayList<ScoreInfo>() {{
       scoreIds.forEach(scoreId -> {

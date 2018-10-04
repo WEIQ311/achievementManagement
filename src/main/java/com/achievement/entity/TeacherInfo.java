@@ -48,12 +48,17 @@ public class TeacherInfo implements Serializable {
   /**
    * 主键
    */
-
   private String teacherId;
+
+  /**
+   * 教师编号
+   */
+  @Length(max = 500, message = "教师编号不能多于500个字符")
+  private String teacherNum;
   /**
    * 教师名称
    */
-  @Length(max = 500, message = "教师名称不能多于4000个字符")
+  @Length(max = 500, message = "教师名称不能多于500个字符")
   private String teacherName;
   /**
    * 电话号码

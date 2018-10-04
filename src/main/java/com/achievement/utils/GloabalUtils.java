@@ -1,5 +1,6 @@
 package com.achievement.utils;
 
+import com.achievement.enums.GlobalEnum;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 
@@ -8,40 +9,33 @@ import java.io.File;
 import java.util.Date;
 import java.util.Properties;
 
+import static com.achievement.constants.GlobalConstants.*;
+
 /**
  * @author weiQiang
  */
 public class GloabalUtils {
+  /**
+   * 转换异常信息
+   *
+   * @param globalEnum 异常提示
+   * @param args       参数
+   */
+  public static void convertMessage(GlobalEnum globalEnum, String... args) {
+    String message = globalEnum.getMessage();
+    convertMessage(message, args);
+  }
 
   /**
-   * linux
+   * 转换异常信息
+   *
+   * @param message 异常提示
+   * @param args    参数
    */
-  public static final String LINUX_NAME = "linux";
-  /**
-   * ok
-   */
-  public static final String OK = "OK";
-  /**
-   * 问号
-   */
-  public static final String QUERY_MARK = "?";
-  /**
-   * 常量:未知
-   */
-  public static final String UNKNOWN = "unknown";
-  /**
-   * xml请求
-   */
-  public static final String XML_HTTP_REQUEST = "XMLHttpRequest";
-  /**
-   * 请求类型
-   */
-  public static final String X_REQUESTED_WIDTH = "X-Requested-With";
-
-  /**
-   * 格式化时间格式
-   */
-  private static final String DATE_TIME_FORMATTER = "yyyyMMddHHmmss";
+  public static void convertMessage(String message, String... args) {
+    message = String.format(message, args);
+    throw new RuntimeException(message);
+  }
 
   /**
    * 创建目录

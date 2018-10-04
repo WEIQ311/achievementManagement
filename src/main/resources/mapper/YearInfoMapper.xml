@@ -6,14 +6,15 @@
     <result property="yearId" column="year_id" jdbcType="VARCHAR"/>
     <result property="insertTime" column="insert_time" jdbcType="TIMESTAMP"/>
     <result property="remark" column="remark" jdbcType="VARCHAR"/>
-    <result property="semesterName" column="semester_name" jdbcType="VARCHAR"/>
+    <result property="yearName" column="year_name" jdbcType="VARCHAR"/>
     <result property="status" column="status" jdbcType="INTEGER"/>
     <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
   </resultMap>
 
   <!--列集合-->
   <sql id="BASE_COLUMN">
-      year_id, insert_time, remark, semester_name, status, update_time    </sql>
+      year_id, insert_time, remark, year_name, status, update_time
+   </sql>
   <!--表名-->
   <sql id="BASE_TABLE">
 		achievement.year_info
@@ -36,8 +37,8 @@
       <if test="remark != null and remark != ''">
         and remark = #{remark}
       </if>
-      <if test="semesterName != null and semesterName != ''">
-        and semester_name = #{semesterName}
+      <if test="yearName != null and yearName != ''">
+        and year_name = #{yearName}
       </if>
       <if test="status != null">
         and status = #{status}
@@ -56,7 +57,7 @@
     VALUES
     <foreach collection="list" item="item" index="index" separator=",">
       (
-      #{item.yearId}, #{item.insertTime}, #{item.remark}, #{item.semesterName}, #{item.status}, #{item.updateTime} )
+      #{item.yearId}, SYSDATE(), #{item.remark}, #{item.yearName}, #{item.status}, SYSDATE() )
     </foreach>
   </insert>
 
@@ -70,13 +71,18 @@
         <if test="item.remark != null and item.remark != ''">
           remark = #{item.remark},
         </if>
-        <if test="item.semesterName != null and item.semesterName != ''">
-          semester_name = #{item.semesterName},
+        <if test="item.yearName != null and item.yearName != ''">
+          year_name = #{item.yearName},
         </if>
         <if test="item.status != null">
           status = #{item.status},
         </if>
-        update_time = SYSDATE()
+        <if test="item.updateTime==null">
+          update_time = SYSDATE(),
+        </if>
+        <if test="item.updateTime != null">
+          update_time = #{item.updateTime},
+        </if>
       </set>
       where year_id = #{item.yearId}
     </foreach>

@@ -10,13 +10,14 @@ import com.achievement.vo.ResultEntity;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
  */
 @Service("studentInfoService")
 public class StudentInfoServiceImpl implements StudentInfoService {
-  @Autowired
+  @Resource
   private StudentInfoMapper studentInfoMapper;
 
   /**
@@ -78,7 +79,19 @@ public class StudentInfoServiceImpl implements StudentInfoService {
     if (null == studentInfoList || studentInfoList.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
-    studentInfoList.stream().forEach(studentInfo -> studentInfo.setStudentId("student_" + GloabalUtils.ordinaryId()));
+
+    Map<String, StudentInfo> studentInfoMap = convertRecordToMap(StudentInfo.builder().build()).values().stream()
+        .filter(info -> StringUtils.isNotBlank(info.getStudentNum()))
+        .collect(Collectors.toMap(StudentInfo::getStudentNum, Function.identity(), (oldValue, newValue) -> newValue));
+    studentInfoList.stream().forEach(studentInfo -> {
+      String studentNum = studentInfo.getStudentNum();
+      if (studentInfoMap.containsKey(studentNum)) {
+        String studentName = studentInfoMap.get(studentNum).getStudentName();
+        GloabalUtils.convertMessage(GlobalEnum.TeacherNumInUsed, studentName, studentNum);
+      }
+      studentInfo.setStudentId("student_" + GloabalUtils.ordinaryId());
+    });
+
     Integer insertCount = studentInfoMapper.insert(studentInfoList);
     if (insertCount > 0) {
       return ResultUtil.success(GlobalEnum.InsertSuccess, studentInfoList);
@@ -126,6 +139,20 @@ public class StudentInfoServiceImpl implements StudentInfoService {
     if (null == studentInfoList || studentInfoList.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
+    Map<String, StudentInfo> studentInfoMap = convertRecordToMap(StudentInfo.builder().build()).values().stream()
+        .filter(info -> StringUtils.isNotBlank(info.getStudentNum()))
+        .collect(Collectors.toMap(StudentInfo::getStudentNum, Function.identity(), (oldValue, newValue) -> newValue));
+    studentInfoList.stream().forEach(studentInfo -> {
+      String studentId = studentInfo.getStudentId();
+      if (StringUtils.isBlank(studentId)) {
+        GloabalUtils.convertMessage(GlobalEnum.PkIdEmpty);
+      }
+      String studentNum = studentInfo.getStudentNum();
+      if (studentInfoMap.containsKey(studentNum) && !Objects.equals(studentId, studentInfoMap.get(studentNum).getStudentId())) {
+        String studentName = studentInfoMap.get(studentNum).getStudentName();
+        GloabalUtils.convertMessage(GlobalEnum.TeacherNumInUsed, studentName, studentNum);
+      }
+    });
     Integer updateCount = studentInfoMapper.update(studentInfoList);
     if (updateCount > 0) {
       return ResultUtil.success(GlobalEnum.UpdateSuccess, studentInfoList);
