@@ -94,11 +94,11 @@
       <scope>test</scope>
     </dependency>
     <!--druid-->
-   <!-- <dependency>
-      <groupId>com.alibaba</groupId>
-      <artifactId>druid</artifactId>
-      <version>${druid.version}</version>
-    </dependency>-->
+    <!-- <dependency>
+       <groupId>com.alibaba</groupId>
+       <artifactId>druid</artifactId>
+       <version>${druid.version}</version>
+     </dependency>-->
     <!--fastjson-->
     <dependency>
       <groupId>com.alibaba</groupId>
