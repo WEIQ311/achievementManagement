@@ -176,6 +176,15 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
     Map<String, SubjectInfo> subjectInfoMap = subjectInfoService.convertRecordToMap(SubjectInfo.builder().build());
     Map<String, TeacherInfo> teacherInfoMap = teacherInfoService.convertRecordToMap(TeacherInfo.builder().build());
     Map<String, SemesterInfo> semesterInfoMap = semesterInfoService.convertRecordToMap(SemesterInfo.builder().build());
+    List<ScoreInfo> scoreInfos = scoreInfoMapper.list(ScoreInfo.builder().build());
+    Map<String, ScoreInfo> scoreInfoMap = scoreInfos.stream().collect(Collectors.toMap(scoreInfo -> {
+      String classId = scoreInfo.getClassId();
+      String studentId = scoreInfo.getStudentId();
+      String subjectId = scoreInfo.getSubjectId();
+      String semesterId = scoreInfo.getSemesterId();
+      String key = semesterId + INTERVAL_NUMBER + classId + INTERVAL_NUMBER + subjectId + INTERVAL_NUMBER + studentId;
+      return key;
+    }, Function.identity(), (oldValue, newValue) -> newValue));
     scoreInfoList.stream().forEach(scoreInfo -> {
       String classId = scoreInfo.getClassId();
       String studentId = scoreInfo.getStudentId();
@@ -213,6 +222,12 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
         GloabalUtils.convertMessage(GlobalEnum.SemesterInfoEmpty, semesterId);
       }
       if (Objects.equals(OPERATE_TYPE_INSERT, operateType)) {
+        String key = semesterId + INTERVAL_NUMBER + classId + INTERVAL_NUMBER + subjectId + INTERVAL_NUMBER + studentId;
+        if (scoreInfoMap.containsKey(key)) {
+          String studentName = studentInfoMap.get(studentId).getStudentName();
+          String subjectName = subjectInfoMap.get(subjectId).getSubjectName();
+          GloabalUtils.convertMessage(GlobalEnum.ScoreInfoHasInUsed, studentName, subjectName);
+        }
         scoreInfo.setScoreId("score_" + GloabalUtils.ordinaryId());
       } else {
         String scoreId = scoreInfo.getScoreId();
