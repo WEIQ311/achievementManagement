@@ -91,7 +91,7 @@ public class TeacherInfoController {
    * @param teacherInfo 查询参数
    * @return ResultEntity
    */
-  @RequestMapping(value = "list", method = RequestMethod.GET)
+  @RequestMapping(value = {"", "list"}, method = RequestMethod.GET)
   public ResultEntity list(TeacherInfo teacherInfo) {
     return teacherInfoService.list(teacherInfo);
   }

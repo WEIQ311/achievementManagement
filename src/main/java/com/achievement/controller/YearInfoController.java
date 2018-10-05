@@ -91,7 +91,7 @@ public class YearInfoController {
    * @param yearInfo 查询参数
    * @return ResultEntity
    */
-  @RequestMapping(value = "list", method = RequestMethod.GET)
+  @RequestMapping(value = {"", "list"}, method = RequestMethod.GET)
   public ResultEntity list(YearInfo yearInfo) {
     return yearInfoService.list(yearInfo);
   }

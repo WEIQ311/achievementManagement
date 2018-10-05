@@ -32,7 +32,8 @@ public class ParentInfoController {
   /**
    * 根据主键集合删除家长(ParentInfo)
    *
-   * @param objectInfo 主键集合
+   * @param objectInfo    主键集合
+   * @param bindingResult 参数绑定校验
    * @return ResultEntity
    */
   @RequestMapping(value = "deleteByIds", method = RequestMethod.POST)
@@ -91,7 +92,7 @@ public class ParentInfoController {
    * @param parentInfo 查询参数
    * @return ResultEntity
    */
-  @RequestMapping(value = "list", method = RequestMethod.GET)
+  @RequestMapping(value = {"", "list"}, method = RequestMethod.GET)
   public ResultEntity list(ParentInfo parentInfo) {
     return parentInfoService.list(parentInfo);
   }

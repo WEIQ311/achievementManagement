@@ -91,7 +91,7 @@ public class SemesterInfoController {
    * @param semesterInfo 查询参数
    * @return ResultEntity
    */
-  @RequestMapping(value = "list", method = RequestMethod.GET)
+  @RequestMapping(value = {"", "list"}, method = RequestMethod.GET)
   public ResultEntity list(SemesterInfo semesterInfo) {
     return semesterInfoService.list(semesterInfo);
   }

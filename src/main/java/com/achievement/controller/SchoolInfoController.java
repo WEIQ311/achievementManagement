@@ -91,7 +91,7 @@ public class SchoolInfoController {
    * @param schoolInfo 查询参数
    * @return ResultEntity
    */
-  @RequestMapping(value = "list", method = RequestMethod.GET)
+  @RequestMapping(value = {"", "list"}, method = RequestMethod.GET)
   public ResultEntity list(SchoolInfo schoolInfo) {
     return schoolInfoService.list(schoolInfo);
   }

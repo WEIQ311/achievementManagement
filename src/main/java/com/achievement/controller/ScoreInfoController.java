@@ -105,7 +105,7 @@ public class ScoreInfoController {
    * @param scoreInfo 查询参数
    * @return ResultEntity
    */
-  @RequestMapping(value = "list", method = RequestMethod.GET)
+  @RequestMapping(value = {"", "list"}, method = RequestMethod.GET)
   public ResultEntity list(ScoreInfo scoreInfo) {
     return scoreInfoService.list(scoreInfo);
   }

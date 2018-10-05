@@ -92,7 +92,7 @@ public class SubjectInfoController {
    * @param subjectInfo 查询参数
    * @return ResultEntity
    */
-  @RequestMapping(value = "list", method = RequestMethod.GET)
+  @RequestMapping(value = {"", "list"}, method = RequestMethod.GET)
   public ResultEntity list(SubjectInfo subjectInfo) {
     return subjectInfoService.list(subjectInfo);
   }
