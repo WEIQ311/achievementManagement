@@ -12,9 +12,25 @@ public class GlobalConstants {
    */
   public static final String DATE_TIME_FORMATTER = "yyyyMMddHHmmss";
   /**
+   * EXCEL首行数据
+   */
+  public static final String[] EXCEL_HEADER_TITLE = {"学生", "成绩"};
+  /**
+   * EXCEL类型
+   */
+  public static final String EXCEL_TYPE_XLS = "xls";
+  /**
+   * EXCEL类型
+   */
+  public static final String EXCEL_TYPE_XLSX = "xlsx";
+  /**
    * 间隔号
    */
   public static final String INTERVAL_NUMBER = "`";
+  /**
+   * 点
+   */
+  public static final String INTERVAL_POINT = ".";
   /**
    * linux
    */
@@ -63,4 +79,6 @@ public class GlobalConstants {
    * 请求类型
    */
   public static final String X_REQUESTED_WIDTH = "X-Requested-With";
+
+
 }

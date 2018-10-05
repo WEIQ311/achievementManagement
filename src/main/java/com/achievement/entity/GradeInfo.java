@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -30,6 +31,7 @@ public class GradeInfo implements Serializable {
   /**
    * 年级名称
    */
+  @NotBlank(message = "年级名称不能为空!")
   @Length(max = 500, message = "年级不能多于500个字符")
   private String gradeName;
   /**

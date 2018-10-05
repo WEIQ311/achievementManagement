@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.Date;
 import java.util.Properties;
@@ -40,28 +41,6 @@ public class GloabalUtils {
       return columnBuilder.toString() + SPACE + direction;
     }
     return "";
-  }
-
-  /**
-   * 转换异常信息
-   *
-   * @param globalEnum 异常提示
-   * @param args       参数
-   */
-  public static void convertMessage(GlobalEnum globalEnum, String... args) {
-    String message = globalEnum.getMessage();
-    convertMessage(message, args);
-  }
-
-  /**
-   * 转换异常信息
-   *
-   * @param message 异常提示
-   * @param args    参数
-   */
-  public static void convertMessage(String message, String... args) {
-    message = String.format(message, args);
-    throw new RuntimeException(message);
   }
 
   /**
@@ -167,5 +146,45 @@ public class GloabalUtils {
    */
   public synchronized static String ordinaryId(Integer count) {
     return DateFormatUtils.format(new Date(), DATE_TIME_FORMATTER) + RandomStringUtils.randomNumeric(count);
+  }
+
+  /**
+   * 发送响应流方法
+   *
+   * @param response 响应
+   * @param fileName 文件名称
+   */
+  public static void setResponseHeader(HttpServletResponse response, String fileName) {
+    try {
+      fileName = new String(fileName.getBytes(), "ISO8859-1");
+      response.setContentType("application/octet-stream;charset=ISO8859-1");
+      response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+      response.addHeader("Pargam", "no-cache");
+      response.addHeader("Cache-Control", "no-cache");
+    } catch (Exception ex) {
+      GloabalUtils.convertMessage(GlobalEnum.ExceptionMessage, ex.getMessage());
+    }
+  }
+
+  /**
+   * 转换异常信息
+   *
+   * @param globalEnum 异常提示
+   * @param args       参数
+   */
+  public static void convertMessage(GlobalEnum globalEnum, String... args) {
+    String message = globalEnum.getMessage();
+    convertMessage(message, args);
+  }
+
+  /**
+   * 转换异常信息
+   *
+   * @param message 异常提示
+   * @param args    参数
+   */
+  public static void convertMessage(String message, String... args) {
+    message = String.format(message, args);
+    throw new RuntimeException(message);
   }
 }

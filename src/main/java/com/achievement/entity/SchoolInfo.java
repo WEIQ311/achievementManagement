@@ -17,7 +17,6 @@ import java.util.Date;
  * @date 2018/9/23
  */
 @Data
-
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
