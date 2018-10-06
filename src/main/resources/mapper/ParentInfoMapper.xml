@@ -55,9 +55,17 @@
       <if test="txWx != null and txWx != ''">
         and tx_wx = #{txWx}
       </if>
-      update_time = SYSDATE(),
+      <if test="updateTime != null ">
+        update_time = #{updateTime}
+      </if>
       <if test="xlWb != null and xlWb != ''">
         and xl_wb = #{xlWb}
+      </if>
+      <if test="parentIds != null and parentIds.size >0 ">
+        and parent_id in
+        <foreach collection="parentIds" item="parentId" index="no" open="(" separator="," close=")">
+          #{parentId}
+        </foreach>
       </if>
     </where>
   </select>

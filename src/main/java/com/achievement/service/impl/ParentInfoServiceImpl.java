@@ -1,15 +1,20 @@
 package com.achievement.service.impl;
 
+import com.achievement.entity.ConfStudentParent;
 import com.achievement.entity.ParentInfo;
+import com.achievement.entity.StudentInfo;
 import com.achievement.enums.GlobalEnum;
 import com.achievement.mapper.ParentInfoMapper;
+import com.achievement.service.ConfStudentParentService;
 import com.achievement.service.ParentInfoService;
+import com.achievement.service.StudentInfoService;
 import com.achievement.utils.GloabalUtils;
 import com.achievement.utils.ResultUtil;
 import com.achievement.vo.ResultEntity;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,8 +33,12 @@ import java.util.stream.Collectors;
  */
 @Service("parentInfoService")
 public class ParentInfoServiceImpl implements ParentInfoService {
+  @Autowired
+  private ConfStudentParentService confStudentParentService;
   @Resource
   private ParentInfoMapper parentInfoMapper;
+  @Autowired
+  private StudentInfoService studentInfoService;
 
   /**
    * 家长(ParentInfo)信息Map
@@ -95,9 +104,53 @@ public class ParentInfoServiceImpl implements ParentInfoService {
   @Override
   public ResultEntity list(ParentInfo parentInfo, int pageNum, int pageSize) {
     PageHelper.startPage(pageNum, pageSize);
-    List<ParentInfo> parentInfoPage = parentInfoMapper.list(parentInfo);
-    PageInfo pageInfo = new PageInfo(parentInfoPage);
+    List<ParentInfo> parentInfos = parentInfoMapper.list(parentInfo);
+    convertParentInfo(parentInfos);
+    PageInfo pageInfo = new PageInfo(parentInfos);
     return ResultUtil.success(GlobalEnum.QuerySuccess, pageInfo);
+  }
+
+  /**
+   * 转换请求结果
+   *
+   * @param parentInfos 家长信息
+   */
+  private void convertParentInfo(List<ParentInfo> parentInfos) {
+    if (null == parentInfos || parentInfos.size() < 1) {
+      return;
+    }
+    List<String> parentIds = parentInfos.stream().filter(studentInfo -> StringUtils.isNotBlank(studentInfo.getParentId()))
+        .map(ParentInfo::getParentId)
+        .collect(Collectors.toList());
+    Map<String, List<ConfStudentParent>> parentOfStudentMap = confStudentParentService.convertParentOfStudentMap(ConfStudentParent.builder().studentIds(parentIds).build());
+    List<String> studentIds = new ArrayList<>();
+    parentOfStudentMap.values().forEach(confStudentParents -> {
+      confStudentParents.stream().forEach(confStudentParent -> {
+        String studentId = confStudentParent.getStudentId();
+        if (StringUtils.isNotBlank(studentId)) {
+          studentIds.add(studentId);
+        }
+      });
+    });
+    List<String> studentIdList = studentIds.stream().distinct().collect(Collectors.toList());
+    if (null != studentIdList && studentIdList.size() > 0) {
+      Map<String, StudentInfo> studentInfoMap = studentInfoService.convertRecordToMap(StudentInfo.builder().studentIds(studentIdList).build());
+      parentInfos.stream().forEach(parentInfo -> {
+        String parentId = parentInfo.getParentId();
+        if (StringUtils.isNotBlank(parentId) && parentOfStudentMap.containsKey(parentId)) {
+          List<ConfStudentParent> confStudentParents = parentOfStudentMap.get(parentId);
+          List<StudentInfo> studentInfos = new ArrayList<StudentInfo>() {{
+            confStudentParents.stream().forEach(confStudentParent -> {
+              String studentId = confStudentParent.getStudentId();
+              if (studentInfoMap.containsKey(studentId)) {
+                add(studentInfoMap.get(studentId));
+              }
+            });
+          }};
+          parentInfo.setChildList(studentInfos);
+        }
+      });
+    }
   }
 
   /**
@@ -109,6 +162,7 @@ public class ParentInfoServiceImpl implements ParentInfoService {
   @Override
   public ResultEntity list(ParentInfo parentInfo) {
     List<ParentInfo> parentInfos = parentInfoMapper.list(parentInfo);
+    convertParentInfo(parentInfos);
     return ResultUtil.success(GlobalEnum.QuerySuccess, parentInfos);
   }
 

@@ -6,11 +6,12 @@
     <result property="confId" column="conf_id" jdbcType="VARCHAR"/>
     <result property="studentId" column="student_id" jdbcType="VARCHAR"/>
     <result property="parentId" column="parent_id" jdbcType="VARCHAR"/>
+    <result property="connectionType" column="connection_type" jdbcType="VARCHAR"/>
   </resultMap>
 
   <!--列集合-->
   <sql id="BASE_COLUMN">
-      CONF_ID, STUDENT_ID, PARENT_ID
+      CONF_ID, STUDENT_ID, PARENT_ID,CONNECTION_TYPE
   </sql>
   <!--表名-->
   <sql id="BASE_TABLE">
@@ -33,6 +34,21 @@
       <if test="parentId != null and parentId != ''">
         and parent_id = #{parentId}
       </if>
+      <if test="connectionType != null and connectionType != ''">
+        and connection_type = #{connectionType}
+      </if>
+      <if test="studentIds != null and studentIds.size >0 ">
+        and student_id in
+        <foreach collection="studentIds" item="studentId" index="no" open="(" separator="," close=")">
+          #{studentId}
+        </foreach>
+      </if>
+      <if test="parentIds != null and parentIds.size >0 ">
+        and parent_id in
+        <foreach collection="parentIds" item="parentId" index="no" open="(" separator="," close=")">
+          #{parentId}
+        </foreach>
+      </if>
     </where>
   </select>
 
@@ -42,7 +58,7 @@
     VALUES
     <foreach collection="list" item="item" index="index" separator=",">
       (
-      #{item.confId}, #{item.studentId}, #{item.parentId} )
+      #{item.confId}, #{item.studentId}, #{item.parentId},#{item.connectionType} )
     </foreach>
   </insert>
 
@@ -57,7 +73,10 @@
           student_id = #{item.studentId},
         </if>
         <if test="item.parentId != null and item.parentId != ''">
-          parent_id = #{item.parentId}
+          parent_id = #{item.parentId},
+        </if>
+        <if test="item.connectionType != null and item.connectionType != ''">
+          connection_type = #{item.connectionType},
         </if>
       </set>
       where conf_id = #{item.confId}

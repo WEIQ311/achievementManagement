@@ -38,6 +38,10 @@ public class StudentInfo implements Serializable {
    */
   private Date insertTime;
   /**
+   * 监护人信息
+   */
+  private List<ParentInfo> parentInfoList;
+  /**
    * 头像url
    */
   private String phoneUrl;
@@ -60,6 +64,11 @@ public class StudentInfo implements Serializable {
    * 主键
    */
   private String studentId;
+  /**
+   * 学生ID集合
+   */
+  @JsonIgnore
+  private List<String> studentIds;
   /**
    * 学生姓名
    */
@@ -91,4 +100,5 @@ public class StudentInfo implements Serializable {
    * 微博
    */
   private String xlWb;
+
 }

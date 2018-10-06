@@ -1,8 +1,12 @@
 package com.achievement.service.impl;
 
+import com.achievement.entity.ConfStudentParent;
+import com.achievement.entity.ParentInfo;
 import com.achievement.entity.StudentInfo;
 import com.achievement.enums.GlobalEnum;
 import com.achievement.mapper.StudentInfoMapper;
+import com.achievement.service.ConfStudentParentService;
+import com.achievement.service.ParentInfoService;
 import com.achievement.service.StudentInfoService;
 import com.achievement.utils.GloabalUtils;
 import com.achievement.utils.ResultUtil;
@@ -10,6 +14,7 @@ import com.achievement.vo.ResultEntity;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,8 +34,58 @@ import java.util.stream.Collectors;
  */
 @Service("studentInfoService")
 public class StudentInfoServiceImpl implements StudentInfoService {
+  @Autowired
+  private ConfStudentParentService confStudentParentService;
+  @Autowired
+  private ParentInfoService parentInfoService;
   @Resource
   private StudentInfoMapper studentInfoMapper;
+
+  /**
+   * 转换请求结果
+   *
+   * @param studentInfos 学生信息
+   */
+  private void convertStudentInfo(List<StudentInfo> studentInfos) {
+    if (null == studentInfos || studentInfos.size() < 1) {
+      return;
+    }
+    List<String> studentIds = studentInfos.stream().filter(studentInfo -> StringUtils.isNotBlank(studentInfo.getStudentId()))
+        .map(StudentInfo::getStudentId)
+        .collect(Collectors.toList());
+    Map<String, List<ConfStudentParent>> studentOfParentMap = confStudentParentService.convertStudentOfParentMap(ConfStudentParent.builder().studentIds(studentIds).build());
+    List<String> parentIds = new ArrayList<>();
+    studentOfParentMap.values().forEach(confStudentParents -> {
+      confStudentParents.stream().forEach(confStudentParent -> {
+        String parentId = confStudentParent.getParentId();
+        if (StringUtils.isNotBlank(parentId)) {
+          parentIds.add(parentId);
+        }
+      });
+    });
+    List<String> parentIdList = parentIds.stream().distinct().collect(Collectors.toList());
+    if (null != parentIdList && parentIdList.size() > 0) {
+      Map<String, ParentInfo> parentInfoMap = parentInfoService.convertRecordToMap(ParentInfo.builder().parentIds(parentIdList).build());
+      studentInfos.stream().forEach(studentInfo -> {
+        String studentId = studentInfo.getStudentId();
+        if (StringUtils.isNotBlank(studentId) && studentOfParentMap.containsKey(studentId)) {
+          List<ConfStudentParent> confStudentParents = studentOfParentMap.get(studentId);
+          List<ParentInfo> parentInfos = new ArrayList<ParentInfo>() {{
+            confStudentParents.stream().forEach(confStudentParent -> {
+              String connectionType = confStudentParent.getConnectionType();
+              String parentId = confStudentParent.getParentId();
+              if (parentInfoMap.containsKey(parentId)) {
+                ParentInfo parentInfo = parentInfoMap.get(parentId);
+                parentInfo.setConnectionType(connectionType);
+                add(parentInfo);
+              }
+            });
+          }};
+          studentInfo.setParentInfoList(parentInfos);
+        }
+      });
+    }
+  }
 
   /**
    * 学生(StudentInfo)信息Map
@@ -79,7 +134,6 @@ public class StudentInfoServiceImpl implements StudentInfoService {
     if (null == studentInfoList || studentInfoList.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
-
     Map<String, StudentInfo> studentInfoMap = convertRecordToMap(StudentInfo.builder().build()).values().stream()
         .filter(info -> StringUtils.isNotBlank(info.getStudentNum()))
         .collect(Collectors.toMap(StudentInfo::getStudentNum, Function.identity(), (oldValue, newValue) -> newValue));
@@ -91,7 +145,6 @@ public class StudentInfoServiceImpl implements StudentInfoService {
       }
       studentInfo.setStudentId("student_" + GloabalUtils.ordinaryId());
     });
-
     Integer insertCount = studentInfoMapper.insert(studentInfoList);
     if (insertCount > 0) {
       return ResultUtil.success(GlobalEnum.InsertSuccess, studentInfoList);
@@ -110,8 +163,9 @@ public class StudentInfoServiceImpl implements StudentInfoService {
   @Override
   public ResultEntity list(StudentInfo studentInfo, int pageNum, int pageSize) {
     PageHelper.startPage(pageNum, pageSize);
-    List<StudentInfo> studentInfoPage = studentInfoMapper.list(studentInfo);
-    PageInfo pageInfo = new PageInfo(studentInfoPage);
+    List<StudentInfo> studentInfos = studentInfoMapper.list(studentInfo);
+    convertStudentInfo(studentInfos);
+    PageInfo pageInfo = new PageInfo(studentInfos);
     return ResultUtil.success(GlobalEnum.QuerySuccess, pageInfo);
   }
 
@@ -124,8 +178,10 @@ public class StudentInfoServiceImpl implements StudentInfoService {
   @Override
   public ResultEntity list(StudentInfo studentInfo) {
     List<StudentInfo> studentInfos = studentInfoMapper.list(studentInfo);
+    convertStudentInfo(studentInfos);
     return ResultUtil.success(GlobalEnum.QuerySuccess, studentInfos);
   }
+
 
   /**
    * 更新学生(StudentInfo)

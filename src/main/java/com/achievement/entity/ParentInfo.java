@@ -1,5 +1,6 @@
 package com.achievement.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,6 +9,7 @@ import org.hibernate.validator.constraints.Length;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 家长信息
@@ -22,7 +24,14 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class ParentInfo implements Serializable {
   private static final long serialVersionUID = 4557366128335272616L;
-
+  /**
+   * 孩子信息
+   */
+  private List<StudentInfo> childList;
+  /**
+   * 关系类型
+   */
+  private String connectionType;
   /**
    * 创建时间
    */
@@ -30,8 +39,12 @@ public class ParentInfo implements Serializable {
   /**
    * 家长ID
    */
-
   private String parentId;
+  /**
+   * 家长ID集合
+   */
+  @JsonIgnore
+  private List<String> parentIds;
   /**
    * 家长名称
    */

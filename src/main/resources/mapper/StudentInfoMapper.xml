@@ -83,6 +83,12 @@
           #{classId}
         </foreach>
       </if>
+      <if test="studentIds != null and studentIds.size >0 ">
+        and student_id in
+        <foreach collection="studentIds" item="studentId" index="no" open="(" separator="," close=")">
+          #{studentId}
+        </foreach>
+      </if>
     </where>
   </select>
 
