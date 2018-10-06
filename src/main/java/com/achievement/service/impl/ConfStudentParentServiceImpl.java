@@ -83,17 +83,17 @@ public class ConfStudentParentServiceImpl implements ConfStudentParentService {
   /**
    * 删除学生与家长关系信息
    *
-   * @param confStudentParents 学生与家长关系信息
+   * @param confIds 学生与家长关系信息
    * @return ResultEntity
    */
   @Override
   @Transactional(rollbackFor = RuntimeException.class)
-  public ResultEntity delete(List<ConfStudentParent> confStudentParents) {
-    if (null == confStudentParents || confStudentParents.size() < 1) {
+  public ResultEntity delete(List<String> confIds) {
+    if (null == confIds || confIds.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
-    confStudentParentMapper.delete(confStudentParents);
-    return ResultUtil.success(GlobalEnum.DeleteSuccess, confStudentParents);
+    confStudentParentMapper.delete(confIds);
+    return ResultUtil.success(GlobalEnum.DeleteSuccess, confIds);
   }
 
   /**

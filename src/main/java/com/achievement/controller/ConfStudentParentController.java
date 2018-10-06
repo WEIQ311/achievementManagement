@@ -42,10 +42,7 @@ public class ConfStudentParentController {
     if (bindingResult.hasErrors()) {
       return ResultUtil.error(bindingResult.getFieldError().getDefaultMessage());
     }
-    List<ConfStudentParent> confStudentParents = new ArrayList<ConfStudentParent>() {{
-      objectInfo.getIds().stream().forEach(id -> add(ConfStudentParent.builder().confId(id).build()));
-    }};
-    return studentParentService.delete(confStudentParents);
+    return studentParentService.delete(objectInfo.getIds());
   }
 
   /**

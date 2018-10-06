@@ -41,10 +41,10 @@ public interface ConfStudentParentService {
   /**
    * 删除学生与家长关系信息
    *
-   * @param confStudentParents 学生与家长关系信息
+   * @param confIds 学生与家长关系信息
    * @return ResultEntity
    */
-  ResultEntity delete(List<ConfStudentParent> confStudentParents);
+  ResultEntity delete(List<String> confIds);
 
   /**
    * 删除学生与家长关系信息
