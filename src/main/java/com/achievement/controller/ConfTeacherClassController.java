@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 教师与班级配置关系
@@ -42,10 +41,7 @@ public class ConfTeacherClassController {
     if (bindingResult.hasErrors()) {
       return ResultUtil.error(bindingResult.getFieldError().getDefaultMessage());
     }
-    List<ConfTeacherClass> confTeacherClasss = new ArrayList<ConfTeacherClass>() {{
-      objectInfo.getIds().stream().forEach(id -> add(ConfTeacherClass.builder().confId(id).build()));
-    }};
-    return confTeacherClassService.delete(confTeacherClasss);
+    return confTeacherClassService.delete(objectInfo.getIds());
   }
 
   /**

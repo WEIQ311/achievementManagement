@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -58,10 +57,7 @@ public class SchoolInfoServiceImpl implements SchoolInfoService {
     if (null == scIds || scIds.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
-    List<SchoolInfo> schoolInfoList = new ArrayList<SchoolInfo>() {{
-      scIds.forEach(scId -> add(SchoolInfo.builder().scId(scId).build()));
-    }};
-    schoolInfoMapper.delete(schoolInfoList);
+    schoolInfoMapper.delete(scIds);
     return ResultUtil.success(GlobalEnum.DeleteSuccess, scIds);
   }
 

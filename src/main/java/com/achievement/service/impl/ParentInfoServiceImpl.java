@@ -66,10 +66,8 @@ public class ParentInfoServiceImpl implements ParentInfoService {
     if (null == parentIds || parentIds.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
-    List<ParentInfo> parentInfoList = new ArrayList<ParentInfo>() {{
-      parentIds.forEach(parentId -> ParentInfo.builder().parentId(parentId).build());
-    }};
-    parentInfoMapper.delete(parentInfoList);
+    confStudentParentService.deleteByParentId(parentIds);
+    parentInfoMapper.delete(parentIds);
     return ResultUtil.success(GlobalEnum.DeleteSuccess, parentIds);
   }
 

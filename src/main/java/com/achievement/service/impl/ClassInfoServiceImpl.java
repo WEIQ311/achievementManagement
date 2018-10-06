@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -76,12 +75,7 @@ public class ClassInfoServiceImpl implements ClassInfoService {
     if (null != studentInfoMap && studentInfoMap.size() > 0) {
       GloabalUtils.convertMessage(GlobalEnum.ClassNameInUsed);
     }
-    List<ClassInfo> classInfos = new ArrayList<ClassInfo>(classIds.size()) {{
-      classIds.forEach(classId -> {
-        add(ClassInfo.builder().classId(classId).build());
-      });
-    }};
-    classInfoMapper.delete(classInfos);
+    classInfoMapper.delete(classIds);
     return ResultUtil.success(GlobalEnum.DeleteSuccess, classIds);
   }
 

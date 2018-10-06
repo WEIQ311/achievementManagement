@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -67,11 +66,8 @@ public class GradeInfoServiceImpl implements GradeInfoService {
     if (null != classInfoMap && classInfoMap.size() > 0) {
       GloabalUtils.convertMessage(GlobalEnum.GradeNameInClass);
     }
-    List<GradeInfo> gradeInfoList = new ArrayList<GradeInfo>() {{
-      gradeIds.forEach(gradeId -> GradeInfo.builder().gradeId(gradeId).build());
-    }};
-    gradeInfoMapper.delete(gradeInfoList);
-    return ResultUtil.success(GlobalEnum.DeleteSuccess, gradeInfoList);
+    gradeInfoMapper.delete(gradeIds);
+    return ResultUtil.success(GlobalEnum.DeleteSuccess, gradeIds);
   }
 
   /**

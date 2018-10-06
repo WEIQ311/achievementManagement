@@ -67,16 +67,16 @@ public class ConfTeacherClassServiceImpl implements ConfTeacherClassService {
   /**
    * 删除教师与班级关系信息
    *
-   * @param confTeacherClassList 教师与班级关系信息
+   * @param confIds 教师与班级关系信息
    * @return ResultEntity
    */
   @Override
-  public ResultEntity delete(List<ConfTeacherClass> confTeacherClassList) {
-    if (null == confTeacherClassList || confTeacherClassList.size() < 1) {
+  public ResultEntity delete(List<String> confIds) {
+    if (null == confIds || confIds.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
-    confTeacherClassMapper.delete(confTeacherClassList);
-    return ResultUtil.success(GlobalEnum.DeleteSuccess, confTeacherClassList);
+    confTeacherClassMapper.delete(confIds);
+    return ResultUtil.success(GlobalEnum.DeleteSuccess, confIds);
   }
 
   /**

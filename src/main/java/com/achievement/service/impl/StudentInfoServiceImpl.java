@@ -113,12 +113,8 @@ public class StudentInfoServiceImpl implements StudentInfoService {
     if (null == studentIds || studentIds.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
-    List<StudentInfo> studentInfoList = new ArrayList<StudentInfo>() {{
-      studentIds.forEach(studentId ->
-          add(StudentInfo.builder().studentId(studentId).build())
-      );
-    }};
-    studentInfoMapper.delete(studentInfoList);
+    confStudentParentService.deleteByStudentId(studentIds);
+    studentInfoMapper.delete(studentIds);
     return ResultUtil.success(GlobalEnum.DeleteSuccess, studentIds);
   }
 

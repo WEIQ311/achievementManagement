@@ -93,5 +93,25 @@
     </foreach>
   </delete>
 
+  <!--删除学生与家长关系信息-->
+  <delete id="deleteByParentId">
+    delete from
+    <include refid="BASE_TABLE"/>
+    where parent_id in
+    <foreach collection="list" item="item" index="no" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </delete>
+
+  <!--删除学生与家长关系信息-->
+  <delete id="deleteByStudentId">
+    delete from
+    <include refid="BASE_TABLE"/>
+    where student_id in
+    <foreach collection="list" item="item" index="no" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </delete>
+
 </mapper>
 

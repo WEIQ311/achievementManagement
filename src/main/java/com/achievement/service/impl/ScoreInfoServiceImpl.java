@@ -84,12 +84,7 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
     if (!deleteScore) {
       return ResultUtil.error(GlobalEnum.DeleteNoSupport);
     }
-    List<ScoreInfo> scoreInfoList = new ArrayList<ScoreInfo>() {{
-      scoreIds.forEach(scoreId -> {
-        add(ScoreInfo.builder().scoreId(scoreId).build());
-      });
-    }};
-    scoreInfoMapper.delete(scoreInfoList);
+    scoreInfoMapper.delete(scoreIds);
     return ResultUtil.success(GlobalEnum.DeleteSuccess, scoreIds);
   }
 

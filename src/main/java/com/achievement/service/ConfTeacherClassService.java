@@ -33,10 +33,10 @@ public interface ConfTeacherClassService {
   /**
    * 删除教师与班级关系信息
    *
-   * @param confTeacherClassList 教师与班级关系信息
+   * @param confIds 教师与班级关系信息
    * @return ResultEntity
    */
-  ResultEntity delete(List<ConfTeacherClass> confTeacherClassList);
+  ResultEntity delete(List<String> confIds);
 
   /**
    * 增加教师与班级关系信息

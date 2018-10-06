@@ -16,7 +16,7 @@ public interface BaseMapper<T, E extends Serializable> {
    *
    * @param records 对象信息
    */
-  void delete(List<T> records);
+  void delete(List<E> records);
 
   /**
    * 增加对象

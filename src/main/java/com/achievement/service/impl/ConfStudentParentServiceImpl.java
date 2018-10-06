@@ -14,11 +14,13 @@ import com.achievement.vo.ResultEntity;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.achievement.constants.GlobalConstants.OPERATE_TYPE_INSERT;
@@ -52,6 +54,20 @@ public class ConfStudentParentServiceImpl implements ConfStudentParentService {
   }
 
   /**
+   * 家长与学生关系信息Map
+   *
+   * @param confStudentParent 家长与学生关系信息
+   * @return Map
+   */
+  @Override
+  public Map<String, ConfStudentParent> convertRecordToMap(ConfStudentParent confStudentParent) {
+    List<ConfStudentParent> studentParents = confStudentParentMapper.list(confStudentParent);
+    Map<String, ConfStudentParent> studentParentMap = studentParents.stream().filter(info -> StringUtils.isNotBlank(info.getConfId()))
+        .collect(Collectors.toMap(ConfStudentParent::getConfId, Function.identity(), (oldValue, newValue) -> newValue));
+    return studentParentMap;
+  }
+
+  /**
    * 学生与家长关系信息Map
    *
    * @param confStudentParent 学生与家长关系信息
@@ -71,6 +87,7 @@ public class ConfStudentParentServiceImpl implements ConfStudentParentService {
    * @return ResultEntity
    */
   @Override
+  @Transactional(rollbackFor = RuntimeException.class)
   public ResultEntity delete(List<ConfStudentParent> confStudentParents) {
     if (null == confStudentParents || confStudentParents.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
@@ -80,12 +97,45 @@ public class ConfStudentParentServiceImpl implements ConfStudentParentService {
   }
 
   /**
+   * 删除学生与家长关系信息
+   *
+   * @param parentIds 家长ID集合
+   * @return ResultEntity
+   */
+  @Override
+  @Transactional(rollbackFor = RuntimeException.class)
+  public ResultEntity deleteByParentId(List<String> parentIds) {
+    if (null == parentIds || parentIds.size() < 1) {
+      return ResultUtil.error(GlobalEnum.DataEmpty);
+    }
+    confStudentParentMapper.deleteByParentId(parentIds);
+    return ResultUtil.success(GlobalEnum.DeleteSuccess, parentIds);
+  }
+
+  /**
+   * 删除学生与家长关系信息
+   *
+   * @param studentIds 学生ID集合
+   * @return ResultEntity
+   */
+  @Override
+  @Transactional(rollbackFor = RuntimeException.class)
+  public ResultEntity deleteByStudentId(List<String> studentIds) {
+    if (null == studentIds || studentIds.size() < 1) {
+      return ResultUtil.error(GlobalEnum.DataEmpty);
+    }
+    confStudentParentMapper.deleteByStudentId(studentIds);
+    return ResultUtil.success(GlobalEnum.DeleteSuccess, studentIds);
+  }
+
+  /**
    * 增加学生与家长关系信息
    *
    * @param confStudentParents 学生与家长关系信息
    * @return ResultEntity
    */
   @Override
+  @Transactional(rollbackFor = RuntimeException.class)
   public ResultEntity insert(List<ConfStudentParent> confStudentParents) {
     if (null == confStudentParents || confStudentParents.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);

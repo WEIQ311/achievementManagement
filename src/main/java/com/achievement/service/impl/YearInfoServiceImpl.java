@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -67,10 +66,7 @@ public class YearInfoServiceImpl implements YearInfoService {
     if (null != semesterInfoMap && semesterInfoMap.size() > 0) {
       GloabalUtils.convertMessage(GlobalEnum.YearNameInSemester);
     }
-    List<YearInfo> yearInfoList = new ArrayList<YearInfo>() {{
-      yearIds.forEach(yearId -> add(YearInfo.builder().yearId(yearId).build()));
-    }};
-    yearInfoMapper.delete(yearInfoList);
+    yearInfoMapper.delete(yearIds);
     return ResultUtil.success(GlobalEnum.DeleteSuccess, yearIds);
   }
 

@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -65,10 +64,7 @@ public class SemesterInfoServiceImpl implements SemesterInfoService {
     if (null == semesterIds || semesterIds.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
-    List<SemesterInfo> semesterInfoList = new ArrayList<SemesterInfo>() {{
-      semesterIds.forEach(semesterId -> add(SemesterInfo.builder().semesterId(semesterId).build()));
-    }};
-    semesterInfoMapper.delete(semesterInfoList);
+    semesterInfoMapper.delete(semesterIds);
     return ResultUtil.success(GlobalEnum.DeleteSuccess, semesterIds);
   }
 

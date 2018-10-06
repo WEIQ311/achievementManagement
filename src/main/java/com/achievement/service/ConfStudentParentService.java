@@ -23,6 +23,14 @@ public interface ConfStudentParentService {
   Map<String, List<ConfStudentParent>> convertParentOfStudentMap(ConfStudentParent confStudentParent);
 
   /**
+   * 家长与学生关系信息Map
+   *
+   * @param confStudentParent 家长与学生关系信息
+   * @return Map
+   */
+  Map<String, ConfStudentParent> convertRecordToMap(ConfStudentParent confStudentParent);
+
+  /**
    * 学生与家长关系信息Map
    *
    * @param confStudentParent 学生与家长关系信息
@@ -37,6 +45,22 @@ public interface ConfStudentParentService {
    * @return ResultEntity
    */
   ResultEntity delete(List<ConfStudentParent> confStudentParents);
+
+  /**
+   * 删除学生与家长关系信息
+   *
+   * @param parentIds 家长ID集合
+   * @return ResultEntity
+   */
+  ResultEntity deleteByParentId(List<String> parentIds);
+
+  /**
+   * 删除学生与家长关系信息
+   *
+   * @param studentIds 学生ID集合
+   * @return ResultEntity
+   */
+  ResultEntity deleteByStudentId(List<String> studentIds);
 
   /**
    * 增加学生与家长关系信息

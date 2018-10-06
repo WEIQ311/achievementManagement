@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -58,10 +57,7 @@ public class SubjectInfoServiceImpl implements SubjectInfoService {
     if (null == subjectIds || subjectIds.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
-    List<SubjectInfo> subjectInfoList = new ArrayList<SubjectInfo>() {{
-      subjectIds.forEach(subjectId -> add(SubjectInfo.builder().subjectId(subjectId).build()));
-    }};
-    subjectInfoMapper.delete(subjectInfoList);
+    subjectInfoMapper.delete(subjectIds);
     return ResultUtil.success(GlobalEnum.DeleteSuccess, subjectIds);
   }
 
