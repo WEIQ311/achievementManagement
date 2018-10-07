@@ -251,27 +251,46 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
     if (null == scoreInfos || scoreInfos.size() < 1) {
       return;
     }
-    List<ScoreInfo> listScoreInfos = scoreInfoMapper.listScoreInfo(scoreInfo);
-    Map<String, ScoreInfo> scoreInfoMap = listScoreInfos.stream()
+    List<ScoreInfo> classScoreInfo = scoreInfoMapper.listClassScoreInfo(scoreInfo);
+    List<ScoreInfo> gradeScoreInfo = scoreInfoMapper.listGradeScoreInfo(scoreInfo);
+    Map<String, ScoreInfo> classScoreMap = classScoreInfo.stream()
         .collect(Collectors.toMap(info -> {
           String classId = info.getClassId();
           String semesterId = info.getSemesterId();
           String subjectId = info.getSubjectId();
           return classId + INTERVAL_NUMBER + semesterId + INTERVAL_NUMBER + subjectId;
         }, Function.identity(), (oldValue, newValue) -> newValue));
+    Map<String, ScoreInfo> gradeScoreMap = gradeScoreInfo.stream()
+        .collect(Collectors.toMap(info -> {
+          String gradeId = info.getGradeId();
+          String semesterId = info.getSemesterId();
+          String subjectId = info.getSubjectId();
+          return gradeId + INTERVAL_NUMBER + semesterId + INTERVAL_NUMBER + subjectId;
+        }, Function.identity(), (oldValue, newValue) -> newValue));
     scoreInfos.stream().forEach(info -> {
       String classId = info.getClassId();
+      String gradeId = info.getGradeId();
       String semesterId = info.getSemesterId();
       String subjectId = info.getSubjectId();
-      String key = classId + INTERVAL_NUMBER + semesterId + INTERVAL_NUMBER + subjectId;
-      if (scoreInfoMap.containsKey(key)) {
-        ScoreInfo score = scoreInfoMap.get(key);
+      String classKey = classId + INTERVAL_NUMBER + semesterId + INTERVAL_NUMBER + subjectId;
+      String gradeKey = gradeId + INTERVAL_NUMBER + semesterId + INTERVAL_NUMBER + subjectId;
+      if (classScoreMap.containsKey(classKey)) {
+        ScoreInfo score = classScoreMap.get(classKey);
         Double maxScore = score.getMaxScore();
         Double minScore = score.getMinScore();
         Double avgScore = score.getAvgScore();
         info.setMaxScore(maxScore);
         info.setMinScore(minScore);
         info.setAvgScore(avgScore);
+      }
+      if (gradeScoreMap.containsKey(gradeKey)) {
+        ScoreInfo score = gradeScoreMap.get(gradeKey);
+        Double gradeMaxScore = score.getGradeMaxScore();
+        Double gradeMinScore = score.getGradeMinScore();
+        Double gradeAvgScore = score.getGradeAvgScore();
+        info.setGradeMaxScore(gradeMaxScore);
+        info.setGradeMinScore(gradeMinScore);
+        info.setGradeAvgScore(gradeAvgScore);
       }
     });
   }
@@ -418,6 +437,30 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
     ScoreInfo scoreInfo = JSON.parseObject(JSON.toJSONString(parentStudentScore), ScoreInfo.class);
     scoreInfo.setStudentId(studentId);
     return list(scoreInfo);
+  }
+
+  /**
+   * 班级最高、平均、最低成绩
+   *
+   * @param scoreInfo 查询成绩信息
+   * @return ResultEntity
+   */
+  @Override
+  public ResultEntity listClassScore(ScoreInfo scoreInfo) {
+    List<ScoreInfo> scoreInfos = scoreInfoMapper.listClassScoreInfo(scoreInfo);
+    return ResultUtil.success(GlobalEnum.QuerySuccess, scoreInfos);
+  }
+
+  /**
+   * 年级最高、平均、最低成绩
+   *
+   * @param scoreInfo 查询成绩信息
+   * @return ResultEntity
+   */
+  @Override
+  public ResultEntity listGradeScore(ScoreInfo scoreInfo) {
+    List<ScoreInfo> scoreInfos = scoreInfoMapper.listGradeScoreInfo(scoreInfo);
+    return ResultUtil.success(GlobalEnum.QuerySuccess, scoreInfos);
   }
 
   /**

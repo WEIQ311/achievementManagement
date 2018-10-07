@@ -25,7 +25,7 @@
   <sql id="SCORE_COLUMN">
     S.SCORE_ID, S.CLASS_ID, S.TEACHER_ID,S.INSERT_TIME, S.REMARK, S.SCORE_NUMBER, S.SEMESTER_ID, S.STATUS, S.STUDENT_ID,
     S.SUBJECT_ID, S.UPDATE_TIME,SUB.SUBJECT_NAME,CLA.CLASS_NAME,STU.STUDENT_NAME,TEA.TEACHER_NAME,SEM.SEMESTER_NAME,
-    GRA.GRADE_NAME,YEA.YEAR_NAME
+    GRA.GRADE_NAME,YEA.YEAR_NAME,GRA.GRADE_ID
   </sql>
 
   <!--成绩表、关联表-->
@@ -121,17 +121,33 @@
     </where>
   </select>
 
-  <!--最高、平均、最低成绩列-->
+  <!--班级最高、平均、最低成绩列-->
   <sql id="SCORE_INFO_COLUMN">
     CLASS_ID,SEMESTER_ID,SUBJECT_ID ,MAX(SCORE_NUMBER) MAX_SCORE,AVG(SCORE_NUMBER) AVG_SCORE,MIN(SCORE_NUMBER) MIN_SCORE
   </sql>
 
-  <!--分组信息-->
+  <!--年级最高、平均、最低成绩列-->
+  <sql id="GRADE_SCORE_INFO_COLUMN">
+    GRA.GRADE_ID,SC.SEMESTER_ID,SC.SUBJECT_ID ,MAX(SC.SCORE_NUMBER) GRADE_MAX_SCORE,
+    AVG(SC.SCORE_NUMBER) GRADE_AVG_SCORE,MIN(SC.SCORE_NUMBER) GRADE_MIN_SCORE
+  </sql>
+
+  <!--班级分组信息-->
   <sql id="CALCULATE_GROUP_SQL">
     GROUP BY CLASS_ID, SEMESTER_ID, SUBJECT_ID
   </sql>
 
-  <!--查询SQL-->
+  <!--年级分组信息-->
+  <sql id="GRADE_CALCULATE_GROUP_SQL">
+    GROUP BY GRA.GRADE_ID, SC.SEMESTER_ID, SC.SUBJECT_ID
+  </sql>
+
+  <!--年级分组表信息-->
+  <sql id="GRADE_TABLE_SQL">
+    SCORE_INFO SC ,GRADE_INFO GRA,CLASS_INFO CLA
+  </sql>
+
+  <!--班级查询SQL-->
   <sql id="CALCULATE_SQL">
     <where>
       <if test="classId!=null and classId!='' ">
@@ -146,14 +162,45 @@
     </where>
   </sql>
 
-  <!--最高、平均、最低成绩-->
-  <select id="listScoreInfo" resultMap="ScoreInfoMap">
+  <!--年级查询SQL-->
+  <sql id="GRADE_CALCULATE_SQL">
+    <where>
+      SC.CLASS_ID= CLA.CLASS_ID
+      AND
+      CLA.GRADE_ID=GRA.GRADE_ID
+      <if test="classId!=null and classId!='' ">
+        AND  SC.CLASS_ID=#{classId}
+      </if>
+      <if test="gradeId!=null and gradeId!='' ">
+        AND  GRA.GRADE_ID=#{gradeId}
+      </if>
+      <if test="semesterId!=null and semesterId!='' ">
+        AND SC.SEMESTER_ID=#{semesterId}
+      </if>
+      <if test="subjectId!=null and subjectId!='' ">
+        AND SC.SUBJECT_ID=#{subjectId}
+      </if>
+    </where>
+  </sql>
+
+  <!--班级最高、平均、最低成绩-->
+  <select id="listClassScoreInfo" resultMap="ScoreInfoMap">
     select
     <include refid="SCORE_INFO_COLUMN"/>
     from
     <include refid="BASE_TABLE"/>
     <include refid="CALCULATE_SQL"/>
     <include refid="CALCULATE_GROUP_SQL"/>
+  </select>
+
+  <!--年级最高、平均、最低成绩-->
+  <select id="listGradeScoreInfo" resultMap="ScoreInfoMap">
+    select
+    <include refid="GRADE_SCORE_INFO_COLUMN"/>
+    from
+    <include refid="GRADE_TABLE_SQL"/>
+    <include refid="GRADE_CALCULATE_SQL"/>
+    <include refid="GRADE_CALCULATE_GROUP_SQL"/>
   </select>
 
   <!--新增所有列-->

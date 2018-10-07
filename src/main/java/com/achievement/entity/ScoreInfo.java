@@ -127,4 +127,22 @@ public class ScoreInfo implements Serializable {
    * 学年名称
    */
   private String yearName;
+
+  /**
+   * 年级平均成绩
+   */
+  private Double gradeAvgScore;
+  /**
+   * 年级最高成绩
+   */
+  private Double gradeMaxScore;
+  /**
+   * 年级最低成绩
+   */
+  private Double gradeMinScore;
+
+  /**
+   * 年级ID
+   */
+  private String gradeId;
 }

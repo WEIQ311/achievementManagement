@@ -13,10 +13,18 @@ import java.util.List;
 public interface ScoreInfoMapper extends BaseMapper<ScoreInfo, String> {
 
   /**
-   * 查询最高、平均、最低成绩
+   * 查询班级最高、平均、最低成绩
    *
    * @param scoreInfo 成绩信息
    * @return ScoreInfo
    */
-  List<ScoreInfo> listScoreInfo(ScoreInfo scoreInfo);
+  List<ScoreInfo> listClassScoreInfo(ScoreInfo scoreInfo);
+
+  /**
+   * 查询年级最高、平均、最低成绩
+   *
+   * @param scoreInfo 成绩信息
+   * @return ScoreInfo
+   */
+  List<ScoreInfo> listGradeScoreInfo(ScoreInfo scoreInfo);
 }

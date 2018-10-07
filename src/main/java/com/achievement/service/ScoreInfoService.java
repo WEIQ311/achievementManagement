@@ -39,4 +39,20 @@ public interface ScoreInfoService extends BaseInfoService<ScoreInfo, String> {
    * @return ResultEntity
    */
   ResultEntity listByParent(ParentStudentScore parentStudentScore);
+
+  /**
+   * 班级最高、平均、最低成绩
+   *
+   * @param scoreInfo 查询成绩信息
+   * @return ResultEntity
+   */
+  ResultEntity listClassScore(ScoreInfo scoreInfo);
+
+  /**
+   * 年级最高、平均、最低成绩
+   *
+   * @param scoreInfo 查询成绩信息
+   * @return ResultEntity
+   */
+  ResultEntity listGradeScore(ScoreInfo scoreInfo);
 }
