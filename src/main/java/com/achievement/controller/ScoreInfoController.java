@@ -5,6 +5,7 @@ import com.achievement.entity.TeacherInfo;
 import com.achievement.service.ScoreInfoService;
 import com.achievement.utils.ResultUtil;
 import com.achievement.vo.ObjectInfo;
+import com.achievement.vo.ParentStudentScore;
 import com.achievement.vo.ResultEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -121,6 +122,17 @@ public class ScoreInfoController {
   @RequestMapping(value = "/listByPage", method = RequestMethod.GET)
   public ResultEntity list(ScoreInfo scoreInfo, @RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "30") Integer pageSize) {
     return scoreInfoService.list(scoreInfo, pageNum, pageSize);
+  }
+
+  /**
+   * 家长查询学生成绩
+   *
+   * @param parentStudentScore 查询成绩信息
+   * @return ResultEntity
+   */
+  @RequestMapping(value = "listByParent", method = RequestMethod.GET)
+  public ResultEntity listByParent(ParentStudentScore parentStudentScore) {
+    return scoreInfoService.listByParent(parentStudentScore);
   }
 
   /**

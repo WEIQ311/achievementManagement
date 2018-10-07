@@ -18,7 +18,6 @@ import java.util.List;
  * @date 2018/10/2
  */
 @Data
-
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor

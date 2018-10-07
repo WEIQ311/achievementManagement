@@ -2,6 +2,7 @@ package com.achievement.service;
 
 import com.achievement.entity.ScoreInfo;
 import com.achievement.entity.TeacherInfo;
+import com.achievement.vo.ParentStudentScore;
 import com.achievement.vo.ResultEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,4 +31,12 @@ public interface ScoreInfoService extends BaseInfoService<ScoreInfo, String> {
    * @return ResultEntity
    */
   ResultEntity importScoreByFile(MultipartFile scoreFile, ScoreInfo scoreInfo);
+
+  /**
+   * 家长查询学生成绩
+   *
+   * @param parentStudentScore 查询成绩信息
+   * @return ResultEntity
+   */
+  ResultEntity listByParent(ParentStudentScore parentStudentScore);
 }

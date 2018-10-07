@@ -7,7 +7,9 @@ import com.achievement.service.*;
 import com.achievement.utils.GloabalUtils;
 import com.achievement.utils.PoiUtil;
 import com.achievement.utils.ResultUtil;
+import com.achievement.vo.ParentStudentScore;
 import com.achievement.vo.ResultEntity;
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang.StringUtils;
@@ -39,11 +41,15 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
   @Autowired
   private ClassInfoService classInfoService;
   @Autowired
+  private ConfStudentParentService confStudentParentService;
+  @Autowired
   private ConfTeacherClassService confTeacherClassService;
   @Autowired
   private ConfTeacherSubjectService confTeacherSubjectService;
   @Value("${achievement.delete.score}")
   private boolean deleteScore;
+  @Autowired
+  private ParentInfoService parentInfoService;
   @Resource
   private ScoreInfoMapper scoreInfoMapper;
   @Autowired
@@ -328,6 +334,53 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
     } else {
       return resultEntity;
     }
+  }
+
+  /**
+   * 家长查询学生成绩
+   *
+   * @param parentStudentScore 查询成绩信息
+   * @return ResultEntity
+   */
+  @Override
+  public ResultEntity listByParent(ParentStudentScore parentStudentScore) {
+    if (null == parentStudentScore) {
+      parentStudentScore = ParentStudentScore.builder().build();
+    }
+    String parentId = parentStudentScore.getParentId();
+    String parentName = parentStudentScore.getParentName();
+    if (StringUtils.isBlank(parentId) && StringUtils.isBlank(parentName)) {
+      return ResultUtil.error(GlobalEnum.ParentInfoQueryEmpty);
+    }
+    String studentName = parentStudentScore.getStudentName();
+    if (StringUtils.isBlank(studentName)) {
+      return ResultUtil.error(GlobalEnum.StudentInfoQueryEmpty);
+    }
+    ParentInfo parentInfo = ParentInfo.builder().parentId(parentId).parentName(parentName).build();
+    Map<String, StudentInfo> studentInfoMap = studentInfoService.convertRecordToMap(StudentInfo.builder().studentName(studentName).build());
+    if (studentInfoMap.isEmpty()) {
+      return ResultUtil.error(GlobalEnum.ParentNoStudentInfo);
+    }
+    List<String> studentIds = studentInfoMap.keySet().stream().collect(Collectors.toList());
+    String studentId = studentIds.get(0);
+    if (StringUtils.isBlank(parentId)) {
+      Map<String, ParentInfo> parentInfoMap = parentInfoService.convertRecordToMap(parentInfo);
+      List<String> parentIds = parentInfoMap.values().stream().filter(info -> Objects.equals(parentName, info.getParentName()))
+          .map(ParentInfo::getParentId)
+          .collect(Collectors.toList());
+      if (null == parentIds || parentIds.size() < 1) {
+        return ResultUtil.error(GlobalEnum.ParentInfoQueryEmpty);
+      }
+      parentId = parentIds.get(0);
+    }
+    Map<String, List<ConfStudentParent>> parentOfStudentMap = confStudentParentService
+        .convertParentOfStudentMap(ConfStudentParent.builder().parentId(parentId).studentId(studentId).build());
+    if (parentOfStudentMap.isEmpty()) {
+      return ResultUtil.error(GlobalEnum.ParentNoStudentInfo);
+    }
+    ScoreInfo scoreInfo = JSON.parseObject(JSON.toJSONString(parentStudentScore), ScoreInfo.class);
+    scoreInfo.setStudentId(studentId);
+    return list(scoreInfo);
   }
 
   /**

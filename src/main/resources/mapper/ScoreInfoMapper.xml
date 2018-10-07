@@ -85,37 +85,37 @@
     <include refid="SCORE_TABLE"/>
     <where>
       <if test="scoreId != null and scoreId != ''">
-        and score_id = #{scoreId}
+        and s.score_id = #{scoreId}
       </if>
       <if test="classId != null and classId != ''">
-        and class_id = #{classId}
+        and s.class_id = #{classId}
       </if>
       <if test="insertTime != null">
-        and insert_time = #{insertTime}
+        and s.insert_time = #{insertTime}
       </if>
       <if test="remark != null and remark != ''">
-        and remark = #{remark}
+        and s.remark = #{remark}
       </if>
       <if test="scoreNumber != null and scoreNumber != ''">
-        and score_number = #{scoreNumber}
+        and s.score_number = #{scoreNumber}
       </if>
       <if test="semesterId != null and semesterId != ''">
-        and semester_id = #{semesterId}
+        and s.semester_id = #{semesterId}
       </if>
       <if test="status != null">
-        and status = #{status}
+        and s.status = #{status}
       </if>
       <if test="studentId != null and studentId != ''">
-        and student_id = #{studentId}
+        and s.student_id = #{studentId}
       </if>
       <if test="subjectId != null and subjectId != ''">
-        and subject_id = #{subjectId}
+        and s.subject_id = #{subjectId}
       </if>
       <if test="teacherId != null and teacherId != ''">
-        and teacher_id = #{teacherId}
+        and s.teacher_id = #{teacherId}
       </if>
       <if test="updateTime != null">
-        and update_time = #{updateTime}
+        and s.update_time = #{updateTime}
       </if>
       <include refid="scoreId"/>
     </where>
@@ -133,7 +133,6 @@
       #{item.semesterId}, #{item.status}, #{item.studentId}, #{item.subjectId}, SYSDATE() )
     </foreach>
   </insert>
-
 
   <!--通过主键修改数据-->
   <update id="update" parameterType="java.util.List">
