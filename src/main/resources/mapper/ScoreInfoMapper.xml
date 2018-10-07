@@ -169,10 +169,10 @@
       AND
       CLA.GRADE_ID=GRA.GRADE_ID
       <if test="classId!=null and classId!='' ">
-        AND  SC.CLASS_ID=#{classId}
+        AND SC.CLASS_ID=#{classId}
       </if>
       <if test="gradeId!=null and gradeId!='' ">
-        AND  GRA.GRADE_ID=#{gradeId}
+        AND GRA.GRADE_ID=#{gradeId}
       </if>
       <if test="semesterId!=null and semesterId!='' ">
         AND SC.SEMESTER_ID=#{semesterId}
