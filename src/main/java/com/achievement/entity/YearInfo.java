@@ -47,6 +47,6 @@ public class YearInfo implements Serializable {
   /**
    * 学年名称
    */
-  @Length(max = 500, message = "学年名称不能多于4000个字符")
+  @Length(max = 500, message = "学年名称不能多于500个字符")
   private String yearName;
 }

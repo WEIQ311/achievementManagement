@@ -18,19 +18,71 @@
 
   <!--列集合-->
   <sql id="BASE_COLUMN">
-      score_id, class_id, teacher_id,insert_time, remark, score_number, semester_id, status, student_id, subject_id, update_time    </sql>
+    SCORE_ID, CLASS_ID, TEACHER_ID,INSERT_TIME, REMARK, SCORE_NUMBER, SEMESTER_ID, STATUS, STUDENT_ID, SUBJECT_ID, UPDATE_TIME
+  </sql>
+
+  <!--成绩列-->
+  <sql id="SCORE_COLUMN">
+    S.SCORE_ID, S.CLASS_ID, S.TEACHER_ID,S.INSERT_TIME, S.REMARK, S.SCORE_NUMBER, S.SEMESTER_ID, S.STATUS, S.STUDENT_ID,
+    S.SUBJECT_ID, S.UPDATE_TIME,SUB.SUBJECT_NAME,CLA.CLASS_NAME,STU.STUDENT_NAME,TEA.TEACHER_NAME,SEM.SEMESTER_NAME,
+    GRA.GRADE_NAME,YEA.YEAR_NAME
+  </sql>
+
+  <!--成绩表、关联表-->
+  <sql id="SCORE_TABLE">
+    SCORE_INFO S, SUBJECT_INFO SUB ,CLASS_INFO CLA, STUDENT_INFO STU, TEACHER_INFO TEA,SEMESTER_INFO SEM,
+    GRADE_INFO GRA,YEAR_INFO YEA
+  </sql>
+
+  <!--关联关系-->
+  <sql id="scoreId">
+    AND
+    S.SUBJECT_ID=SUB.SUBJECT_ID
+    AND
+    S.CLASS_ID=CLA.CLASS_ID
+    AND
+    S.STUDENT_ID=STU.STUDENT_ID
+    AND
+    S.TEACHER_ID=TEA.TEACHER_ID
+    AND
+    S.SEMESTER_ID=SEM.SEMESTER_ID
+    AND
+    CLA.GRADE_ID=GRA.GRADE_ID
+    AND
+    SEM.YEAR_ID=YEA.YEAR_ID
+    <if test="className!=null and className!=''">
+      AND CLA.CLASS_NAME=#{className}
+    </if>
+    <if test="subjectName!=null and subjectName!=''">
+      AND SUB.SUBJECT_NAME=#{subjectName}
+    </if>
+    <if test="studentName!=null and studentName!=''">
+      AND STU.STUDENT_NAME=#{studentName}
+    </if>
+    <if test="teacherName!=null and teacherName!=''">
+      AND TEA.TEACHER_NAME=#{teacherName}
+    </if>
+    <if test="semesterName!=null and semesterName!=''">
+      AND SEM.SEMESTER_NAME=#{semesterName}
+    </if>
+    <if test="gradeName!=null and gradeName!=''">
+      AND GRA.GRADE_NAME=#{gradeName}
+    </if>
+    <if test="yearName!=null and yearName!=''">
+      AND YER.YEAR_NAME=#{yearName}
+    </if>
+  </sql>
   <!--表名-->
   <sql id="BASE_TABLE">
 		achievement.score_info
 	</sql>
 
-
   <!--通过实体作为筛选条件查询-->
   <select id="list" resultMap="ScoreInfoMap">
     select
-    <include refid="BASE_COLUMN"/>
+    <include refid="SCORE_COLUMN"/>
     from
-    <include refid="BASE_TABLE"/>
+    <include refid="SCORE_TABLE"/>
     <where>
       <if test="scoreId != null and scoreId != ''">
         and score_id = #{scoreId}
@@ -65,6 +117,7 @@
       <if test="updateTime != null">
         and update_time = #{updateTime}
       </if>
+      <include refid="scoreId"/>
     </where>
   </select>
 

@@ -32,8 +32,16 @@ public class ClassInfo implements Serializable {
   /**
    * 班级名称
    */
-  @Length(max = 500, message = "班级名称不能多于4000个字符")
+  @Length(max = 500, message = "班级名称不能多于500个字符")
   private String className;
+  /**
+   * 班级类型
+   * 文科班
+   * 理科班
+   * 艺术班
+   * ……
+   */
+  private String classType;
   /**
    * 年级ID
    */

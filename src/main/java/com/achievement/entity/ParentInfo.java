@@ -48,7 +48,7 @@ public class ParentInfo implements Serializable {
   /**
    * 家长名称
    */
-  @Length(max = 500, message = "家长名称不能多于4000个字符")
+  @Length(max = 500, message = "家长名称不能多于500个字符")
   private String parentName;
   /**
    * 备注

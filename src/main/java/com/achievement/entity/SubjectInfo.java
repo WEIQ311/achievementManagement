@@ -1,5 +1,6 @@
 package com.achievement.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,6 +10,7 @@ import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 科目
@@ -40,8 +42,13 @@ public class SubjectInfo implements Serializable {
   /**
    * 主键
    */
-
   private String subjectId;
+
+  /**
+   * 科目IDS
+   */
+  @JsonIgnore
+  private List<String> subjectIds;
   /**
    * 科目名称
    */

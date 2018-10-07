@@ -8,12 +8,13 @@
     <result property="gradeId" column="grade_id" jdbcType="VARCHAR"/>
     <result property="insertTime" column="insert_time" jdbcType="TIMESTAMP"/>
     <result property="remark" column="remark" jdbcType="VARCHAR"/>
+    <result property="classType" column="class_type" jdbcType="VARCHAR"/>
     <result property="status" column="status" jdbcType="INTEGER"/>
     <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
   </resultMap>
   <!--列集合-->
   <sql id="BASE_COLUMN">
-      CLASS_ID, CLASS_NAME, GRADE_ID, INSERT_TIME, REMARK, STATUS, UPDATE_TIME
+      CLASS_ID, CLASS_NAME, GRADE_ID, INSERT_TIME, REMARK, STATUS, UPDATE_TIME,CLASS_TYPE
     </sql>
   <!--表名-->
   <sql id="BASE_TABLE">
@@ -45,6 +46,9 @@
       <if test="status != null">
         and status = #{status}
       </if>
+      <if test="classType != null and classType != ''">
+        and class_type = #{classType}
+      </if>
       <if test="updateTime != null">
         and update_time = #{updateTime}
       </if>
@@ -70,7 +74,9 @@
       #{item.gradeId},
       SYSDATE(),
       #{item.remark},
-      #{item.status}, SYSDATE()
+      #{item.status},
+      SYSDATE(),
+      #{item.classType}
       )
     </foreach>
   </insert>
@@ -98,6 +104,9 @@
         </if>
         <if test="item.updateTime != null">
           update_time = #{item.updateTime},
+        </if>
+        <if test="item.classType != null">
+          class_type = #{item.classType},
         </if>
       </set>
       where class_id = #{item.classId}

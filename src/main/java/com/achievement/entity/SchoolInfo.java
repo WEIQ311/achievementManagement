@@ -40,7 +40,6 @@ public class SchoolInfo implements Serializable {
   /**
    * 主键
    */
-
   private String scId;
   /**
    * 状态

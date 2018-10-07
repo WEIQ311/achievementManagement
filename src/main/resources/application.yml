@@ -35,6 +35,3 @@ server:
     basedir: ${user.home}/${spring.application.name}/tomcat
 
 
-
-
-

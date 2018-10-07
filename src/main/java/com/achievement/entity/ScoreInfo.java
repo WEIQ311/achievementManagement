@@ -30,6 +30,14 @@ public class ScoreInfo implements Serializable {
   @NotBlank(message = "班级ID不能为空!")
   private String classId;
   /**
+   * 班级名称
+   */
+  private String className;
+  /**
+   * 年级名称
+   */
+  private String gradeName;
+  /**
    * 创建时间
    */
   private Date insertTime;
@@ -64,6 +72,10 @@ public class ScoreInfo implements Serializable {
   @NotBlank(message = "学期ID不能为空!")
   private String semesterId;
   /**
+   * 学期名称
+   */
+  private String semesterName;
+  /**
    * 状态
    * 0:不可用;1:可用
    */
@@ -74,17 +86,34 @@ public class ScoreInfo implements Serializable {
   @NotBlank(message = "学生ID不能为空!")
   private String studentId;
   /**
+   * 学生姓名
+   */
+  private String studentName;
+  /**
    * 科目ID
    */
   @NotBlank(message = "科目ID不能为空!")
   private String subjectId;
+  /**
+   * 科目名称
+   */
+  private String subjectName;
   /**
    * 教师ID
    */
   @NotBlank(message = "教师ID不能为空!")
   private String teacherId;
   /**
+   * 教师姓名
+   */
+  private String teacherName;
+  /**
    * 更新时间
    */
   private Date updateTime;
+  /**
+   * 学年名称
+   */
+  private String yearName;
+
 }

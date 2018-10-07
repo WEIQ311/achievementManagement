@@ -39,7 +39,7 @@ public class SemesterInfo implements Serializable {
   /**
    * 学期名称
    */
-  @Length(max = 500, message = "学期名称不能多于4000个字符")
+  @Length(max = 500, message = "学期名称不能多于500个字符")
   private String semesterName;
   /**
    * 状态
