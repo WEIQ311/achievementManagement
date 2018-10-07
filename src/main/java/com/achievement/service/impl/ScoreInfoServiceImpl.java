@@ -129,6 +129,7 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
       PageHelper.orderBy(GloabalUtils.changeColumn(scoreInfo.getOrderColumn(), scoreInfo.getOrderDirection()));
     }
     List<ScoreInfo> scoreInfoPage = scoreInfoMapper.list(scoreInfo);
+    convertScoreInfo(scoreInfoPage, scoreInfo);
     PageInfo pageInfo = new PageInfo(scoreInfoPage);
     return ResultUtil.success(GlobalEnum.QuerySuccess, pageInfo);
   }
@@ -142,6 +143,7 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
   @Override
   public ResultEntity list(ScoreInfo scoreInfo) {
     List<ScoreInfo> scoreInfos = scoreInfoMapper.list(scoreInfo);
+    convertScoreInfo(scoreInfos, scoreInfo);
     return ResultUtil.success(GlobalEnum.QuerySuccess, scoreInfos);
   }
 
@@ -235,6 +237,41 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
         if (StringUtils.isBlank(scoreId)) {
           GloabalUtils.convertMessage(GlobalEnum.PkIdEmpty);
         }
+      }
+    });
+  }
+
+  /**
+   * 转换班级内最高、平均、最低成绩信息
+   *
+   * @param scoreInfos 成绩结果
+   * @param scoreInfo  查询成绩信息
+   */
+  private void convertScoreInfo(List<ScoreInfo> scoreInfos, ScoreInfo scoreInfo) {
+    if (null == scoreInfos || scoreInfos.size() < 1) {
+      return;
+    }
+    List<ScoreInfo> listScoreInfos = scoreInfoMapper.listScoreInfo(scoreInfo);
+    Map<String, ScoreInfo> scoreInfoMap = listScoreInfos.stream()
+        .collect(Collectors.toMap(info -> {
+          String classId = info.getClassId();
+          String semesterId = info.getSemesterId();
+          String subjectId = info.getSubjectId();
+          return classId + INTERVAL_NUMBER + semesterId + INTERVAL_NUMBER + subjectId;
+        }, Function.identity(), (oldValue, newValue) -> newValue));
+    scoreInfos.stream().forEach(info -> {
+      String classId = info.getClassId();
+      String semesterId = info.getSemesterId();
+      String subjectId = info.getSubjectId();
+      String key = classId + INTERVAL_NUMBER + semesterId + INTERVAL_NUMBER + subjectId;
+      if (scoreInfoMap.containsKey(key)) {
+        ScoreInfo score = scoreInfoMap.get(key);
+        Double maxScore = score.getMaxScore();
+        Double minScore = score.getMinScore();
+        Double avgScore = score.getAvgScore();
+        info.setMaxScore(maxScore);
+        info.setMinScore(minScore);
+        info.setAvgScore(avgScore);
       }
     });
   }

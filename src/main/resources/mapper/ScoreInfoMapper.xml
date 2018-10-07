@@ -121,6 +121,41 @@
     </where>
   </select>
 
+  <!--最高、平均、最低成绩列-->
+  <sql id="SCORE_INFO_COLUMN">
+    CLASS_ID,SEMESTER_ID,SUBJECT_ID ,MAX(SCORE_NUMBER) MAX_SCORE,AVG(SCORE_NUMBER) AVG_SCORE,MIN(SCORE_NUMBER) MIN_SCORE
+  </sql>
+
+  <!--分组信息-->
+  <sql id="CALCULATE_GROUP_SQL">
+    GROUP BY CLASS_ID, SEMESTER_ID, SUBJECT_ID
+  </sql>
+
+  <!--查询SQL-->
+  <sql id="CALCULATE_SQL">
+    <where>
+      <if test="classId!=null and classId!='' ">
+        AND CLASS_ID=#{classId}
+      </if>
+      <if test="semesterId!=null and semesterId!='' ">
+        AND SEMESTER_ID=#{semesterId}
+      </if>
+      <if test="subjectId!=null and subjectId!='' ">
+        AND SUBJECT_ID=#{subjectId}
+      </if>
+    </where>
+  </sql>
+
+  <!--最高、平均、最低成绩-->
+  <select id="listScoreInfo" resultMap="ScoreInfoMap">
+    select
+    <include refid="SCORE_INFO_COLUMN"/>
+    from
+    <include refid="BASE_TABLE"/>
+    <include refid="CALCULATE_SQL"/>
+    <include refid="CALCULATE_GROUP_SQL"/>
+  </select>
+
   <!--新增所有列-->
   <insert id="insert" keyProperty="scoreId" useGeneratedKeys="true" parameterType="java.util.List">
     insert into

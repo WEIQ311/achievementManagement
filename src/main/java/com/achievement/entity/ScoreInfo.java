@@ -25,6 +25,10 @@ import java.util.Date;
 public class ScoreInfo implements Serializable {
   private static final long serialVersionUID = 311146311988636636L;
   /**
+   * 平均成绩
+   */
+  private Double avgScore;
+  /**
    * 班级ID
    */
   @NotBlank(message = "班级ID不能为空!")
@@ -41,6 +45,14 @@ public class ScoreInfo implements Serializable {
    * 创建时间
    */
   private Date insertTime;
+  /**
+   * 最高成绩
+   */
+  private Double maxScore;
+  /**
+   * 最低成绩
+   */
+  private Double minScore;
   /**
    * 排序字段
    */
@@ -115,5 +127,4 @@ public class ScoreInfo implements Serializable {
    * 学年名称
    */
   private String yearName;
-
 }
