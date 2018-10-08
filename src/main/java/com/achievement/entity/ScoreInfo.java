@@ -143,4 +143,13 @@ public class ScoreInfo implements Serializable {
    * 学年名称
    */
   private String yearName;
+  /**
+   * 班级排名
+   */
+  private Integer classRanking;
+  /**
+   * 年级排名
+   */
+  private Integer gradeRanking;
+
 }

@@ -7,6 +7,7 @@ import com.achievement.vo.ResultEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 /**
  * 成绩(ScoreInfo)Service
@@ -55,4 +56,11 @@ public interface ScoreInfoService extends BaseInfoService<ScoreInfo, String> {
    * @return ResultEntity
    */
   ResultEntity listGradeScore(ScoreInfo scoreInfo);
+
+  /**
+   * 排名信息
+   * @param scoreInfo 成绩信息
+   * @return ResultEntity
+   */
+  Map<String,ScoreInfo> listRankingMap(ScoreInfo scoreInfo);
 }
