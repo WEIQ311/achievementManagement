@@ -34,6 +34,14 @@ public class ScoreInfo implements Serializable {
   @NotBlank(message = "班级ID不能为空!")
   private String classId;
   /**
+   * 班级类型
+   * 文科班
+   * 理科班
+   * 艺术班
+   * ……
+   */
+  private String classType;
+  /**
    * 班级名称
    */
   private String className;

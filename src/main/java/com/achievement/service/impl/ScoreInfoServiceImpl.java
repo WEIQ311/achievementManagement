@@ -488,9 +488,10 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
     }));
     Map<String, List<ScoreInfo>> gradeScoreInfoListMap = scoreInfoList.stream().collect(Collectors.groupingBy(info -> {
       String gradeId = info.getGradeId();
+      String classType = info.getClassType();
       String semesterId = info.getSemesterId();
       String subjectId = info.getSubjectId();
-      return gradeId + INTERVAL_NUMBER + semesterId + INTERVAL_NUMBER + subjectId;
+      return gradeId + INTERVAL_NUMBER + classType + INTERVAL_NUMBER + semesterId + INTERVAL_NUMBER + subjectId;
     }));
 
     classScoreInfoListMap.forEach((key, scoreInfos) -> {
@@ -521,10 +522,11 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
       String scoreId = info.getScoreId();
       String classId = info.getClassId();
       String gradeId = info.getGradeId();
+      String classType = info.getClassType();
       String semesterId = info.getSemesterId();
       String subjectId = info.getSubjectId();
       String classKey = classId + INTERVAL_NUMBER + semesterId + INTERVAL_NUMBER + subjectId;
-      String gradeKey = gradeId + INTERVAL_NUMBER + semesterId + INTERVAL_NUMBER + subjectId;
+      String gradeKey = gradeId + INTERVAL_NUMBER + classType + INTERVAL_NUMBER + semesterId + INTERVAL_NUMBER + subjectId;
       Integer classRanking = classScoreInfoListMap.get(classKey).stream().filter(score -> Objects.equals(scoreId, score.getScoreId()))
           .collect(Collectors.toList()).get(0).getClassRanking();
       Integer gradeRanking = gradeScoreInfoListMap.get(gradeKey).stream().filter(score -> Objects.equals(scoreId, score.getScoreId()))
