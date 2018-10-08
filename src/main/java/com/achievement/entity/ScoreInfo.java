@@ -38,6 +38,10 @@ public class ScoreInfo implements Serializable {
    */
   private String className;
   /**
+   * 班级排名
+   */
+  private Integer classRanking;
+  /**
    * 年级平均成绩
    */
   private Double gradeAvgScore;
@@ -57,6 +61,10 @@ public class ScoreInfo implements Serializable {
    * 年级名称
    */
   private String gradeName;
+  /**
+   * 年级排名
+   */
+  private Integer gradeRanking;
   /**
    * 创建时间
    */
@@ -143,13 +151,4 @@ public class ScoreInfo implements Serializable {
    * 学年名称
    */
   private String yearName;
-  /**
-   * 班级排名
-   */
-  private Integer classRanking;
-  /**
-   * 年级排名
-   */
-  private Integer gradeRanking;
-
 }

@@ -59,8 +59,9 @@ public interface ScoreInfoService extends BaseInfoService<ScoreInfo, String> {
 
   /**
    * 排名信息
+   *
    * @param scoreInfo 成绩信息
    * @return ResultEntity
    */
-  Map<String,ScoreInfo> listRankingMap(ScoreInfo scoreInfo);
+  Map<String, ScoreInfo> listRankingMap(ScoreInfo scoreInfo);
 }
