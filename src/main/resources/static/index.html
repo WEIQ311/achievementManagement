@@ -36,8 +36,6 @@
     jQuery('#navbar-menu').delegate('li', 'click',
         function() {
           jQuery(this).parent().find('li').removeClass('active').end().end().addClass('active');
-          console.log(jQuery(this)[0].context.innerHTML);
-          jQuery('title')[0].innerHTML = jQuery(this)[0].context.innerHTML;
         });
     _openPage('./views/indexInfo.html');
   });
@@ -75,6 +73,10 @@
         </li>
         <li>
           <a href="javascript:_openPage('./views/systemInfo.html')" class="glyphicon glyphicon-cog">系统配置
+            <span class="selected"> </span></a>
+        </li>
+        <li>
+          <a href="./druid/index.html" class="glyphicon glyphicon-bell" target="_Blank">系统监控
             <span class="selected"> </span></a>
         </li>
       </ul>
