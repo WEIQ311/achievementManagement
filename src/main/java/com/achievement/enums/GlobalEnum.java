@@ -65,6 +65,10 @@ public enum GlobalEnum {
   ImportStudentInfoNoMatch("学科\"%s\"下的第%s行学生\"%s\"不存在,请检查!"),
   ImportScoreInfoDataEmpty("学科\"%s\"下的数据为空,请检查!"),
   ExceptionMessage("发生了错误:%s"),
+  EndDeadlineTime("成绩录入截至时间不能小于当前时间"),
+  BeginDeadlineTime("成绩录入开始时间不能大于截至时间"),
+  NoBeginTime("还没有到录入成绩日期(\"%s\")!"),
+  NoEndTime("成绩录入日期(\"%s\")已经过!"),
   ;
   private String message;
 

@@ -13,6 +13,7 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -180,6 +181,7 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
     Map<String, TeacherInfo> teacherInfoMap = teacherInfoService.convertRecordToMap(TeacherInfo.builder().build());
     Map<String, SemesterInfo> semesterInfoMap = semesterInfoService.convertRecordToMap(SemesterInfo.builder().build());
     List<ScoreInfo> scoreInfos = scoreInfoMapper.list(ScoreInfo.builder().build());
+    long currentTimeMillis = System.currentTimeMillis();
     Map<String, ScoreInfo> scoreInfoMap = scoreInfos.stream().collect(Collectors.toMap(scoreInfo -> {
       String classId = scoreInfo.getClassId();
       String studentId = scoreInfo.getStudentId();
@@ -223,6 +225,23 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
       }
       if (!semesterInfoMap.containsKey(semesterId)) {
         GloabalUtils.convertMessage(GlobalEnum.SemesterInfoEmpty, semesterId);
+      }
+      SemesterInfo semesterInfo = semesterInfoMap.get(semesterId);
+      Date scoreEndDeadline = semesterInfo.getScoreEndDeadline();
+      Date scoreBeginDeadline = semesterInfo.getScoreBeginDeadline();
+      if (null != scoreBeginDeadline) {
+        long beginDeadlineTime = scoreBeginDeadline.getTime();
+        if (beginDeadlineTime > currentTimeMillis) {
+          String beginTime = DateFormatUtils.format(scoreBeginDeadline, DATE_TIME_FORMAT);
+          GloabalUtils.convertMessage(GlobalEnum.NoBeginTime, beginTime);
+        }
+      }
+      if (null != scoreEndDeadline) {
+        long endDeadlineTime = scoreEndDeadline.getTime();
+        if (currentTimeMillis > endDeadlineTime) {
+          String enndTime = DateFormatUtils.format(scoreEndDeadline, DATE_TIME_FORMAT);
+          GloabalUtils.convertMessage(GlobalEnum.NoEndTime, enndTime);
+        }
       }
       if (Objects.equals(OPERATE_TYPE_INSERT, operateType)) {
         String key = semesterId + INTERVAL_NUMBER + classId + INTERVAL_NUMBER + subjectId + INTERVAL_NUMBER + studentId;

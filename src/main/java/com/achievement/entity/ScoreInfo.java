@@ -7,7 +7,10 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -107,8 +110,9 @@ public class ScoreInfo implements Serializable {
   /**
    * 成绩
    */
-  @NotBlank(message = "成绩不能为空!")
-  @Length(max = 300, message = "成绩不能多于300个字符")
+  @NotNull(message = "成绩不能为空!")
+  @Max(value = 150, message = "成绩不能高于150分")
+  @Min(value = 0, message = "成绩不能低于0分")
   private Double scoreNumber;
   /**
    * 学期ID

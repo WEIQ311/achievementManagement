@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -93,6 +94,7 @@ public class SemesterInfoServiceImpl implements SemesterInfoService {
       if (semesterInfoMap.containsKey(key)) {
         GloabalUtils.convertMessage(GlobalEnum.SemesterNameInUsed, semesterName, yearName);
       }
+      convertDeadLineTime(semesterInfo);
       semesterInfo.setSemesterId("semester_" + GloabalUtils.ordinaryId());
     });
     Integer insertCount = semesterInfoMapper.insert(semesterInfoList);
@@ -115,6 +117,25 @@ public class SemesterInfoServiceImpl implements SemesterInfoService {
         .filter(info -> StringUtils.isNotBlank(info.getSemesterName()) && StringUtils.isNotBlank(info.getYearId()))
         .collect(Collectors.toMap(info -> info.getSemesterName() + INTERVAL_NUMBER + info.getYearId(), Function.identity(), (oldValue, newValue) -> newValue));
     return semesterInfoMap;
+  }
+
+  /**
+   * 判断添加考试成绩开始与截至时间是否合法
+   *
+   * @param semesterInfo 学期信息
+   */
+  private void convertDeadLineTime(SemesterInfo semesterInfo) {
+    Date scoreEndDeadline = semesterInfo.getScoreEndDeadline();
+    Date scoreBeginDeadline = semesterInfo.getScoreBeginDeadline();
+    long endDeadlineTime = scoreEndDeadline.getTime();
+    long beginDeadlineTime = scoreBeginDeadline.getTime();
+    long timeMillis = System.currentTimeMillis();
+    if (timeMillis > endDeadlineTime) {
+      GloabalUtils.convertMessage(GlobalEnum.EndDeadlineTime);
+    }
+    if (beginDeadlineTime >= endDeadlineTime) {
+      GloabalUtils.convertMessage(GlobalEnum.BeginDeadlineTime);
+    }
   }
 
   /**
@@ -176,6 +197,7 @@ public class SemesterInfoServiceImpl implements SemesterInfoService {
       if (semesterInfoMap.containsKey(key) && !Objects.equals(semesterId, semesterInfoMap.get(key).getSemesterId())) {
         GloabalUtils.convertMessage(GlobalEnum.SemesterNameInUsed, semesterName, yearName);
       }
+      convertDeadLineTime(semesterInfo);
     });
     Integer updateCount = semesterInfoMapper.update(semesterInfoList);
     if (updateCount > 0) {

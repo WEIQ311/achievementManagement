@@ -9,17 +9,19 @@
     <result property="semesterName" column="semester_name" jdbcType="VARCHAR"/>
     <result property="status" column="status" jdbcType="INTEGER"/>
     <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    <result property="scoreEndDeadline" column="score_end_deadline" jdbcType="TIMESTAMP"/>
+    <result property="scoreBeginDeadline" column="score_begin_deadline" jdbcType="TIMESTAMP"/>
     <result property="yearId" column="year_id" jdbcType="VARCHAR"/>
   </resultMap>
 
   <!--列集合-->
   <sql id="BASE_COLUMN">
-      semester_id, insert_time, remark, semester_name, status, update_time, year_id    </sql>
+      SEMESTER_ID, INSERT_TIME, REMARK, SEMESTER_NAME, STATUS, UPDATE_TIME, YEAR_ID,SCORE_END_DEADLINE,SCORE_BEGIN_DEADLINE
+  </sql>
   <!--表名-->
   <sql id="BASE_TABLE">
 		achievement.semester_info
 	</sql>
-
 
   <!--通过实体作为筛选条件查询-->
   <select id="list" resultMap="SemesterInfoMap">
@@ -46,6 +48,12 @@
       <if test="updateTime != null">
         and update_time = #{updateTime}
       </if>
+      <if test="scoreEndDeadline != null">
+        and score_end_deadline = #{scoreEndDeadline}
+      </if>
+      <if test="scoreBeginDeadline != null">
+        and score_begin_deadline = #{scoreBeginDeadline}
+      </if>
       <if test="yearId != null and yearId != ''">
         and year_id = #{yearId}
       </if>
@@ -67,10 +75,10 @@
     <foreach collection="list" item="item" index="index" separator=",">
       (
       #{item.semesterId}, SYSDATE(), #{item.remark}, #{item.semesterName},
-      #{item.status}, SYSDATE(), #{item.yearId} )
+      #{item.status}, SYSDATE(), #{item.yearId},#{item.scoreEndDeadline},
+      #{item.scoreBeginDeadline} )
     </foreach>
   </insert>
-
 
   <!--通过主键修改数据-->
   <update id="update" parameterType="java.util.List">
@@ -88,13 +96,19 @@
           status = #{item.status},
         </if>
         <if test="item.yearId != null and item.yearId != ''">
-          year_id = #{item.yearId}
+          year_id = #{item.yearId},
         </if>
         <if test="item.updateTime==null">
           update_time = SYSDATE(),
         </if>
         <if test="item.updateTime != null">
           update_time = #{item.updateTime},
+        </if>
+        <if test="item.scoreEndDeadline != null">
+          score_end_deadline =#{item.scoreEndDeadline},
+        </if>
+        <if test="item.scoreBeginDeadline != null">
+          score_begin_deadline =#{item.scoreBeginDeadline},
         </if>
       </set>
       where semester_id = #{item.semesterId}

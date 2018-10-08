@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -32,6 +33,16 @@ public class SemesterInfo implements Serializable {
    */
   @Length(max = 4000, message = "备注不能多于4000个字符")
   private String remark;
+  /**
+   * 更新开始日期
+   */
+  @NotNull(message = "更新开始日期不能为空")
+  private Date scoreBeginDeadline;
+  /**
+   * 更新截至日期
+   */
+  @NotNull(message = "更新截至日期不能为空")
+  private Date scoreEndDeadline;
   /**
    * 主键
    */
