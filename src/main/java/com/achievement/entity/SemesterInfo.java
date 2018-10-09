@@ -25,6 +25,11 @@ import java.util.List;
 public class SemesterInfo implements Serializable {
   private static final long serialVersionUID = -63253345008351707L;
   /**
+   * 考试时间
+   */
+  @NotNull(message = "考试时间不能为空")
+  private Date examTime;
+  /**
    * 创建时间
    */
   private Date insertTime;

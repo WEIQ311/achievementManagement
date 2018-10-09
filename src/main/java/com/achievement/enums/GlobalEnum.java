@@ -43,6 +43,8 @@ public enum GlobalEnum {
   StudentIdEmpty("学生ID为空!"),
   SubjectIdEmpty("学科ID为空!"),
   TeacherIdEmpty("教师ID为空!"),
+  TeacherHeadInUsed("该班级班主任已经选配,为:\"%s\"!"),
+  TeacherNoHead("该教师\"%s\"不具有班主任职责!"),
   SemesterIdEmpty("学期ID为空!"),
   ParentIdEmpty("家长ID为空!"),
   ParentInfoQueryEmpty("家长信息为空!"),
@@ -67,6 +69,7 @@ public enum GlobalEnum {
   ExceptionMessage("发生了错误:%s"),
   EndDeadlineTime("成绩录入截至时间不能小于当前时间"),
   BeginDeadlineTime("成绩录入开始时间不能大于截至时间"),
+  BeginDeadlineExamTime("考试时间不能大于成绩录入开始时间"),
   NoBeginTime("还没有到录入成绩时间(\"%s\")!"),
   NoEndTime("成绩录入时间(\"%s\")已经过!"),
   ;

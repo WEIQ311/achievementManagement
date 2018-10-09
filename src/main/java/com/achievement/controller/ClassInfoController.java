@@ -36,7 +36,7 @@ public class ClassInfoController {
    * @return ResultEntity
    */
   @RequestMapping(value = "deleteByIds", method = RequestMethod.POST)
-  public ResultEntity delete(@Valid ObjectInfo objectInfo, BindingResult bindingResult) {
+  public ResultEntity delete(@Valid @RequestBody ObjectInfo objectInfo, BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {
       return ResultUtil.error(bindingResult.getFieldError().getDefaultMessage());
     }
@@ -46,13 +46,13 @@ public class ClassInfoController {
   /**
    * 删除班级
    *
-   * @param markId
+   * @param classId 班级主键
    * @return ResultEntity
    */
-  @RequestMapping(path = "{markId}", method = RequestMethod.DELETE)
-  public ResultEntity delete(@PathVariable String markId) {
+  @RequestMapping(path = "{classId}", method = RequestMethod.DELETE)
+  public ResultEntity delete(@PathVariable String classId) {
     return classInfoService.delete(new ArrayList<String>() {{
-      add(markId);
+      add(classId);
     }});
   }
 
@@ -64,7 +64,7 @@ public class ClassInfoController {
    * @return ResultEntity
    */
   @RequestMapping(value = "insert", method = RequestMethod.POST)
-  public ResultEntity insert(@Valid ClassInfo classInfo, BindingResult bindingResult) {
+  public ResultEntity insert(@Valid @RequestBody ClassInfo classInfo, BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {
       return ResultUtil.error(bindingResult.getFieldError().getDefaultMessage());
     }
@@ -104,7 +104,7 @@ public class ClassInfoController {
    * @return ResultEntity
    */
   @RequestMapping(value = "update", method = RequestMethod.POST)
-  public ResultEntity update(@Valid ClassInfo classInfo, BindingResult bindingResult) {
+  public ResultEntity update(@Valid @RequestBody ClassInfo classInfo, BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {
       return ResultUtil.error(bindingResult.getFieldError().getDefaultMessage());
     }

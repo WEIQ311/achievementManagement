@@ -127,14 +127,19 @@ public class SemesterInfoServiceImpl implements SemesterInfoService {
   private void convertDeadLineTime(SemesterInfo semesterInfo) {
     Date scoreEndDeadline = semesterInfo.getScoreEndDeadline();
     Date scoreBeginDeadline = semesterInfo.getScoreBeginDeadline();
+    Date examTime = semesterInfo.getExamTime();
     long endDeadlineTime = scoreEndDeadline.getTime();
     long beginDeadlineTime = scoreBeginDeadline.getTime();
+    long time = examTime.getTime();
     long timeMillis = System.currentTimeMillis();
     if (timeMillis > endDeadlineTime) {
       GloabalUtils.convertMessage(GlobalEnum.EndDeadlineTime);
     }
     if (beginDeadlineTime >= endDeadlineTime) {
       GloabalUtils.convertMessage(GlobalEnum.BeginDeadlineTime);
+    }
+    if (time >= beginDeadlineTime) {
+      GloabalUtils.convertMessage(GlobalEnum.BeginDeadlineExamTime);
     }
   }
 

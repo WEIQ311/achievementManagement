@@ -7,10 +7,7 @@ import com.achievement.vo.ObjectInfo;
 import com.achievement.vo.ResultEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -37,7 +34,7 @@ public class ConfTeacherClassController {
    * @return ResultEntity
    */
   @RequestMapping(value = "deleteByIds", method = RequestMethod.POST)
-  public ResultEntity delete(@Valid ObjectInfo objectInfo, BindingResult bindingResult) {
+  public ResultEntity delete(@Valid @RequestBody ObjectInfo objectInfo, BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {
       return ResultUtil.error(bindingResult.getFieldError().getDefaultMessage());
     }
@@ -52,7 +49,7 @@ public class ConfTeacherClassController {
    * @return ResultEntity
    */
   @RequestMapping(value = "insert", method = RequestMethod.POST)
-  public ResultEntity insert(@Valid ConfTeacherClass confTeacherClass, BindingResult bindingResult) {
+  public ResultEntity insert(@Valid @RequestBody ConfTeacherClass confTeacherClass, BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {
       return ResultUtil.error(bindingResult.getFieldError().getDefaultMessage());
     }

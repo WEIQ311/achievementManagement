@@ -10,6 +10,7 @@
     <result property="remark" column="remark" jdbcType="VARCHAR"/>
     <result property="sex" column="sex" jdbcType="VARCHAR"/>
     <result property="status" column="status" jdbcType="INTEGER"/>
+    <result property="teacherDuty" column="teacher_duty" jdbcType="VARCHAR"/>
     <result property="teacherName" column="teacher_name" jdbcType="VARCHAR"/>
     <result property="telPhone" column="tel_phone" jdbcType="VARCHAR"/>
     <result property="txQq" column="tx_qq" jdbcType="VARCHAR"/>
@@ -20,7 +21,7 @@
 
   <!--列集合-->
   <sql id="BASE_COLUMN">
-      teacher_id,teacher_num, insert_time, phone_url, remark, sex, status, teacher_name, tel_phone, tx_qq, tx_wx, update_time, xl_wb
+      teacher_id,teacher_num, insert_time, phone_url, remark, sex, status, teacher_name, tel_phone, tx_qq, tx_wx, update_time, xl_wb,teacher_duty
   </sql>
   <!--表名-->
   <sql id="BASE_TABLE">
@@ -45,34 +46,37 @@
         and phone_url = #{phoneUrl}
       </if>
       <if test="remark != null and remark != ''">
-        and remark = #{remark}
+        and remark LIKE CONCAT('%',#{remark},'%')
       </if>
       <if test="sex != null and sex != ''">
-        and sex = #{sex}
+        and sex LIKE CONCAT('%',#{sex},'%')
       </if>
       <if test="status != null">
         and status = #{status}
       </if>
       <if test="teacherName != null and teacherName != ''">
-        and teacher_name = #{teacherName}
+        and teacher_name LIKE CONCAT('%',#{teacherName},'%')
       </if>
       <if test="telPhone != null and telPhone != ''">
-        and tel_phone = #{telPhone}
+        and tel_phone LIKE CONCAT('%',#{telPhone},'%')
       </if>
       <if test="txQq != null and txQq != ''">
-        and tx_qq = #{txQq}
+        and tx_qq LIKE CONCAT('%',#{txQq},'%')
       </if>
       <if test="txWx != null and txWx != ''">
-        and tx_wx = #{txWx}
+        and tx_wx LIKE CONCAT('%',#{txWx},'%')
       </if>
       <if test="updateTime != null">
         and update_time = #{updateTime}
       </if>
       <if test="xlWb != null and xlWb != ''">
-        and xl_wb = #{xlWb}
+        and xl_wb LIKE CONCAT('%',#{xlWb},'%')
       </if>
       <if test="teacherNum != null and teacherNum != ''">
-        and teacher_num = #{teacherNum}
+        and teacher_num LIKE CONCAT('%',#{teacherNum},'%')
+      </if>
+      <if test="teacherDuty != null and teacherDuty != ''">
+        and teacher_duty = #{teacherDuty}
       </if>
     </where>
   </select>
@@ -87,7 +91,9 @@
       (
       #{item.teacherId},#{item.teacherNum}, SYSDATE(), #{item.phoneUrl}, #{item.remark}, #{item.sex},
       #{item.status},
-      #{item.teacherName}, #{item.telPhone}, #{item.txQq}, #{item.txWx}, SYSDATE(), #{item.xlWb} )
+      #{item.teacherName}, #{item.telPhone}, #{item.txQq}, #{item.txWx}, SYSDATE(), #{item.xlWb},
+      #{item.teacherDuty}
+      )
     </foreach>
   </insert>
 
@@ -130,6 +136,9 @@
         </if>
         <if test="item.teacherNum != null and item.teacherNum != ''">
           teacher_num = #{item.teacherNum},
+        </if>
+        <if test="item.teacherDuty != null and item.teacherDuty != ''">
+          teacher_duty =  #{item.teacherDuty},
         </if>
         <if test="item.updateTime==null">
           update_time = SYSDATE(),

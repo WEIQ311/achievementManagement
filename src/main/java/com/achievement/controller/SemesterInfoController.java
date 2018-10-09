@@ -36,7 +36,7 @@ public class SemesterInfoController {
    * @return ResultEntity
    */
   @RequestMapping(value = "deleteByIds", method = RequestMethod.POST)
-  public ResultEntity delete(@Valid ObjectInfo objectInfo, BindingResult bindingResult) {
+  public ResultEntity delete(@Valid @RequestBody ObjectInfo objectInfo, BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {
       return ResultUtil.error(bindingResult.getFieldError().getDefaultMessage());
     }
@@ -64,7 +64,7 @@ public class SemesterInfoController {
    * @return ResultEntity
    */
   @RequestMapping(value = "insert", method = RequestMethod.POST)
-  public ResultEntity insert(@Valid SemesterInfo semesterInfo, BindingResult bindingResult) {
+  public ResultEntity insert(@Valid @RequestBody SemesterInfo semesterInfo, BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {
       return ResultUtil.error(bindingResult.getFieldError().getDefaultMessage());
     }
@@ -104,7 +104,7 @@ public class SemesterInfoController {
    * @return ResultEntity
    */
   @RequestMapping(value = "update", method = RequestMethod.POST)
-  public ResultEntity update(@Valid SemesterInfo semesterInfo, BindingResult bindingResult) {
+  public ResultEntity update(@Valid @RequestBody SemesterInfo semesterInfo, BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {
       return ResultUtil.error(bindingResult.getFieldError().getDefaultMessage());
     }

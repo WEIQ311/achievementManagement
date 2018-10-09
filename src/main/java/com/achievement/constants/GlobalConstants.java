@@ -16,9 +16,17 @@ public class GlobalConstants {
    */
   public static final String DATE_TIME_FORMATTER = "yyyyMMddHHmmss";
   /**
+   * 前缀
+   */
+  public static final String DEFAULT_PREFIX = "(";
+  /**
    * 默认排名
    */
   public static final Integer DEFAULT_RANKING = 1;
+  /**
+   * 后缀
+   */
+  public static final String DEFAULT_SUFFIX = ")";
   /**
    * EXCEL首行数据
    */
@@ -72,6 +80,18 @@ public class GlobalConstants {
    */
   public static final String SPACE = " ";
   /**
+   * 教师管理员
+   */
+  public static final String TEACHER_ROLE_ADMIN = "0";
+  /**
+   * 班主任
+   */
+  public static final String TEACHER_ROLE_HEAD = "1";
+  /**
+   * 普通教师
+   */
+  public static final String TEACHER_ROLE_ORDINARY = "2";
+  /**
    * 下划线
    */
   public static final String UNDER_LINE = "_";
@@ -87,5 +107,4 @@ public class GlobalConstants {
    * 请求类型
    */
   public static final String X_REQUESTED_WIDTH = "X-Requested-With";
-
 }

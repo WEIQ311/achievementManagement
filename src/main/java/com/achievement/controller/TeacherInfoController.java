@@ -36,7 +36,7 @@ public class TeacherInfoController {
    * @return ResultEntity
    */
   @RequestMapping(value = "deleteByIds", method = RequestMethod.POST)
-  public ResultEntity delete(@Valid ObjectInfo objectInfo, BindingResult bindingResult) {
+  public ResultEntity delete(@Valid @RequestBody ObjectInfo objectInfo, BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {
       return ResultUtil.error(bindingResult.getFieldError().getDefaultMessage());
     }
@@ -64,7 +64,7 @@ public class TeacherInfoController {
    * @return ResultEntity
    */
   @RequestMapping(value = "insert", method = RequestMethod.POST)
-  public ResultEntity insert(@Valid TeacherInfo teacherInfo, BindingResult bindingResult) {
+  public ResultEntity insert(@Valid @RequestBody TeacherInfo teacherInfo, BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {
       return ResultUtil.error(bindingResult.getFieldError().getDefaultMessage());
     }
@@ -104,7 +104,7 @@ public class TeacherInfoController {
    * @return ResultEntity
    */
   @RequestMapping(value = "update", method = RequestMethod.POST)
-  public ResultEntity update(@Valid TeacherInfo teacherInfo, BindingResult bindingResult) {
+  public ResultEntity update(@Valid @RequestBody TeacherInfo teacherInfo, BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {
       return ResultUtil.error(bindingResult.getFieldError().getDefaultMessage());
     }

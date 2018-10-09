@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -45,6 +46,11 @@ public class TeacherInfo implements Serializable {
    * 0:不可用;1:可用
    */
   private Integer status;
+  /**
+   * 教师职责
+   */
+  @NotBlank(message = "教师职责不能为空!")
+  private String teacherDuty;
   /**
    * 主键
    */

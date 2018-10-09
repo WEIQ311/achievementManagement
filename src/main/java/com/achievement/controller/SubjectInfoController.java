@@ -100,7 +100,7 @@ public class SubjectInfoController {
   /**
    * 更新学科(SubjectInfo)
    *
-   * @param subjectInfo   更新参数
+   * @param subjectInfos  更新参数
    * @param bindingResult 参数绑定校验
    * @return ResultEntity
    */

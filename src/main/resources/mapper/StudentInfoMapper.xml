@@ -45,31 +45,31 @@
         and phone_url = #{phoneUrl}
       </if>
       <if test="remark != null and remark != ''">
-        and remark = #{remark}
+        and remark  LIKE CONCAT('%',#{remark},'%')
       </if>
       <if test="sex != null and sex != ''">
-        and sex = #{sex}
+        and sex LIKE CONCAT('%',#{sex},'%')
       </if>
       <if test="status != null">
         and status = #{status}
       </if>
       <if test="studentName != null and studentName != ''">
-        and student_name = #{studentName}
+        and student_name LIKE CONCAT('%',#{studentName},'%')
       </if>
       <if test="telPhone != null and telPhone != ''">
-        and tel_phone = #{telPhone}
+        and tel_phone LIKE CONCAT('%',#{telPhone},'%')
       </if>
       <if test="txQq != null and txQq != ''">
-        and tx_qq = #{txQq}
+        and tx_qq LIKE CONCAT('%',#{txQq},'%')
       </if>
       <if test="txWx != null and txWx != ''">
-        and tx_wx = #{txWx}
+        and tx_wx LIKE CONCAT('%',#{txWx},'%')
       </if>
       <if test="updateTime != null">
         and update_time = #{updateTime}
       </if>
       <if test="xlWb != null and xlWb != ''">
-        and xl_wb = #{xlWb}
+        and xl_wb LIKE CONCAT('%',#{xlWb},'%')
       </if>
       <if test="classId != null and classId != ''">
         and class_id = #{classId}

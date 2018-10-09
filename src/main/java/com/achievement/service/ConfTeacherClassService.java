@@ -15,7 +15,7 @@ import java.util.Map;
 public interface ConfTeacherClassService {
 
   /**
-   * 家长与学生关系信息Map
+   * 教师与班级关系信息Map
    *
    * @param confTeacherClass 班级与教师关系信息
    * @return Map
@@ -47,10 +47,26 @@ public interface ConfTeacherClassService {
   ResultEntity insert(List<ConfTeacherClass> confTeacherClassList);
 
   /**
-   * 查询家长与学生关系信息
+   * 增加或编辑班级班主任
    *
-   * @param confTeacherClass 家长与学生关系信息
+   * @param confTeacherClasses 教师与班级关系信息
+   * @return ResultEntity
+   */
+  ResultEntity insertOrUpdateClassHeadTeacher(List<ConfTeacherClass> confTeacherClasses);
+
+  /**
+   * 查询教师与班级关系信息
+   *
+   * @param confTeacherClass 教师与班级关系信息
    * @return ResultEntity
    */
   ResultEntity list(ConfTeacherClass confTeacherClass);
+
+  /**
+   * 更新教师与班级关系信息
+   *
+   * @param confTeacherClassList 教师与班级关系信息
+   * @return ResultEntity
+   */
+  ResultEntity update(List<ConfTeacherClass> confTeacherClassList);
 }

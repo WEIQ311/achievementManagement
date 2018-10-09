@@ -1,31 +1,29 @@
 package com.achievement.service.impl;
 
-import com.achievement.entity.ClassInfo;
-import com.achievement.entity.GradeInfo;
-import com.achievement.entity.StudentInfo;
+import com.achievement.entity.*;
 import com.achievement.enums.GlobalEnum;
 import com.achievement.mapper.ClassInfoMapper;
-import com.achievement.service.ClassInfoService;
-import com.achievement.service.GradeInfoService;
-import com.achievement.service.StudentInfoService;
+import com.achievement.service.*;
 import com.achievement.utils.GloabalUtils;
 import com.achievement.utils.ResultUtil;
 import com.achievement.vo.ResultEntity;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.achievement.constants.GlobalConstants.INTERVAL_NUMBER;
+import static com.achievement.constants.GlobalConstants.*;
 
 /**
  * (ClassInfo)表服务实现类
@@ -33,17 +31,20 @@ import static com.achievement.constants.GlobalConstants.INTERVAL_NUMBER;
  * @author weiqiang
  * @since 2018-10-02 15:20:56
  */
+@Slf4j
 @Service("classInfoService")
 public class ClassInfoServiceImpl implements ClassInfoService {
 
   @Resource
   private ClassInfoMapper classInfoMapper;
-
+  @Autowired
+  private ConfTeacherClassService confTeacherClassService;
   @Autowired
   private GradeInfoService gradeInfoService;
-
   @Autowired
   private StudentInfoService studentInfoService;
+  @Autowired
+  private TeacherInfoService teacherInfoService;
 
   /**
    * 班级信息Map
@@ -107,6 +108,8 @@ public class ClassInfoServiceImpl implements ClassInfoService {
       classInfo.setClassId("class_" + GloabalUtils.ordinaryId());
     });
     Integer insertCount = classInfoMapper.insert(classInfos);
+    ResultEntity resultEntity = insertOrUpdateClassHeadTeacher(classInfos);
+    log.info("增加班级班主任:{}", resultEntity);
     if (insertCount > 0) {
       return ResultUtil.success(GlobalEnum.InsertSuccess, classInfos);
     }
@@ -128,6 +131,21 @@ public class ClassInfoServiceImpl implements ClassInfoService {
             Function.identity(), (oldValue, newValue) -> newValue)
         );
     return classInfoMap;
+  }
+
+  /**
+   * 增加或编辑班级班主任
+   *
+   * @param classInfos 班级信息
+   * @return ResultEntity
+   */
+  private ResultEntity insertOrUpdateClassHeadTeacher(List<ClassInfo> classInfos) {
+    List<ConfTeacherClass> confTeacherClasses = new ArrayList<ConfTeacherClass>() {{
+      classInfos.forEach(classInfo -> {
+        add(ConfTeacherClass.builder().classId(classInfo.getClassId()).teacherId(classInfo.getTeacherId()).build());
+      });
+    }};
+    return confTeacherClassService.insertOrUpdateClassHeadTeacher(confTeacherClasses);
   }
 
   /**
@@ -191,6 +209,8 @@ public class ClassInfoServiceImpl implements ClassInfoService {
       }
     });
     Integer updateCount = classInfoMapper.update(classInfos);
+    ResultEntity resultEntity = insertOrUpdateClassHeadTeacher(classInfos);
+    log.info("更新班级班主任:{}", resultEntity);
     if (updateCount > 0) {
       return ResultUtil.success(GlobalEnum.UpdateSuccess, classInfos);
     }
@@ -206,11 +226,43 @@ public class ClassInfoServiceImpl implements ClassInfoService {
     if (null == classInfoList || classInfoList.size() < 1) {
       return;
     }
+    List<String> classIds = classInfoList.stream().filter(classInfo -> StringUtils.isNotBlank(classInfo.getClassId()))
+        .map(ClassInfo::getClassId)
+        .distinct()
+        .collect(Collectors.toList());
+    Map<String, List<StudentInfo>> studentListMap = studentInfoService.convertRecordToMap(StudentInfo.builder().classIds(classIds).build())
+        .values().stream()
+        .collect(Collectors.groupingBy(StudentInfo::getClassId));
+    Map<String, List<ConfTeacherClass>> classOfTeacherMap = confTeacherClassService.convertClassOfTeacherMap(ConfTeacherClass.builder().build());
+    Map<String, TeacherInfo> teacherInfoMap = teacherInfoService.convertRecordToMap(TeacherInfo.builder().build());
     Map<String, GradeInfo> gradeInfoMap = gradeInfoService.convertRecordToMap(GradeInfo.builder().build());
     classInfoList.stream().forEach(classInfo -> {
       String gradeId = classInfo.getGradeId();
       if (StringUtils.isNotBlank(gradeId) && gradeInfoMap.containsKey(gradeId)) {
-        classInfo.setGradeInfo(gradeInfoMap.get(gradeId));
+        GradeInfo gradeInfo = gradeInfoMap.get(gradeId);
+        classInfo.setGradeInfo(gradeInfo);
+        String gradeName = gradeInfo.getGradeName();
+        classInfo.setGradeClassName(gradeName + DEFAULT_PREFIX + classInfo.getClassName() + DEFAULT_SUFFIX);
+      }
+      String classId = classInfo.getClassId();
+      if (classOfTeacherMap.containsKey(classId)) {
+        List<ConfTeacherClass> teacherClassList = classOfTeacherMap.get(classId).stream().filter(confTeacherClass -> Objects.equals(TEACHER_ROLE_HEAD, confTeacherClass.getTeacherDuty()))
+            .collect(Collectors.toList());
+        String teacherId = new String();
+        String teacherName = new String();
+        if (null != teacherClassList && teacherClassList.size() > 0) {
+          ConfTeacherClass confTeacherClass = teacherClassList.get(0);
+          teacherId = confTeacherClass.getTeacherId();
+          if (teacherInfoMap.containsKey(teacherId)) {
+            teacherName = teacherInfoMap.get(teacherId).getTeacherName();
+            classInfo.setTeacherId(teacherId);
+            classInfo.setTeacherName(teacherName);
+          }
+        }
+      }
+      if (studentListMap.containsKey(classId)) {
+        int studentCount = studentListMap.get(classId).size();
+        classInfo.setStudentCount(studentCount);
       }
     });
   }
