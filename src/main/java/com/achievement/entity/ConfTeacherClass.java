@@ -30,6 +30,11 @@ public class ConfTeacherClass implements Serializable {
    */
   private String confId;
   /**
+   * 教师职责
+   */
+  @NotBlank(message = "教师职责不能为空!")
+  private String teacherDuty;
+  /**
    * 教师ID
    */
   @NotBlank(message = "教师ID不能为空!")
