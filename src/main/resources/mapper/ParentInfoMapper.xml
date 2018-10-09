@@ -118,7 +118,7 @@
           update_time = #{item.updateTime},
         </if>
       </set>
-      where parent_id = #{parentId}
+      where parent_id = #{item.parentId}
     </foreach>
   </update>
 

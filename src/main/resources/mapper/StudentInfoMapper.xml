@@ -114,9 +114,6 @@
       UPDATE
       <include refid="BASE_TABLE"/>
       <set>
-        <if test="insertTime != null">
-          insert_time = #{insertTime},
-        </if>
         <if test="item.phoneUrl != null and item.phoneUrl != ''">
           phone_url = #{item.phoneUrl},
         </if>
@@ -157,7 +154,7 @@
           update_time = #{item.updateTime},
         </if>
       </set>
-      where student_id = #{studentId}
+      where student_id = #{item.studentId}
     </foreach>
   </update>
 

@@ -83,7 +83,7 @@
           update_time = #{item.updateTime},
         </if>
       </set>
-      where grade_id = #{gradeId}
+      where grade_id = #{item.gradeId}
     </foreach>
   </update>
 
