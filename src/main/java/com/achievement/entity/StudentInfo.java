@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +28,7 @@ public class StudentInfo implements Serializable {
   /**
    * 班级ID
    */
+  @NotBlank(message = "班级ID不能为空!")
   private String classId;
   /**
    * 班级ID集合
