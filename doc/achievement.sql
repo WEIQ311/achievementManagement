@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50719
 File Encoding         : 65001
 
-Date: 2018-10-09 14:08:53
+Date: 2018-10-09 21:32:29
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -142,6 +142,7 @@ CREATE TABLE `semester_info` (
   `semester_name` varchar(4000) DEFAULT NULL COMMENT '学期名称',
   `remark` varchar(4000) DEFAULT NULL COMMENT '备注',
   `status` int(10) DEFAULT '1',
+  `exam_time` datetime DEFAULT NULL COMMENT '考试时间',
   `score_begin_deadline` datetime DEFAULT NULL COMMENT '更新开始日期不能为空',
   `score_end_deadline` datetime DEFAULT NULL COMMENT '更新成绩截至日期',
   `insert_time` datetime DEFAULT NULL,
@@ -196,6 +197,7 @@ CREATE TABLE `teacher_info` (
   `teacher_name` varchar(4000) DEFAULT NULL COMMENT '教师名称',
   `teacher_num` varchar(255) NOT NULL COMMENT '教师编号',
   `phone_url` varchar(255) DEFAULT NULL,
+  `teacher_duty` varchar(255) DEFAULT '2' COMMENT '教师职责',
   `remark` varchar(4000) DEFAULT NULL COMMENT '备注',
   `sex` varchar(2) DEFAULT NULL COMMENT '性别',
   `tel_phone` varchar(12) DEFAULT NULL COMMENT '电话号码',
