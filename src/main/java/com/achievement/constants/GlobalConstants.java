@@ -16,6 +16,10 @@ public class GlobalConstants {
    */
   public static final String DATE_TIME_FORMATTER = "yyyyMMddHHmmss";
   /**
+   * 默认排名
+   */
+  public static final Integer DEFAULT_RANKING = 1;
+  /**
    * EXCEL首行数据
    */
   public static final String[] EXCEL_HEADER_TITLE = {"学生", "成绩"};
@@ -83,6 +87,5 @@ public class GlobalConstants {
    * 请求类型
    */
   public static final String X_REQUESTED_WIDTH = "X-Requested-With";
-
 
 }

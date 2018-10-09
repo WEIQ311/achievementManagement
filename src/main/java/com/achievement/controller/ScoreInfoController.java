@@ -125,6 +125,17 @@ public class ScoreInfoController {
   }
 
   /**
+   * 班级成绩信息
+   *
+   * @param scoreInfo 成绩信息
+   * @return ResultEntity
+   */
+  @RequestMapping(value = "listByClass", method = RequestMethod.GET)
+  public ResultEntity listByClass(ScoreInfo scoreInfo) {
+    return scoreInfoService.listByClass(scoreInfo);
+  }
+
+  /**
    * 家长查询学生成绩
    *
    * @param parentStudentScore 查询成绩信息

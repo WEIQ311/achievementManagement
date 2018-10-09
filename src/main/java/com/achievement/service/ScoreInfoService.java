@@ -34,6 +34,14 @@ public interface ScoreInfoService extends BaseInfoService<ScoreInfo, String> {
   ResultEntity importScoreByFile(MultipartFile scoreFile, ScoreInfo scoreInfo);
 
   /**
+   * 班级成绩信息
+   *
+   * @param scoreInfo 成绩信息
+   * @return ResultEntity
+   */
+  ResultEntity listByClass(ScoreInfo scoreInfo);
+
+  /**
    * 家长查询学生成绩
    *
    * @param parentStudentScore 查询成绩信息

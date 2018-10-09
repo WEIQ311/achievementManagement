@@ -147,6 +147,10 @@ public class ScoreInfo implements Serializable {
    */
   private String subjectName;
   /**
+   * 总成绩
+   */
+  private Double sumScore;
+  /**
    * 教师ID
    */
   @NotBlank(message = "教师ID不能为空!")
@@ -159,6 +163,10 @@ public class ScoreInfo implements Serializable {
    * 更新时间
    */
   private Date updateTime;
+  /**
+   * 学年ID
+   */
+  private String yearId;
   /**
    * 学年名称
    */

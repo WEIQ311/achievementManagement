@@ -25,7 +25,7 @@
   <sql id="SCORE_COLUMN">
     S.SCORE_ID, S.CLASS_ID, S.TEACHER_ID,S.INSERT_TIME, S.REMARK, S.SCORE_NUMBER, S.SEMESTER_ID, S.STATUS, S.STUDENT_ID,
     S.SUBJECT_ID, S.UPDATE_TIME,SUB.SUBJECT_NAME,CLA.CLASS_NAME,STU.STUDENT_NAME,TEA.TEACHER_NAME,SEM.SEMESTER_NAME,
-    GRA.GRADE_NAME,YEA.YEAR_NAME,GRA.GRADE_ID,CLA.CLASS_TYPE
+    GRA.GRADE_NAME,YEA.YEAR_ID,YEA.YEAR_NAME,GRA.GRADE_ID,CLA.CLASS_TYPE
   </sql>
 
   <!--成绩表、关联表-->
@@ -201,6 +201,48 @@
     <include refid="GRADE_TABLE_SQL"/>
     <include refid="GRADE_CALCULATE_SQL"/>
     <include refid="GRADE_CALCULATE_GROUP_SQL"/>
+  </select>
+
+  <!--班级排名信息-->
+  <select id="listClassScoreRanking" resultMap="ScoreInfoMap">
+    SELECT
+    S.SUBJECT_ID, GRA.GRADE_ID, GRA.GRADE_NAME, CLA.CLASS_ID,
+    CLA.CLASS_NAME, CLA.CLASS_TYPE, SUB.SUBJECT_NAME,
+    YEA.YEAR_ID,YEA.YEAR_NAME,SEM.SEMESTER_ID,SEM.SEMESTER_NAME,
+    SUM(S.SCORE_NUMBER) SUM_SCORE, MAX(S.SCORE_NUMBER) MAX_SCORE,
+    MIN(S.SCORE_NUMBER) MIN_SCORE, AVG(S.SCORE_NUMBER) AVG_SCORE
+    FROM
+    achievement.SCORE_INFO S, achievement.CLASS_INFO CLA,
+    achievement.GRADE_INFO GRA,achievement.SUBJECT_INFO SUB,
+    achievement.YEAR_INFO YEA,SEMESTER_INFO SEM
+    <where>
+      S.CLASS_ID = CLA.CLASS_ID
+      AND CLA.GRADE_ID = GRA.GRADE_ID
+      AND S.SUBJECT_ID=SUB.SUBJECT_ID
+      AND S.SEMESTER_ID=SEM.SEMESTER_ID
+      AND YEA.YEAR_ID=SEM.YEAR_ID
+      <if test="yearId!=null and yearId!=''">
+        AND YEA.YEAR_ID=#{yearId}
+      </if>
+      <if test="semesterId!=null and semesterId!=''">
+        AND S.SEMESTER_ID=#{semesterId}
+      </if>
+      <if test="subjectId!=null and subjectId!=''">
+        AND S.SUBJECT_ID=#{subjectId}
+      </if>
+      <if test="gradeId!=null and gradeId!=''">
+        AND CLA.GRADE_ID=#{gradeId}
+      </if>
+      <if test="classType!=null and classType!=''">
+        AND CLA.CLASS_TYPE=#{classType}
+      </if>
+    </where>
+    GROUP BY
+    S.SEMESTER_ID, S.SUBJECT_ID, CLA.CLASS_ID,
+    GRA.GRADE_ID,CLA.CLASS_TYPE,SEM.SEMESTER_ID,
+    YEA.YEAR_ID
+    ORDER BY
+    S.SUBJECT_ID , SUM(S.SCORE_NUMBER) DESC,S.CLASS_ID
   </select>
 
   <!--新增所有列-->

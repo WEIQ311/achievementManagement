@@ -418,6 +418,53 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
   }
 
   /**
+   * 班级成绩信息
+   *
+   * @param scoreInfo 成绩信息
+   * @return ResultEntity
+   */
+  @Override
+  public ResultEntity listByClass(ScoreInfo scoreInfo) {
+    if (null == scoreInfo) {
+      scoreInfo = ScoreInfo.builder().build();
+    }
+    String classId = scoreInfo.getClassId();
+    List<ScoreInfo> scoreInfos = scoreInfoMapper.listClassScoreRanking(scoreInfo);
+    Map<String, Integer> rankingMap = new HashMap<>();
+    scoreInfos.stream()
+        .collect(Collectors.toMap(info -> {
+          String gradeId = info.getGradeId();
+          String subjectId = info.getSubjectId();
+          String semesterId = info.getSemesterId();
+          String classType = info.getClassType();
+          String key = gradeId + INTERVAL_NUMBER + semesterId + INTERVAL_NUMBER + subjectId + INTERVAL_NUMBER + classType;
+          return key;
+        }, Function.identity(), (oldValue, newValue) -> newValue)).forEach((key, info) -> {
+      rankingMap.put(key, DEFAULT_RANKING);
+    });
+    scoreInfos.stream().forEach(info -> {
+      String gradeId = info.getGradeId();
+      String subjectId = info.getSubjectId();
+      String semesterId = info.getSemesterId();
+      String classType = info.getClassType();
+      String key = gradeId + INTERVAL_NUMBER + semesterId + INTERVAL_NUMBER + subjectId + INTERVAL_NUMBER + classType;
+      if (rankingMap.containsKey(key)) {
+        info.setClassRanking(rankingMap.get(key));
+        Integer ranking = rankingMap.get(key);
+        ranking += 1;
+        rankingMap.put(key, ranking);
+      } else {
+        info.setClassRanking(DEFAULT_RANKING);
+      }
+    });
+    if (StringUtils.isNotBlank(classId)) {
+      scoreInfos = scoreInfos.stream().filter(info -> Objects.equals(classId, info.getClassId()))
+          .collect(Collectors.toList());
+    }
+    return ResultUtil.success(GlobalEnum.QuerySuccess, scoreInfos);
+  }
+
+  /**
    * 家长查询学生成绩
    *
    * @param parentStudentScore 查询成绩信息
