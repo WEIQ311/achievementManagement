@@ -22,7 +22,7 @@ achievement:
   delete:
     #    删除成绩
     score: false
-
-
+  #    成绩管理系统首页
+  indexUrl: http://www.baidu.com
 
 
