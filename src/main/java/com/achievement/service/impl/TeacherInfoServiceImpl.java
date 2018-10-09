@@ -1,8 +1,10 @@
 package com.achievement.service.impl;
 
+import com.achievement.entity.ConfTeacherClass;
 import com.achievement.entity.TeacherInfo;
 import com.achievement.enums.GlobalEnum;
 import com.achievement.mapper.TeacherInfoMapper;
+import com.achievement.service.ConfTeacherClassService;
 import com.achievement.service.TeacherInfoService;
 import com.achievement.utils.GloabalUtils;
 import com.achievement.utils.ResultUtil;
@@ -10,6 +12,7 @@ import com.achievement.vo.ResultEntity;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +33,8 @@ import java.util.stream.Collectors;
 public class TeacherInfoServiceImpl implements TeacherInfoService {
   @Resource
   private TeacherInfoMapper teacherInfoMapper;
+  @Autowired
+  private ConfTeacherClassService confTeacherClassService;
 
   /**
    * 教师(TeacherInfo)信息Map
@@ -103,8 +108,28 @@ public class TeacherInfoServiceImpl implements TeacherInfoService {
   public ResultEntity list(TeacherInfo teacherInfo, int pageNum, int pageSize) {
     PageHelper.startPage(pageNum, pageSize);
     List<TeacherInfo> teacherInfoPage = teacherInfoMapper.list(teacherInfo);
+    convertTeacherInfo(teacherInfoPage);
     PageInfo pageInfo = new PageInfo(teacherInfoPage);
     return ResultUtil.success(GlobalEnum.QuerySuccess, pageInfo);
+  }
+
+  /**
+   * 教师信息
+   *
+   * @param teacherInfos 教师信息
+   */
+  private void convertTeacherInfo(List<TeacherInfo> teacherInfos) {
+    if (null == teacherInfos || teacherInfos.size() < 1) {
+      return;
+    }
+    Map<String, List<ConfTeacherClass>> teacherOfClassMap = confTeacherClassService.convertTeacherOfClassMap(ConfTeacherClass.builder().build());
+    teacherInfos.stream().forEach(teacherInfo -> {
+      String teacherId = teacherInfo.getTeacherId();
+      if (teacherOfClassMap.containsKey(teacherId)) {
+        List<ConfTeacherClass> confTeacherClasses = teacherOfClassMap.get(teacherId);
+        teacherInfo.setConfTeacherClasses(confTeacherClasses);
+      }
+    });
   }
 
   /**
@@ -116,6 +141,7 @@ public class TeacherInfoServiceImpl implements TeacherInfoService {
   @Override
   public ResultEntity list(TeacherInfo teacherInfo) {
     List<TeacherInfo> teacherInfos = teacherInfoMapper.list(teacherInfo);
+    convertTeacherInfo(teacherInfos);
     return ResultUtil.success(GlobalEnum.QuerySuccess, teacherInfos);
   }
 
