@@ -22,7 +22,7 @@ DROP TABLE IF EXISTS `subject_info`;
 CREATE TABLE `subject_info` (
   `subject_id` varchar(255) NOT NULL,
   `subject_name` varchar(300) DEFAULT NULL COMMENT '科目名称',
-  `subject_type` int(11) DEFAULT '1' COMMENT '学科类型：0:通用1:文科，2:理科，3:艺术',
+  `subject_type` int(11) DEFAULT '0' COMMENT '学科类型：0:通用1:文科，2:理科，3:艺术',
   `remark` varchar(4000) DEFAULT NULL COMMENT '备注',
   `status` int(10) DEFAULT '1',
   `insert_time` datetime DEFAULT NULL,
