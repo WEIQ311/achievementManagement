@@ -317,6 +317,7 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
       Integer gradeRanking = scoreInfoMap.get(scoreId).getGradeRanking();
       info.setClassRanking(classRanking);
       info.setGradeRanking(gradeRanking);
+      info.setGradeClassName(info.getGradeName() + DEFAULT_PREFIX + info.getClassName() + DEFAULT_SUFFIX);
     });
   }
 
@@ -456,6 +457,7 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
       } else {
         info.setClassRanking(DEFAULT_RANKING);
       }
+      info.setGradeClassName(info.getGradeName() + DEFAULT_PREFIX + info.getClassName() + DEFAULT_SUFFIX);
     });
     if (StringUtils.isNotBlank(classId)) {
       scoreInfos = scoreInfos.stream().filter(info -> Objects.equals(classId, info.getClassId()))

@@ -77,6 +77,10 @@ public class ScoreInfo implements Serializable {
    */
   private Integer gradeRanking;
   /**
+   * 年级名称
+   */
+  private String gradeClassName;
+  /**
    * 创建时间
    */
   private Date insertTime;
