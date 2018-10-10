@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.Date;
@@ -42,6 +43,7 @@ public class StudentInfo implements Serializable {
   /**
    * 监护人信息
    */
+  @Valid
   private List<ParentInfo> parentInfoList;
   /**
    * 头像url

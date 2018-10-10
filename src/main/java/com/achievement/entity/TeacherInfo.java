@@ -25,6 +25,10 @@ import java.util.List;
 public class TeacherInfo implements Serializable {
   private static final long serialVersionUID = -5760954050112830182L;
   /**
+   * 教师班级信息
+   */
+  private List<ConfTeacherClass> confTeacherClasses;
+  /**
    * 创建时间
    */
   private Date insertTime;
@@ -87,8 +91,4 @@ public class TeacherInfo implements Serializable {
    * 微博
    */
   private String xlWb;
-  /**
-   * 教师班级信息
-   */
-  private List<ConfTeacherClass> confTeacherClasses;
 }

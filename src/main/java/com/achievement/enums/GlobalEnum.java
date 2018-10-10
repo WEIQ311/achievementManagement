@@ -48,6 +48,8 @@ public enum GlobalEnum {
   SemesterIdEmpty("学期ID为空!"),
   ParentIdEmpty("家长ID为空!"),
   ParentInfoQueryEmpty("家长信息为空!"),
+  ParentNameEmpty("家长姓名不能为空!"),
+  ParentAndStudentTypeEmpty("家长\"%s\"与学生\"%s\"的关系不能为空!"),
   StudentInfoQueryEmpty("学生信息为空!"),
   ParentNoStudentInfo("该家长下不存在学生信息!"),
   TeacherNoSubject("教师\"%s\"不存在所授科目"),

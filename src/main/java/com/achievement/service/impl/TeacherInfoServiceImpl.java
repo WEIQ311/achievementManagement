@@ -31,10 +31,10 @@ import java.util.stream.Collectors;
  */
 @Service("teacherInfoService")
 public class TeacherInfoServiceImpl implements TeacherInfoService {
-  @Resource
-  private TeacherInfoMapper teacherInfoMapper;
   @Autowired
   private ConfTeacherClassService confTeacherClassService;
+  @Resource
+  private TeacherInfoMapper teacherInfoMapper;
 
   /**
    * 教师(TeacherInfo)信息Map

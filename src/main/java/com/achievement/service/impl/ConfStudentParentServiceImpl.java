@@ -24,6 +24,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.achievement.constants.GlobalConstants.OPERATE_TYPE_INSERT;
+import static com.achievement.constants.GlobalConstants.OPERATE_TYPE_UPDATE;
 
 /**
  * (ConfStudentParent)表服务实现类
@@ -193,5 +194,24 @@ public class ConfStudentParentServiceImpl implements ConfStudentParentService {
   public ResultEntity list(ConfStudentParent confStudentParent) {
     List<ConfStudentParent> studentParents = confStudentParentMapper.list(confStudentParent);
     return ResultUtil.success(GlobalEnum.QuerySuccess, studentParents);
+  }
+
+  /**
+   * 更新学生与家长关系信息
+   *
+   * @param confStudentParents 学生与家长关系信息
+   * @return ResultEntity
+   */
+  @Override
+  public ResultEntity update(List<ConfStudentParent> confStudentParents) {
+    if (null == confStudentParents || confStudentParents.size() < 1) {
+      return ResultUtil.error(GlobalEnum.DataEmpty);
+    }
+    checkConfInfo(confStudentParents, OPERATE_TYPE_UPDATE);
+    Integer updateCount = confStudentParentMapper.update(confStudentParents);
+    if (updateCount > 0) {
+      return ResultUtil.success(GlobalEnum.UpdateSuccess, confStudentParents);
+    }
+    return ResultUtil.error(GlobalEnum.UpdateError);
   }
 }

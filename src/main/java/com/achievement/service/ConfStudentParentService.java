@@ -77,4 +77,12 @@ public interface ConfStudentParentService {
    * @return ResultEntity
    */
   ResultEntity list(ConfStudentParent confStudentParent);
+
+  /**
+   * 更新学生与家长关系信息
+   *
+   * @param confStudentParents 学生与家长关系信息
+   * @return ResultEntity
+   */
+  ResultEntity update(List<ConfStudentParent> confStudentParents);
 }

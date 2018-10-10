@@ -13,6 +13,7 @@ import com.achievement.utils.ResultUtil;
 import com.achievement.vo.ResultEntity;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
  * @author weiQiang
  * @since 2018-10-02 17:52:27
  */
+@Slf4j
 @Service("studentInfoService")
 public class StudentInfoServiceImpl implements StudentInfoService {
   @Autowired
@@ -142,6 +144,7 @@ public class StudentInfoServiceImpl implements StudentInfoService {
       studentInfo.setStudentId("student_" + GloabalUtils.ordinaryId());
     });
     Integer insertCount = studentInfoMapper.insert(studentInfoList);
+    insertOrUpdateParent(studentInfoList);
     if (insertCount > 0) {
       return ResultUtil.success(GlobalEnum.InsertSuccess, studentInfoList);
     }
@@ -206,9 +209,84 @@ public class StudentInfoServiceImpl implements StudentInfoService {
       }
     });
     Integer updateCount = studentInfoMapper.update(studentInfoList);
+    insertOrUpdateParent(studentInfoList);
     if (updateCount > 0) {
       return ResultUtil.success(GlobalEnum.UpdateSuccess, studentInfoList);
     }
     return ResultUtil.error(GlobalEnum.UpdateError);
+  }
+
+  /**
+   * 增加或编辑学生家长关系信息
+   *
+   * @param studentInfos 学生信息
+   * @return ResultEntity
+   */
+  private void insertOrUpdateParent(List<StudentInfo> studentInfos) {
+    if (null == studentInfos || studentInfos.size() < 1) {
+      return;
+    }
+    Map<String, List<ConfStudentParent>> studentOfParentMap = confStudentParentService.convertStudentOfParentMap(ConfStudentParent.builder().build());
+    List<ConfStudentParent> insertConfStudentParents = new ArrayList<>();
+    List<ConfStudentParent> updateConfStudentParents = new ArrayList<>();
+    List<ParentInfo> insertParentInfos = new ArrayList<>();
+    List<ParentInfo> updateParentInfos = new ArrayList<>();
+    studentInfos.stream()
+        .filter(studentInfo -> null != studentInfo.getParentInfoList() && studentInfo.getParentInfoList().size() > 0)
+        .forEach(studentInfo -> {
+          String studentId = studentInfo.getStudentId();
+          String studentName = studentInfo.getStudentName();
+          List<ParentInfo> parentInfoList = studentInfo.getParentInfoList();
+          parentInfoList.stream().forEach(parentInfo -> {
+            String parentId = parentInfo.getParentId();
+            String parentName = parentInfo.getParentName();
+            String connectionType = parentInfo.getConnectionType();
+            if (StringUtils.isBlank(parentName)) {
+              GloabalUtils.convertMessage(GlobalEnum.ParentNameEmpty);
+            }
+            if (StringUtils.isBlank(connectionType)) {
+              GloabalUtils.convertMessage(GlobalEnum.ParentAndStudentTypeEmpty, parentName, studentName);
+            }
+            if (StringUtils.isBlank(parentId)) {
+              parentId = "parent_" + GloabalUtils.ordinaryId();
+              insertParentInfos.add(parentInfo);
+              insertConfStudentParents.add(ConfStudentParent.builder().studentId(studentId).parentId(parentId).connectionType(connectionType).build());
+            } else {
+              if (studentOfParentMap.containsKey(studentId) && null != studentOfParentMap.get(studentId) && studentOfParentMap.get(studentId).size() > 0) {
+                String finalParentId = parentId;
+                studentOfParentMap.get(studentId).stream().forEach(confStudentParent -> {
+                  String confParentId = confStudentParent.getParentId();
+                  String confConnectionType = confStudentParent.getConnectionType();
+                  if (Objects.equals(finalParentId, confParentId) && !Objects.equals(connectionType, confConnectionType)) {
+                    confStudentParent.setConnectionType(connectionType);
+                    updateConfStudentParents.add(confStudentParent);
+                  } else if (!Objects.equals(finalParentId, confParentId)) {
+                    insertConfStudentParents.add(ConfStudentParent.builder().studentId(studentId).parentId(finalParentId).connectionType(connectionType).build());
+                  }
+                });
+              } else {
+                insertConfStudentParents.add(ConfStudentParent.builder().studentId(studentId).parentId(parentId).connectionType(connectionType).build());
+              }
+              updateParentInfos.add(parentInfo);
+            }
+          });
+        });
+
+    if (insertParentInfos.size() > 0) {
+      ResultEntity insert = parentInfoService.insert(insertParentInfos);
+      log.info("增加家长信息:{}", insert);
+    }
+    if (updateConfStudentParents.size() > 0) {
+      ResultEntity update = parentInfoService.update(updateParentInfos);
+      log.info("更新家长信息:{}", update);
+    }
+    if (insertConfStudentParents.size() > 0) {
+      ResultEntity insert = confStudentParentService.insert(insertConfStudentParents);
+      log.info("增加学生与家长关系:{}", insert);
+    }
+    if (updateConfStudentParents.size() > 0) {
+      ResultEntity update = confStudentParentService.update(updateConfStudentParents);
+      log.info("更新学生与家长关系:{}", update);
+    }
   }
 }

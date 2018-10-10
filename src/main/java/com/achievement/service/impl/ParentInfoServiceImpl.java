@@ -83,7 +83,11 @@ public class ParentInfoServiceImpl implements ParentInfoService {
     if (null == parentInfoList || parentInfoList.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
-    parentInfoList.stream().forEach(parentInfo -> parentInfo.setParentId("parent_" + GloabalUtils.ordinaryId()));
+    parentInfoList.stream().forEach(parentInfo -> {
+      if (StringUtils.isBlank(parentInfo.getParentId())) {
+        parentInfo.setParentId("parent_" + GloabalUtils.ordinaryId());
+      }
+    });
     Integer insertCount = parentInfoMapper.insert(parentInfoList);
     if (insertCount > 0) {
       return ResultUtil.success(GlobalEnum.InsertSuccess, parentInfoList);
