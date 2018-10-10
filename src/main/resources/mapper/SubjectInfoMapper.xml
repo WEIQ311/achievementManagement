@@ -7,13 +7,14 @@
     <result property="insertTime" column="insert_time" jdbcType="TIMESTAMP"/>
     <result property="remark" column="remark" jdbcType="VARCHAR"/>
     <result property="status" column="status" jdbcType="INTEGER"/>
+    <result property="subjectType" column="subject_type" jdbcType="INTEGER"/>
     <result property="subjectName" column="subject_name" jdbcType="VARCHAR"/>
     <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
   </resultMap>
 
   <!--列集合-->
   <sql id="BASE_COLUMN">
-     SUBJECT_ID, INSERT_TIME, REMARK, STATUS, SUBJECT_NAME, UPDATE_TIME
+     SUBJECT_ID, INSERT_TIME, REMARK, STATUS, SUBJECT_NAME, UPDATE_TIME,SUBJECT_TYPE
   </sql>
   <!--表名-->
   <sql id="BASE_TABLE">
@@ -45,6 +46,9 @@
       <if test="updateTime != null">
         and update_time = #{updateTime}
       </if>
+      <if test="subjectType != null">
+        and subject_type = #{subjectType}
+      </if>
     </where>
   </select>
 
@@ -58,7 +62,8 @@
     VALUES
     <foreach collection="list" item="item" index="index" separator=",">
       (
-      #{item.subjectId},SYSDATE(), #{item.remark}, #{item.status}, #{item.subjectName}, SYSDATE()
+      #{item.subjectId},SYSDATE(), #{item.remark}, #{item.status}, #{item.subjectName},
+      SYSDATE(),#{item.subjectType}
       )
     </foreach>
   </insert>
@@ -83,6 +88,9 @@
         </if>
         <if test="item.updateTime != null">
           update_time = #{item.updateTime},
+        </if>
+        <if test="item.subjectType != null">
+          subject_type = #{item.subjectType},
         </if>
       </set>
       where subject_id = #{item.subjectId}

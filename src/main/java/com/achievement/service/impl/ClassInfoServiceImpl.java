@@ -134,6 +134,25 @@ public class ClassInfoServiceImpl implements ClassInfoService {
   }
 
   /**
+   * 班级信息Map
+   *
+   * @param classInfo
+   * @return Map
+   */
+  @Override
+  public Map<String, ClassInfo> convertClassNameAndGradeNameMap(ClassInfo classInfo) {
+    List<ClassInfo> classInfoList = classInfoMapper.list(classInfo);
+    Map<String, GradeInfo> gradeInfoMap = gradeInfoService.convertRecordToMap(GradeInfo.builder().build());
+    Map<String, ClassInfo> classInfoMap = classInfoList.stream()
+        .filter(info -> StringUtils.isNotBlank(info.getClassName())
+            && StringUtils.isNotEmpty(info.getGradeId()) && gradeInfoMap.containsKey(info.getGradeId()))
+        .collect(Collectors.toMap(info -> info.getClassName() + INTERVAL_NUMBER + gradeInfoMap.get(info.getGradeId()).getGradeName(),
+            Function.identity(), (oldValue, newValue) -> newValue)
+        );
+    return classInfoMap;
+  }
+
+  /**
    * 增加或编辑班级班主任
    *
    * @param classInfos 班级信息

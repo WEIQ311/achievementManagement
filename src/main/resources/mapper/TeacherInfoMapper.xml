@@ -5,29 +5,30 @@
   <resultMap type="com.achievement.entity.TeacherInfo" id="TeacherInfoMap">
     <result property="teacherId" column="teacher_id" jdbcType="VARCHAR"/>
     <result property="teacherNum" column="teacher_num" jdbcType="VARCHAR"/>
-    <result property="insertTime" column="insert_time" jdbcType="TIMESTAMP"/>
+    <result property="subjectId" column="subject_id" jdbcType="VARCHAR"/>
     <result property="phoneUrl" column="phone_url" jdbcType="VARCHAR"/>
-    <result property="remark" column="remark" jdbcType="VARCHAR"/>
     <result property="sex" column="sex" jdbcType="VARCHAR"/>
-    <result property="status" column="status" jdbcType="INTEGER"/>
     <result property="teacherDuty" column="teacher_duty" jdbcType="VARCHAR"/>
     <result property="teacherName" column="teacher_name" jdbcType="VARCHAR"/>
     <result property="telPhone" column="tel_phone" jdbcType="VARCHAR"/>
     <result property="txQq" column="tx_qq" jdbcType="VARCHAR"/>
     <result property="txWx" column="tx_wx" jdbcType="VARCHAR"/>
-    <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
     <result property="xlWb" column="xl_wb" jdbcType="VARCHAR"/>
+    <result property="remark" column="remark" jdbcType="VARCHAR"/>
+    <result property="status" column="status" jdbcType="INTEGER"/>
+    <result property="insertTime" column="insert_time" jdbcType="TIMESTAMP"/>
+    <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
   </resultMap>
 
   <!--列集合-->
   <sql id="BASE_COLUMN">
-      teacher_id,teacher_num, insert_time, phone_url, remark, sex, status, teacher_name, tel_phone, tx_qq, tx_wx, update_time, xl_wb,teacher_duty
+      teacher_id,teacher_num, insert_time, phone_url, remark, sex, status, teacher_name,
+       tel_phone, tx_qq, tx_wx, update_time, xl_wb,teacher_duty,subject_id
   </sql>
   <!--表名-->
   <sql id="BASE_TABLE">
 		achievement.teacher_info
 	</sql>
-
 
   <!--通过实体作为筛选条件查询-->
   <select id="list" resultMap="TeacherInfoMap">
@@ -78,6 +79,9 @@
       <if test="teacherDuty != null and teacherDuty != ''">
         and teacher_duty = #{teacherDuty}
       </if>
+      <if test="subjectId != null and subjectId != ''">
+        and subject_id = #{subjectId}
+      </if>
     </where>
   </select>
 
@@ -92,11 +96,10 @@
       #{item.teacherId},#{item.teacherNum}, SYSDATE(), #{item.phoneUrl}, #{item.remark}, #{item.sex},
       #{item.status},
       #{item.teacherName}, #{item.telPhone}, #{item.txQq}, #{item.txWx}, SYSDATE(), #{item.xlWb},
-      #{item.teacherDuty}
+      #{item.teacherDuty}, #{item.subjectId}
       )
     </foreach>
   </insert>
-
 
   <!--通过主键修改数据-->
   <update id="update" parameterType="java.util.List">
@@ -139,6 +142,9 @@
         </if>
         <if test="item.teacherDuty != null and item.teacherDuty != ''">
           teacher_duty =  #{item.teacherDuty},
+        </if>
+        <if test="item.subjectId != null and item.subjectId != ''">
+          subject_id =  #{item.subjectId},
         </if>
         <if test="item.updateTime==null">
           update_time = SYSDATE(),

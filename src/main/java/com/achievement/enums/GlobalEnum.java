@@ -58,6 +58,7 @@ public enum GlobalEnum {
   StudentInfoEmpty("学生ID\"%s\"不存在,请检查!"),
   SubjectInfoEmpty("学科ID\"%s\"不存在,请检查!"),
   SubjectNameInfoEmpty("学科\"%s\"不存在,请检查!"),
+  SheetNameError("导入文件sheet\"%s\"名称错误,请检查!"),
   TeacherInfoEmpty("教师ID\"%s\"不存在,请检查!"),
   SemesterInfoEmpty("学期ID\"%s\"不存在,请检查!"),
   ParentInfoEmpty("家长ID\"%s\"不存在,请检查!"),

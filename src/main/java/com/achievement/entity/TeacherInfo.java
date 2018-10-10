@@ -91,4 +91,9 @@ public class TeacherInfo implements Serializable {
    * 微博
    */
   private String xlWb;
+
+  /**
+   * 科目ID
+   */
+  private String subjectId;
 }

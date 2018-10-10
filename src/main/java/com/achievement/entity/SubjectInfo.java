@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -58,4 +59,13 @@ public class SubjectInfo implements Serializable {
    * 更新时间
    */
   private Date updateTime;
+  /**
+   * 学科类型
+   * 0:通用,
+   * 1:文科,
+   * 2:理科,
+   * 3:艺术
+   */
+  @NotNull(message = "学科类型不能为空!")
+  private Integer subjectType;
 }

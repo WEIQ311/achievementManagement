@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50719
 File Encoding         : 65001
 
-Date: 2018-10-09 21:32:29
+Date: 2018-10-10 15:45:51
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -52,17 +52,7 @@ CREATE TABLE `conf_teacher_class` (
   `teacher_id` varchar(255) NOT NULL COMMENT '教师ID',
   `class_id` varchar(255) NOT NULL COMMENT '班级ID',
   `teacher_duty` varchar(255) NOT NULL DEFAULT '代课教师' COMMENT '教师职责',
-  PRIMARY KEY (`conf_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Table structure for conf_teacher_subject
--- ----------------------------
-DROP TABLE IF EXISTS `conf_teacher_subject`;
-CREATE TABLE `conf_teacher_subject` (
-  `conf_id` varchar(255) NOT NULL COMMENT '主键',
-  `teacher_id` varchar(255) NOT NULL COMMENT '教师ID',
-  `subject_id` varchar(255) DEFAULT NULL COMMENT '学科ID',
+  `subject_id` varchar(255) NOT NULL DEFAULT '1' COMMENT '学科ID',
   PRIMARY KEY (`conf_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -180,6 +170,7 @@ DROP TABLE IF EXISTS `subject_info`;
 CREATE TABLE `subject_info` (
   `subject_id` varchar(255) NOT NULL,
   `subject_name` varchar(300) DEFAULT NULL COMMENT '科目名称',
+  `subject_type` int(11) DEFAULT '1' COMMENT '学科类型：0:通用1:文科，2:理科，3:艺术',
   `remark` varchar(4000) DEFAULT NULL COMMENT '备注',
   `status` int(10) DEFAULT '1',
   `insert_time` datetime DEFAULT NULL,
@@ -196,6 +187,7 @@ CREATE TABLE `teacher_info` (
   `teacher_id` varchar(255) NOT NULL,
   `teacher_name` varchar(4000) DEFAULT NULL COMMENT '教师名称',
   `teacher_num` varchar(255) NOT NULL COMMENT '教师编号',
+  `subject_id` varchar(255) DEFAULT NULL COMMENT '学科ID',
   `phone_url` varchar(255) DEFAULT NULL,
   `teacher_duty` varchar(255) DEFAULT '2' COMMENT '教师职责',
   `remark` varchar(4000) DEFAULT NULL COMMENT '备注',

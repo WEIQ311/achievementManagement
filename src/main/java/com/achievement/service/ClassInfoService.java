@@ -19,4 +19,12 @@ public interface ClassInfoService extends BaseInfoService<ClassInfo, String> {
    * @return Map
    */
   Map<String, ClassInfo> convertClassNameAndGradeIdMap(ClassInfo classInfo);
+
+  /**
+   * 班级信息Map
+   *
+   * @param classInfo
+   * @return Map
+   */
+  Map<String, ClassInfo> convertClassNameAndGradeNameMap(ClassInfo classInfo);
 }

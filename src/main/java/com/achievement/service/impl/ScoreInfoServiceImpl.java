@@ -42,11 +42,11 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
   @Autowired
   private ClassInfoService classInfoService;
   @Autowired
+  private GradeInfoService gradeInfoService;
+  @Autowired
   private ConfStudentParentService confStudentParentService;
   @Autowired
   private ConfTeacherClassService confTeacherClassService;
-  @Autowired
-  private ConfTeacherSubjectService confTeacherSubjectService;
   @Value("${achievement.delete.score}")
   private boolean deleteScore;
   @Autowired
@@ -330,54 +330,72 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
   @Override
   public void exportScoreTemplate(TeacherInfo teacherInfo, HttpServletResponse response) {
     String teacherId = teacherInfo.getTeacherId();
-    List<List<String>> contentList = new ArrayList<>();
     StringBuilder fileNameBuilder = new StringBuilder("学生成绩信息");
     fileNameBuilder.append(UNDER_LINE);
     HSSFWorkbook workbook = new HSSFWorkbook();
     if (StringUtils.isNotBlank(teacherId)) {
       Map<String, SubjectInfo> subjectInfoMap = subjectInfoService.convertRecordToMap(SubjectInfo.builder().build());
       Map<String, TeacherInfo> teacherInfoMap = teacherInfoService.convertRecordToMap(TeacherInfo.builder().teacherId(teacherId).build());
+      Map<String, ClassInfo> classInfoMap = classInfoService.convertRecordToMap(ClassInfo.builder().build());
+      Map<String, GradeInfo> gradeInfoMap = gradeInfoService.convertRecordToMap(GradeInfo.builder().build());
       if (null == teacherInfoMap || teacherInfoMap.isEmpty()) {
         GloabalUtils.convertMessage(GlobalEnum.TeacherInfoEmpty, teacherId);
       }
       String teacherName = teacherInfoMap.get(teacherId).getTeacherName();
-      Map<String, List<ConfTeacherSubject>> teacherOfSubjectMap = confTeacherSubjectService.convertTeacherOfSubjectMap(ConfTeacherSubject.builder().teacherId(teacherId).build());
-      if (null == teacherOfSubjectMap || teacherOfSubjectMap.isEmpty()) {
-        GloabalUtils.convertMessage(GlobalEnum.TeacherNoSubject, teacherName);
-      }
       Map<String, List<ConfTeacherClass>> teacherOfClassMap = confTeacherClassService.convertTeacherOfClassMap(ConfTeacherClass.builder().teacherId(teacherId).build());
       if (null == teacherOfClassMap || teacherOfClassMap.isEmpty()) {
-        GloabalUtils.convertMessage(GlobalEnum.TeacherNoClass, teacherName);
+        GloabalUtils.convertMessage(GlobalEnum.TeacherNoSubject, teacherName);
       }
-      List<ConfTeacherSubject> confTeacherSubjects = teacherOfSubjectMap.get(teacherId);
       List<ConfTeacherClass> confTeacherClasses = teacherOfClassMap.get(teacherId);
       List<String> classIds = confTeacherClasses.stream().filter(confTeacherClass -> StringUtils.isNotBlank(confTeacherClass.getClassId()))
           .map(ConfTeacherClass::getClassId)
           .distinct().collect(Collectors.toList());
       Map<String, StudentInfo> studentInfoMap = studentInfoService.convertRecordToMap(StudentInfo.builder().classIds(classIds).build());
+      Map<String, List<List<String>>> studentListMap = new HashMap<>();
       studentInfoMap.forEach((studentId, studentInfo) -> {
+        List<List<String>> contentList = new ArrayList<>();
+        String classId = studentInfo.getClassId();
         List<String> studentNameList = new ArrayList<String>() {{
           add(studentInfo.getStudentName());
           add(new String());
         }};
         contentList.add(studentNameList);
+        if (studentListMap.containsKey(classId)) {
+          List<List<String>> lists = studentListMap.get(classId);
+          contentList.addAll(lists);
+          studentListMap.put(classId, contentList);
+        } else {
+          studentListMap.put(classId, contentList);
+        }
       });
-      for (int i = 0; i < confTeacherSubjects.size(); i++) {
-        ConfTeacherSubject confTeacherSubject = confTeacherSubjects.get(i);
-        String subjectId = confTeacherSubject.getSubjectId();
+      for (int i = 0; i < confTeacherClasses.size(); i++) {
+        ConfTeacherClass confTeacherClass = confTeacherClasses.get(i);
+        String subjectId = confTeacherClass.getSubjectId();
         if (!subjectInfoMap.containsKey(subjectId)) {
           GloabalUtils.convertMessage(GlobalEnum.SubjectInfoEmpty, subjectId);
         }
         String subjectName = subjectInfoMap.getOrDefault(subjectId, SubjectInfo.builder().subjectName(subjectId).build()).getSubjectName();
+        String classId = confTeacherClass.getClassId();
+        if (!classInfoMap.containsKey(classId)) {
+          GloabalUtils.convertMessage(GlobalEnum.ClassInfoEmpty, classId);
+        }
+        ClassInfo classInfo = classInfoMap.get(classId);
+        String className = classInfo.getClassName();
+        String gradeId = classInfo.getGradeId();
+        if (!gradeInfoMap.containsKey(gradeId)) {
+          GloabalUtils.convertMessage(GlobalEnum.GradeIdError, className, gradeId);
+        }
+        String gradeName = gradeInfoMap.get(gradeId).getGradeName();
         Integer sheetNum = i;
-        String sheetName = subjectName;
+        String sheetName = subjectName + INTERVAL_NUMBER + gradeName + INTERVAL_NUMBER + className;
+        List<List<String>> contentList = studentListMap.getOrDefault(classId, new ArrayList<>());
         PoiUtil.exportExcel(workbook, sheetNum, sheetName, EXCEL_HEADER_TITLE, contentList);
       }
       fileNameBuilder.append(teacherName);
     } else {
       Integer sheetNum = 0;
       String sheetName = "请填写科目";
-      PoiUtil.exportExcel(workbook, sheetNum, sheetName, EXCEL_HEADER_TITLE, contentList);
+      PoiUtil.exportExcel(workbook, sheetNum, sheetName, EXCEL_HEADER_TITLE, new ArrayList<>());
       fileNameBuilder.append(System.currentTimeMillis());
     }
     fileNameBuilder.append(INTERVAL_POINT);
@@ -618,19 +636,45 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
     List<ScoreInfo> scoreInfoList = new ArrayList<>();
     if (null != scoreInfoMap && !scoreInfoMap.isEmpty()) {
       String teacherId = scoreInfo.getTeacherId();
-      String classId = scoreInfo.getClassId();
+      final String[] classId = {scoreInfo.getClassId()};
       String semesterId = scoreInfo.getSemesterId();
       Map<String, SubjectInfo> subjectInfoMap = subjectInfoService.convertRecordToMap(SubjectInfo.builder().build()).values().stream()
           .filter(subjectInfo -> StringUtils.isNotBlank(subjectInfo.getSubjectName()))
           .collect(Collectors.toMap(SubjectInfo::getSubjectName, Function.identity(),
               (oldValue, newValue) -> newValue));
-      Map<String, StudentInfo> studentInfoMap = studentInfoService.convertRecordToMap(StudentInfo.builder().classId(classId).build()).values().stream()
+      Map<String, ClassInfo> classInfoMap = classInfoService.convertClassNameAndGradeNameMap(ClassInfo.builder().build());
+      Map<String, StudentInfo> studentInfoMap = studentInfoService.convertRecordToMap(StudentInfo.builder().classId(classId[0]).build()).values().stream()
           .filter(studentInfo -> StringUtils.isNotBlank(studentInfo.getStudentName()))
           .collect(Collectors.toMap(StudentInfo::getStudentName, Function.identity(),
               (oldValue, newValue) -> newValue));
-      scoreInfoMap.forEach((subjectName, scoreInfos) -> {
+      scoreInfoMap.forEach((subjectAndGradeAndClassName, scoreInfos) -> {
+        String subjectName = "";
+        String gradeName = "";
+        String className = "";
+        String classAndGradeName = "";
+        if (!subjectAndGradeAndClassName.contains(INTERVAL_NUMBER)) {
+          subjectName = subjectAndGradeAndClassName;
+        } else {
+          String[] strings = subjectAndGradeAndClassName.split(INTERVAL_NUMBER);
+          if (strings.length != 3) {
+            GloabalUtils.convertMessage(GlobalEnum.SheetNameError, subjectAndGradeAndClassName);
+          } else {
+            subjectName = strings[0];
+            gradeName = strings[1];
+            className = strings[2];
+            classAndGradeName = className + INTERVAL_NUMBER + gradeName;
+          }
+        }
         if (!subjectInfoMap.containsKey(subjectName)) {
           GloabalUtils.convertMessage(GlobalEnum.SubjectNameInfoEmpty, subjectName);
+        }
+
+        if (StringUtils.isNotBlank(classAndGradeName)) {
+          if (!classInfoMap.containsKey(classAndGradeName)) {
+            GloabalUtils.convertMessage(GlobalEnum.ClassNameInGrade, className, gradeName);
+          } else {
+            classId[0] = classInfoMap.get(classAndGradeName).getClassId();
+          }
         }
         String subjectId = subjectInfoMap.get(subjectName).getSubjectId();
         if (null == scoreInfos || scoreInfos.size() < 2) {
@@ -643,7 +687,7 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
           if (headers.length != bodies.length) {
             GloabalUtils.convertMessage(GlobalEnum.ScoreInfoNoMatchFirstRow, subjectName, message);
           } else {
-            ScoreInfo newScoreInfo = ScoreInfo.builder().teacherId(teacherId).classId(classId).semesterId(semesterId).subjectId(subjectId).build();
+            ScoreInfo newScoreInfo = ScoreInfo.builder().teacherId(teacherId).classId(classId[0]).semesterId(semesterId).subjectId(subjectId).build();
             for (int j = 0; j < headers.length; j++) {
               String header = headers[j];
               String body = bodies[j];

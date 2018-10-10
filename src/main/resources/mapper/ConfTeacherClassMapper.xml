@@ -6,12 +6,13 @@
     <result property="confId" column="conf_id" jdbcType="VARCHAR"/>
     <result property="teacherId" column="teacher_id" jdbcType="VARCHAR"/>
     <result property="classId" column="class_id" jdbcType="VARCHAR"/>
+    <result property="subjectId" column="subject_id" jdbcType="VARCHAR"/>
     <result property="teacherDuty" column="teacher_duty" jdbcType="VARCHAR"/>
   </resultMap>
 
   <!--列集合-->
   <sql id="BASE_COLUMN">
-      CONF_ID, TEACHER_ID, CLASS_ID,TEACHER_DUTY
+      CONF_ID, TEACHER_ID, CLASS_ID,TEACHER_DUTY,SUBJECT_ID
   </sql>
   <!--表名-->
   <sql id="BASE_TABLE">
@@ -37,6 +38,9 @@
       <if test="teacherDuty != null and teacherDuty != ''">
         and teacher_duty = #{teacherDuty}
       </if>
+      <if test="subjectId != null and subjectId != ''">
+        and subject_id = #{subjectId}
+      </if>
     </where>
   </select>
 
@@ -46,7 +50,7 @@
     VALUES
     <foreach collection="list" item="item" index="index" separator=",">
       (
-      #{item.confId}, #{item.teacherId}, #{item.classId} ,#{item.teacherDuty})
+      #{item.confId}, #{item.teacherId}, #{item.classId} ,#{item.teacherDuty},#{item.subjectId})
     </foreach>
   </insert>
 
@@ -64,6 +68,9 @@
         </if>
         <if test="item.teacherDuty != null and item.teacherDuty != ''">
           teacher_duty = #{item.teacherDuty}
+        </if>
+        <if test="item.subjectId != null and item.subjectId != ''">
+          subject_id = #{item.subjectId}
         </if>
       </set>
       where conf_id = #{item.confId}
