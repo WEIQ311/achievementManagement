@@ -1,11 +1,14 @@
 package com.achievement.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 学科成绩表
@@ -33,6 +36,7 @@ public class SubjectScoreInfo implements Serializable {
   /**
    * 学期ID
    */
+  @NotBlank(message = "学期ID不能为空")
   private String semesterId;
 
   /**
@@ -46,6 +50,11 @@ public class SubjectScoreInfo implements Serializable {
   private String classId;
 
   /**
+   * 班级名称
+   */
+  private String className;
+
+  /**
    * 班级类型
    */
   private String classType;
@@ -54,6 +63,11 @@ public class SubjectScoreInfo implements Serializable {
    * 学生ID
    */
   private String studentId;
+
+  /**
+   * 教师ID
+   */
+  private String teacherId;
 
   /**
    * 年级排名
@@ -129,5 +143,68 @@ public class SubjectScoreInfo implements Serializable {
    * 音乐
    */
   private Double subMusic;
+
+  /**
+   * 最高成绩
+   */
+  private Double maxScore;
+  /**
+   * 最低成绩
+   */
+  private Double minScore;
+  /**
+   * 平均成绩
+   */
+  private Double avgScore;
+
+  /**
+   * 年级平均成绩
+   */
+  private Double gradeAvgScore;
+  /**
+   * 年级最高成绩
+   */
+  private Double gradeMaxScore;
+  /**
+   * 年级最低成绩
+   */
+  private Double gradeMinScore;
+  /**
+   * 年级名称
+   */
+  private String gradeName;
+  /**
+   * 年级名称
+   */
+  private String gradeClassName;
+
+  /**
+   * 科目ID
+   */
+  private String subjectId;
+  /**
+   * 成绩
+   */
+  private Double scoreNumber;
+  /**
+   * 排序字段
+   */
+  @JsonIgnore
+  private String orderColumn;
+  /**
+   * 排序方向
+   */
+  @JsonIgnore
+  private String orderDirection;
+
+  /**
+   * 添加时间
+   */
+  private Date insertTime;
+
+  /**
+   * 更新时间
+   */
+  private Date updateTime;
 
 }

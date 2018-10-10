@@ -1,8 +1,8 @@
 package com.achievement.controller;
 
-import com.achievement.entity.ScoreInfo;
+import com.achievement.entity.SubjectScoreInfo;
 import com.achievement.entity.TeacherInfo;
-import com.achievement.service.ScoreInfoService;
+import com.achievement.service.SubjectScoreInfoService;
 import com.achievement.utils.ResultUtil;
 import com.achievement.vo.ObjectInfo;
 import com.achievement.vo.ParentStudentScore;
@@ -16,25 +16,23 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.ArrayList;
 
-
 /**
- * 成绩(ScoreInfo)表控制层
+ * (SubjectScoreInfo)表控制层
  *
- * @author weiQiang
- * @since 2018-10-02 17:52:27
+ * @author 魏强
+ * @since 2018-10-10 16:15:35
  */
 @RestController
-@RequestMapping("oldScoreInfo")
-@CrossOrigin
-public class ScoreInfoController {
+@RequestMapping("scoreInfo")
+public class SubjectScoreInfoController {
   /**
-   * Service
+   * 服务对象
    */
   @Autowired
-  private ScoreInfoService scoreInfoService;
+  private SubjectScoreInfoService subjectScoreInfoService;
 
   /**
-   * 根据主键集合删除成绩(ScoreInfo)
+   * 根据主键集合删除成绩(SubjectScoreInfo)
    *
    * @param objectInfo 主键集合
    * @return ResultEntity
@@ -44,18 +42,18 @@ public class ScoreInfoController {
     if (bindingResult.hasErrors()) {
       return ResultUtil.error(bindingResult.getFieldError().getDefaultMessage());
     }
-    return scoreInfoService.delete(objectInfo.getIds());
+    return subjectScoreInfoService.delete(objectInfo.getIds());
   }
 
   /**
-   * 删除成绩(ScoreInfo)
+   * 删除成绩(SubjectScoreInfo)
    *
    * @param scoreId 主键
    * @return ResultEntity
    */
   @RequestMapping(path = "{scoreId}", method = RequestMethod.DELETE)
   public ResultEntity delete(@PathVariable String scoreId) {
-    return scoreInfoService.delete(new ArrayList<String>() {{
+    return subjectScoreInfoService.delete(new ArrayList<String>() {{
       add(scoreId);
     }});
   }
@@ -68,71 +66,71 @@ public class ScoreInfoController {
    */
   @RequestMapping(value = "exportScoreTemplate", method = RequestMethod.GET)
   public void exportScoreTemplate(TeacherInfo teacherInfo, HttpServletResponse response) {
-    scoreInfoService.exportScoreTemplate(teacherInfo, response);
+    subjectScoreInfoService.exportScoreTemplate(teacherInfo, response);
   }
 
   /**
    * 上传学生成绩
    *
    * @param scoreFile 成绩文件
-   * @param scoreInfo 成绩信息
+   * @param subjectScoreInfo 成绩信息
    * @return ResultEntity
    */
   @RequestMapping(value = "importScore", method = RequestMethod.POST)
-  public ResultEntity importScoreByFile(MultipartFile scoreFile, ScoreInfo scoreInfo) {
-    return scoreInfoService.importScoreByFile(scoreFile, scoreInfo);
+  public ResultEntity importScoreByFile(MultipartFile scoreFile, SubjectScoreInfo subjectScoreInfo) {
+    return subjectScoreInfoService.importScoreByFile(scoreFile, subjectScoreInfo);
   }
 
   /**
-   * 增加成绩(ScoreInfo)
+   * 增加成绩(SubjectScoreInfo)
    *
-   * @param scoreInfo     插入参数
-   * @param bindingResult 参数绑定校验
+   * @param subjectScoreInfo 插入参数
+   * @param bindingResult    参数绑定校验
    * @return ResultEntity
    */
   @RequestMapping(value = "insert", method = RequestMethod.POST)
-  public ResultEntity insert(@Valid @RequestBody ScoreInfo scoreInfo, BindingResult bindingResult) {
+  public ResultEntity insert(@Valid @RequestBody SubjectScoreInfo subjectScoreInfo, BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {
       return ResultUtil.error(bindingResult.getFieldError().getDefaultMessage());
     }
-    return scoreInfoService.insert(new ArrayList<ScoreInfo>() {{
-      add(scoreInfo);
+    return subjectScoreInfoService.insert(new ArrayList<SubjectScoreInfo>() {{
+      add(subjectScoreInfo);
     }});
   }
 
   /**
    * 根据条件查询
    *
-   * @param scoreInfo 查询参数
+   * @param subjectScoreInfo 查询参数
    * @return ResultEntity
    */
   @RequestMapping(value = {"", "list"}, method = RequestMethod.GET)
-  public ResultEntity list(ScoreInfo scoreInfo) {
-    return scoreInfoService.list(scoreInfo);
+  public ResultEntity list(SubjectScoreInfo subjectScoreInfo) {
+    return subjectScoreInfoService.list(subjectScoreInfo);
   }
 
   /**
    * 根据条件分页查询
    *
-   * @param scoreInfo 查询参数
-   * @param pageNum   开始页数
-   * @param pageSize  每页显示的数据条数
+   * @param subjectScoreInfo 查询参数
+   * @param pageNum          开始页数
+   * @param pageSize         每页显示的数据条数
    * @return ResultEntity
    */
   @RequestMapping(value = "/listByPage", method = RequestMethod.GET)
-  public ResultEntity list(ScoreInfo scoreInfo, @RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "30") Integer pageSize) {
-    return scoreInfoService.list(scoreInfo, pageNum, pageSize);
+  public ResultEntity list(SubjectScoreInfo subjectScoreInfo, @RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "30") Integer pageSize) {
+    return subjectScoreInfoService.list(subjectScoreInfo, pageNum, pageSize);
   }
 
   /**
    * 班级成绩信息
    *
-   * @param scoreInfo 成绩信息
+   * @param subjectScoreInfo 成绩信息
    * @return ResultEntity
    */
   @RequestMapping(value = "listByClass", method = RequestMethod.GET)
-  public ResultEntity listByClass(ScoreInfo scoreInfo) {
-    return scoreInfoService.listByClass(scoreInfo);
+  public ResultEntity listByClass(SubjectScoreInfo subjectScoreInfo) {
+    return subjectScoreInfoService.listByClass(subjectScoreInfo);
   }
 
   /**
@@ -143,23 +141,23 @@ public class ScoreInfoController {
    */
   @RequestMapping(value = "listByParent", method = RequestMethod.GET)
   public ResultEntity listByParent(ParentStudentScore parentStudentScore) {
-    return scoreInfoService.listByParent(parentStudentScore);
+    return subjectScoreInfoService.listByParent(parentStudentScore);
   }
 
   /**
-   * 更新成绩(ScoreInfo)
+   * 更新成绩(SubjectScoreInfo)
    *
-   * @param scoreInfo     更新参数
-   * @param bindingResult 参数绑定校验
+   * @param subjectScoreInfo 更新参数
+   * @param bindingResult    参数绑定校验
    * @return ResultEntity
    */
   @RequestMapping(value = "update", method = RequestMethod.POST)
-  public ResultEntity update(@Valid @RequestBody ScoreInfo scoreInfo, BindingResult bindingResult) {
+  public ResultEntity update(@Valid @RequestBody SubjectScoreInfo subjectScoreInfo, BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {
       return ResultUtil.error(bindingResult.getFieldError().getDefaultMessage());
     }
-    return scoreInfoService.update(new ArrayList<ScoreInfo>() {{
-      add(scoreInfo);
+    return subjectScoreInfoService.update(new ArrayList<SubjectScoreInfo>() {{
+      add(subjectScoreInfo);
     }});
   }
 }

@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.achievement.mapper.SubjectScoreInfoMapper">
+
+  <resultMap type="com.achievement.entity.SubjectScoreInfo" id="SubjectScoreInfoMap">
+    <result property="id" column="id" jdbcType="VARCHAR"/>
+    <result property="yearId" column="year_id" jdbcType="VARCHAR"/>
+    <result property="semesterId" column="semester_id" jdbcType="VARCHAR"/>
+    <result property="gradeId" column="grade_id" jdbcType="VARCHAR"/>
+    <result property="classId" column="class_id" jdbcType="VARCHAR"/>
+    <result property="classType" column="class_type" jdbcType="VARCHAR"/>
+    <result property="studentId" column="student_id" jdbcType="VARCHAR"/>
+    <result property="teacherId" column="teacher_id" jdbcType="VARCHAR"/>
+    <result property="subLanguage" column="sub_language" jdbcType="OTHER"/>
+    <result property="subMathematics" column="sub_mathematics" jdbcType="OTHER"/>
+    <result property="subEnglish" column="sub_english" jdbcType="OTHER"/>
+    <result property="subHistory" column="sub_history" jdbcType="OTHER"/>
+    <result property="subGeography" column="sub_geography" jdbcType="OTHER"/>
+    <result property="subBiological" column="sub_biological" jdbcType="OTHER"/>
+    <result property="subChemistry" column="sub_chemistry" jdbcType="OTHER"/>
+    <result property="subPhysical" column="sub_physical" jdbcType="OTHER"/>
+    <result property="subPolitical" column="sub_political" jdbcType="OTHER"/>
+    <result property="subComputer" column="sub_computer" jdbcType="OTHER"/>
+    <result property="subSports" column="sub_sports" jdbcType="OTHER"/>
+    <result property="subArt" column="sub_art" jdbcType="OTHER"/>
+    <result property="subMusic" column="sub_music" jdbcType="OTHER"/>
+    <result property="insertTime" column="insert_time" jdbcType="TIMESTAMP"/>
+    <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+  </resultMap>
+
+  <!--列集合-->
+  <sql id="BASE_COLUMN">
+      ID, YEAR_ID, SEMESTER_ID, GRADE_ID, CLASS_ID, CLASS_TYPE, STUDENT_ID, TEACHER_ID, SUB_LANGUAGE,
+      SUB_MATHEMATICS, SUB_ENGLISH, SUB_HISTORY, SUB_GEOGRAPHY, SUB_BIOLOGICAL, SUB_CHEMISTRY,
+      SUB_PHYSICAL, SUB_POLITICAL, SUB_COMPUTER, SUB_SPORTS, SUB_ART, SUB_MUSIC, INSERT_TIME, UPDATE_TIME
+   </sql>
+  <!--表名-->
+  <sql id="BASE_TABLE">
+		achievement.subject_score_info
+	</sql>
+
+  <!--通过实体作为筛选条件查询-->
+  <select id="list" resultMap="SubjectScoreInfoMap">
+    select
+    <include refid="BASE_COLUMN"/>
+    from
+    <include refid="BASE_TABLE"/>
+    <where>
+      <if test="id != null and id != ''">
+        and id = #{id}
+      </if>
+      <if test="yearId != null and yearId != ''">
+        and year_id = #{yearId}
+      </if>
+      <if test="semesterId != null and semesterId != ''">
+        and semester_id = #{semesterId}
+      </if>
+      <if test="gradeId != null and gradeId != ''">
+        and grade_id = #{gradeId}
+      </if>
+      <if test="classId != null and classId != ''">
+        and class_id = #{classId}
+      </if>
+      <if test="classType != null and classType != ''">
+        and class_type = #{classType}
+      </if>
+      <if test="studentId != null and studentId != ''">
+        and student_id = #{studentId}
+      </if>
+      <if test="teacherId != null and teacherId != ''">
+        and teacher_id = #{teacherId}
+      </if>
+      <if test="subLanguage != null">
+        and sub_language = #{subLanguage}
+      </if>
+      <if test="subMathematics != null">
+        and sub_mathematics = #{subMathematics}
+      </if>
+      <if test="subEnglish != null">
+        and sub_english = #{subEnglish}
+      </if>
+      <if test="subHistory != null">
+        and sub_history = #{subHistory}
+      </if>
+      <if test="subGeography != null">
+        and sub_geography = #{subGeography}
+      </if>
+      <if test="subBiological != null">
+        and sub_biological = #{subBiological}
+      </if>
+      <if test="subChemistry != null">
+        and sub_chemistry = #{subChemistry}
+      </if>
+      <if test="subPhysical != null">
+        and sub_physical = #{subPhysical}
+      </if>
+      <if test="subPolitical != null">
+        and sub_political = #{subPolitical}
+      </if>
+      <if test="subComputer != null">
+        and sub_computer = #{subComputer}
+      </if>
+      <if test="subSports != null">
+        and sub_sports = #{subSports}
+      </if>
+      <if test="subArt != null">
+        and sub_art = #{subArt}
+      </if>
+      <if test="subMusic != null">
+        and sub_music = #{subMusic}
+      </if>
+      <if test="insertTime != null">
+        and insert_time = #{insertTime}
+      </if>
+      <if test="updateTime != null">
+        and update_time = #{updateTime}
+      </if>
+    </where>
+  </select>
+
+  <select id="listClassScoreInfo">
+
+  </select>
+
+  <!--新增所有列-->
+  <insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="java.util.List">
+    insert into<include refid="BASE_TABLE"/>(<include refid="BASE_COLUMN"/>)
+    VALUES
+    <foreach collection="list" item="item" index="index" separator=",">
+      (
+      #{item.id}, #{item.yearId}, #{item.semesterId}, #{item.gradeId}, #{item.classId}, #{item.classType},
+      #{item.studentId}, #{item.teacherId}, #{item.subLanguage}, #{item.subMathematics}, #{item.subEnglish},
+      #{item.subHistory}, #{item.subGeography}, #{item.subBiological}, #{item.subChemistry}, #{item.subPhysical},
+      #{item.subPolitical}, #{item.subComputer}, #{item.subSports}, #{item.subArt}, #{item.subMusic},
+      SYSDATE(),SYSDATE()
+      )
+    </foreach>
+  </insert>
+
+  <!--通过主键修改数据-->
+  <update id="update" parameterType="java.util.List">
+    <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+      UPDATE
+      <include refid="BASE_TABLE"/>
+      <set>
+        <if test="item.yearId != null and item.yearId != ''">
+          year_id = #{item.yearId},
+        </if>
+        <if test="item.semesterId != null and item.semesterId != ''">
+          semester_id = #{item.semesterId},
+        </if>
+        <if test="item.gradeId != null and item.gradeId != ''">
+          grade_id = #{item.gradeId},
+        </if>
+        <if test="item.classId != null and item.classId != ''">
+          class_id = #{item.classId},
+        </if>
+        <if test="item.classType != null and item.classType != ''">
+          class_type = #{item.classType},
+        </if>
+        <if test="item.studentId != null and item.studentId != ''">
+          student_id = #{item.studentId},
+        </if>
+        <if test="item.teacherId != null and item.teacherId != ''">
+          teacher_id = #{item.teacherId},
+        </if>
+        <if test="item.subLanguage != null">
+          sub_language = #{item.subLanguage},
+        </if>
+        <if test="item.subMathematics != null">
+          sub_mathematics = #{item.subMathematics},
+        </if>
+        <if test="item.subEnglish != null">
+          sub_english = #{item.subEnglish},
+        </if>
+        <if test="item.subHistory != null">
+          sub_history = #{item.subHistory},
+        </if>
+        <if test="item.subGeography != null">
+          sub_geography = #{item.subGeography},
+        </if>
+        <if test="item.subBiological != null">
+          sub_biological = #{item.subBiological},
+        </if>
+        <if test="item.subChemistry != null">
+          sub_chemistry = #{item.subChemistry},
+        </if>
+        <if test="item.subPhysical != null">
+          sub_physical = #{item.subPhysical},
+        </if>
+        <if test="item.subPolitical != null">
+          sub_political = #{item.subPolitical},
+        </if>
+        <if test="item.subComputer != null">
+          sub_computer = #{item.subComputer},
+        </if>
+        <if test="item.subSports != null">
+          sub_sports = #{item.subSports},
+        </if>
+        <if test="item.subArt != null">
+          sub_art = #{item.subArt},
+        </if>
+        <if test="item.subMusic != null">
+          sub_music = #{item.subMusic},
+        </if>
+        <if test="item.updateTime == null">
+          update_time = SYSDATE(),
+        </if>
+        <if test="item.updateTime != null">
+          update_time = #{item.updateTime},
+        </if>
+      </set>
+      where id = #{item.id}
+    </foreach>
+  </update>
+
+  <!--通过主键删除-->
+  <delete id="delete">
+    delete from
+    <include refid="BASE_TABLE"/>
+    where id in
+    <foreach collection="list" item="item" index="no" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </delete>
+
+</mapper>
+

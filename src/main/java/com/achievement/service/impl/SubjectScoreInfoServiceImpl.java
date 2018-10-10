@@ -2,7 +2,7 @@ package com.achievement.service.impl;
 
 import com.achievement.entity.*;
 import com.achievement.enums.GlobalEnum;
-import com.achievement.mapper.ScoreInfoMapper;
+import com.achievement.mapper.SubjectScoreInfoMapper;
 import com.achievement.service.*;
 import com.achievement.utils.GloabalUtils;
 import com.achievement.utils.PoiUtil;
@@ -12,6 +12,7 @@ import com.achievement.vo.ResultEntity;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -25,6 +26,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -32,13 +34,14 @@ import java.util.stream.Collectors;
 import static com.achievement.constants.GlobalConstants.*;
 
 /**
- * 成绩(ScoreInfo)ServiceImpl
+ * (SubjectScoreInfo)表服务实现类
  *
- * @author weiQiang
- * @since 2018-10-02 17:52:27
+ * @author 魏强
+ * @since 2018-10-10 16:15:15
  */
-@Service("scoreInfoService")
-public class ScoreInfoServiceImpl implements ScoreInfoService {
+@Slf4j
+@Service("subjectScoreInfoService")
+public class SubjectScoreInfoServiceImpl implements SubjectScoreInfoService {
   @Autowired
   private ClassInfoService classInfoService;
   @Autowired
@@ -51,72 +54,67 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
   private GradeInfoService gradeInfoService;
   @Autowired
   private ParentInfoService parentInfoService;
-  @Resource
-  private ScoreInfoMapper scoreInfoMapper;
   @Autowired
   private SemesterInfoService semesterInfoService;
   @Autowired
   private StudentInfoService studentInfoService;
   @Autowired
   private SubjectInfoService subjectInfoService;
+  @Resource
+  private SubjectScoreInfoMapper subjectScoreInfoMapper;
   @Autowired
   private TeacherInfoService teacherInfoService;
 
   /**
-   * 成绩(ScoreInfo)信息Map
+   * 对象信息Map
    *
-   * @param scoreInfo 查询参数
-   * @return ResultEntity
+   * @param subjectScoreInfo 查询参数
+   * @return Map
    */
   @Override
-  public Map<String, ScoreInfo> convertRecordToMap(ScoreInfo scoreInfo) {
-    List<ScoreInfo> scoreInfos = scoreInfoMapper.list(scoreInfo);
-    Map<String, ScoreInfo> scoreInfoMap = scoreInfos.stream().filter(info -> StringUtils.isNotBlank(info.getScoreId()))
-        .collect(Collectors.toMap(ScoreInfo::getScoreId, Function.identity(), (oldValue, newValue) -> newValue));
+  public Map<String, SubjectScoreInfo> convertRecordToMap(SubjectScoreInfo subjectScoreInfo) {
+    List<SubjectScoreInfo> subjectScoreInfos = subjectScoreInfoMapper.list(subjectScoreInfo);
+    Map<String, SubjectScoreInfo> scoreInfoMap = subjectScoreInfos.stream().filter(info -> StringUtils.isNotBlank(info.getId()))
+        .collect(Collectors.toMap(SubjectScoreInfo::getId, Function.identity(), (oldValue, newValue) -> newValue));
     return scoreInfoMap;
   }
 
   /**
-   * 删除成绩(ScoreInfo)
+   * 删除对象
    *
-   * @param scoreIds 主键集合
+   * @param pkIds 对象主键集合
    * @return ResultEntity
    */
   @Override
   @Transactional(rollbackFor = RuntimeException.class)
-  public ResultEntity delete(List<String> scoreIds) {
-    if (null == scoreIds || scoreIds.size() < 1) {
+  public ResultEntity delete(List<String> pkIds) {
+    if (null == pkIds || pkIds.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
     if (!deleteScore) {
       return ResultUtil.error(GlobalEnum.DeleteNoSupport);
     }
-    scoreInfoMapper.delete(scoreIds);
-    return ResultUtil.success(GlobalEnum.DeleteSuccess, scoreIds);
+    subjectScoreInfoMapper.delete(pkIds);
+    return ResultUtil.success(GlobalEnum.DeleteSuccess, pkIds);
   }
 
   /**
-   * 增加成绩(ScoreInfo)
+   * 增加对象
    *
-   * @param scoreInfoList 参数
+   * @param subjectScoreInfos 对象参数
    * @return ResultEntity
    */
   @Override
   @Transactional(rollbackFor = RuntimeException.class)
-  public ResultEntity insert(List<ScoreInfo> scoreInfoList) {
-    if (null == scoreInfoList || scoreInfoList.size() < 1) {
+  public ResultEntity insert(List<SubjectScoreInfo> subjectScoreInfos) {
+    if (null == subjectScoreInfos || subjectScoreInfos.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
-    checkScoreInfo(scoreInfoList, OPERATE_TYPE_INSERT);
-    Integer insertCount = scoreInfoMapper.insert(scoreInfoList);
-    if (insertCount > 0) {
-      return ResultUtil.success(GlobalEnum.InsertSuccess, scoreInfoList);
-    }
-    return ResultUtil.error(GlobalEnum.InsertError);
+    return insertOrUpdateScoreInfo(subjectScoreInfos, OPERATE_TYPE_INSERT);
   }
 
   /**
-   * 根据条件分页查询
+   * 根据条件分页查询对象
    *
    * @param scoreInfo 查询参数
    * @param pageNum   开始页数
@@ -124,109 +122,81 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
    * @return ResultEntity
    */
   @Override
-  public ResultEntity list(ScoreInfo scoreInfo, int pageNum, int pageSize) {
+  public ResultEntity list(SubjectScoreInfo scoreInfo, int pageNum, int pageSize) {
     PageHelper.startPage(pageNum, pageSize);
     if (null != scoreInfo && StringUtils.isNotBlank(scoreInfo.getOrderColumn())) {
       PageHelper.orderBy(GloabalUtils.changeColumn(scoreInfo.getOrderColumn(), scoreInfo.getOrderDirection()));
     }
-    List<ScoreInfo> scoreInfoPage = scoreInfoMapper.list(scoreInfo);
-    convertScoreInfo(scoreInfoPage, scoreInfo);
-    PageInfo pageInfo = new PageInfo(scoreInfoPage);
+    List<SubjectScoreInfo> subjectScoreInfos = subjectScoreInfoMapper.list(scoreInfo);
+    convertScoreInfo(subjectScoreInfos, scoreInfo);
+    PageInfo pageInfo = new PageInfo(subjectScoreInfos);
     return ResultUtil.success(GlobalEnum.QuerySuccess, pageInfo);
   }
 
   /**
-   * 根据条件查询
+   * 根据条件查询对象
    *
-   * @param scoreInfo 查询参数
+   * @param subjectScoreInfo 查询参数
    * @return ResultEntity
    */
   @Override
-  public ResultEntity list(ScoreInfo scoreInfo) {
-    List<ScoreInfo> scoreInfos = scoreInfoMapper.list(scoreInfo);
-    convertScoreInfo(scoreInfos, scoreInfo);
-    return ResultUtil.success(GlobalEnum.QuerySuccess, scoreInfos);
+  public ResultEntity list(SubjectScoreInfo subjectScoreInfo) {
+    List<SubjectScoreInfo> subjectScoreInfos = subjectScoreInfoMapper.list(subjectScoreInfo);
+    convertScoreInfo(subjectScoreInfos, subjectScoreInfo);
+    return ResultUtil.success(GlobalEnum.QuerySuccess, subjectScoreInfos);
+
   }
 
   /**
-   * 更新成绩(ScoreInfo)
+   * 更新对象
    *
-   * @param scoreInfoList 更新参数
+   * @param subjectScoreInfos 更新参数
    * @return ResultEntity
    */
   @Override
-  @Transactional(rollbackFor = RuntimeException.class)
-  public ResultEntity update(List<ScoreInfo> scoreInfoList) {
+  public ResultEntity update(List<SubjectScoreInfo> subjectScoreInfos) {
+    if (null == subjectScoreInfos || subjectScoreInfos.size() < 1) {
+      return ResultUtil.error(GlobalEnum.DataEmpty);
+    }
+    return insertOrUpdateScoreInfo(subjectScoreInfos, OPERATE_TYPE_UPDATE);
+  }
+
+  /**
+   * 增加或更新学生成绩
+   *
+   * @param scoreInfoList 学生成绩
+   * @param operateType   操作类型
+   * @return
+   */
+  private ResultEntity insertOrUpdateScoreInfo(List<SubjectScoreInfo> scoreInfoList, String operateType) {
     if (null == scoreInfoList || scoreInfoList.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
-    checkScoreInfo(scoreInfoList, OPERATE_TYPE_UPDATE);
-    Integer updateCount = scoreInfoMapper.update(scoreInfoList);
-    if (updateCount > 0) {
-      return ResultUtil.success(GlobalEnum.UpdateSuccess, scoreInfoList);
-    }
-    return ResultUtil.error(GlobalEnum.UpdateError);
-  }
-
-  /**
-   * 检查成绩中的参数是否合法
-   *
-   * @param scoreInfoList 成绩数据
-   * @param operateType   操作类型
-   */
-  private void checkScoreInfo(List<ScoreInfo> scoreInfoList, String operateType) {
+    List<SubjectScoreInfo> insertSubjectScoreInfoList = new ArrayList<>();
+    List<SubjectScoreInfo> updateSubjectScoreInfoList = new ArrayList<>();
+    long currentTimeMillis = System.currentTimeMillis();
+    List<SubjectScoreInfo> subjectScoreInfos = subjectScoreInfoMapper.list(SubjectScoreInfo.builder().build());
     Map<String, ClassInfo> classInfoMap = classInfoService.convertRecordToMap(ClassInfo.builder().build());
     Map<String, StudentInfo> studentInfoMap = studentInfoService.convertRecordToMap(StudentInfo.builder().build());
     Map<String, SubjectInfo> subjectInfoMap = subjectInfoService.convertRecordToMap(SubjectInfo.builder().build());
     Map<String, TeacherInfo> teacherInfoMap = teacherInfoService.convertRecordToMap(TeacherInfo.builder().build());
     Map<String, SemesterInfo> semesterInfoMap = semesterInfoService.convertRecordToMap(SemesterInfo.builder().build());
-    List<ScoreInfo> scoreInfos = scoreInfoMapper.list(ScoreInfo.builder().build());
-    long currentTimeMillis = System.currentTimeMillis();
-    Map<String, ScoreInfo> scoreInfoMap = scoreInfos.stream().collect(Collectors.toMap(scoreInfo -> {
-      String classId = scoreInfo.getClassId();
-      String studentId = scoreInfo.getStudentId();
-      String subjectId = scoreInfo.getSubjectId();
-      String semesterId = scoreInfo.getSemesterId();
-      String key = semesterId + INTERVAL_NUMBER + classId + INTERVAL_NUMBER + subjectId + INTERVAL_NUMBER + studentId;
-      return key;
+    Map<String, SubjectScoreInfo> scoreInfoMap = subjectScoreInfos.stream().collect(Collectors.toMap(subjectScoreInfo -> {
+      String semesterId = subjectScoreInfo.getSemesterId();
+      String classId = subjectScoreInfo.getClassId();
+      String studentId = subjectScoreInfo.getStudentId();
+      return semesterId + INTERVAL_NUMBER + classId + INTERVAL_NUMBER + studentId;
     }, Function.identity(), (oldValue, newValue) -> newValue));
     scoreInfoList.stream().forEach(scoreInfo -> {
-      String classId = scoreInfo.getClassId();
-      String studentId = scoreInfo.getStudentId();
-      String subjectId = scoreInfo.getSubjectId();
-      String teacherId = scoreInfo.getTeacherId();
-      String semesterId = scoreInfo.getSemesterId();
-      if (StringUtils.isBlank(classId)) {
-        GloabalUtils.convertMessage(GlobalEnum.ClassIdEmpty);
-      }
-      if (StringUtils.isBlank(studentId)) {
-        GloabalUtils.convertMessage(GlobalEnum.StudentIdEmpty);
-      }
-      if (StringUtils.isBlank(subjectId)) {
-        GloabalUtils.convertMessage(GlobalEnum.SubjectIdEmpty);
-      }
-      if (StringUtils.isBlank(teacherId)) {
-        GloabalUtils.convertMessage(GlobalEnum.TeacherIdEmpty);
-      }
-      if (StringUtils.isBlank(semesterId)) {
-        GloabalUtils.convertMessage(GlobalEnum.SemesterIdEmpty);
-      }
-      if (!classInfoMap.containsKey(classId)) {
-        GloabalUtils.convertMessage(GlobalEnum.ClassInfoEmpty, classId);
-      }
-      if (!studentInfoMap.containsKey(studentId)) {
-        GloabalUtils.convertMessage(GlobalEnum.StudentInfoEmpty, studentId);
-      }
-      if (!subjectInfoMap.containsKey(subjectId)) {
-        GloabalUtils.convertMessage(GlobalEnum.SubjectInfoEmpty, subjectId);
-      }
-      if (!teacherInfoMap.containsKey(teacherId)) {
-        GloabalUtils.convertMessage(GlobalEnum.TeacherInfoEmpty, teacherId);
-      }
-      if (!semesterInfoMap.containsKey(semesterId)) {
-        GloabalUtils.convertMessage(GlobalEnum.SemesterInfoEmpty, semesterId);
-      }
+      CheckSubjectScoreInfo checkSubjectScoreInfo = new CheckSubjectScoreInfo(classInfoMap, studentInfoMap, subjectInfoMap, teacherInfoMap, semesterInfoMap, scoreInfo).invoke();
+      String classId = checkSubjectScoreInfo.getClassId();
+      String studentId = checkSubjectScoreInfo.getStudentId();
+      String semesterId = checkSubjectScoreInfo.getSemesterId();
       SemesterInfo semesterInfo = semesterInfoMap.get(semesterId);
+      ClassInfo classInfo = classInfoMap.get(classId);
+      scoreInfo.setClassType(classInfo.getClassType());
+      scoreInfo.setGradeId(classInfo.getGradeId());
+      scoreInfo.setYearId(semesterInfo.getYearId());
       Date scoreEndDeadline = semesterInfo.getScoreEndDeadline();
       Date scoreBeginDeadline = semesterInfo.getScoreBeginDeadline();
       if (null != scoreBeginDeadline) {
@@ -244,51 +214,198 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
         }
       }
       if (Objects.equals(OPERATE_TYPE_INSERT, operateType)) {
-        String key = semesterId + INTERVAL_NUMBER + classId + INTERVAL_NUMBER + subjectId + INTERVAL_NUMBER + studentId;
+        String key = semesterId + INTERVAL_NUMBER + classId + INTERVAL_NUMBER + studentId;
         if (scoreInfoMap.containsKey(key)) {
-          String studentName = studentInfoMap.get(studentId).getStudentName();
-          String subjectName = subjectInfoMap.get(subjectId).getSubjectName();
-          GloabalUtils.convertMessage(GlobalEnum.ScoreInfoHasInUsed, studentName, subjectName);
+          String id = scoreInfoMap.get(key).getId();
+          scoreInfo.setId(id);
+          updateSubjectScoreInfoList.add(scoreInfo);
+        } else {
+          insertSubjectScoreInfoList.add(scoreInfo);
         }
-        scoreInfo.setScoreId("score_" + GloabalUtils.ordinaryId());
       } else {
-        String scoreId = scoreInfo.getScoreId();
+        String scoreId = scoreInfo.getId();
         if (StringUtils.isBlank(scoreId)) {
           GloabalUtils.convertMessage(GlobalEnum.PkIdEmpty);
         }
+        updateSubjectScoreInfoList.add(scoreInfo);
       }
     });
+    List<SubjectScoreInfo> insertSubjectScoreInfos = convertInsertSubjectScoreInfo(insertSubjectScoreInfoList);
+    if (null != insertSubjectScoreInfos && insertSubjectScoreInfos.size() > 0) {
+      Integer updateCount = subjectScoreInfoMapper.insert(insertSubjectScoreInfos);
+      log.info("增加学生成绩:{}条", updateCount);
+      if (updateCount > 0) {
+        return ResultUtil.success(GlobalEnum.UpdateSuccess, insertSubjectScoreInfos);
+      }
+    }
+    if (null != updateSubjectScoreInfoList && updateSubjectScoreInfoList.size() > 0) {
+      Integer updateCount = subjectScoreInfoMapper.update(updateSubjectScoreInfoList);
+      log.info("更新学生成绩:{}条", updateCount);
+      if (updateCount > 0) {
+        return ResultUtil.success(GlobalEnum.UpdateSuccess, updateSubjectScoreInfoList);
+      }
+    }
+    return ResultUtil.success(GlobalEnum.UpdateError, scoreInfoList);
+  }
+
+  /**
+   * 增加成绩时将成绩合并
+   *
+   * @param insertSubjectScoreInfos 成绩数据
+   * @return List
+   */
+  private List<SubjectScoreInfo> convertInsertSubjectScoreInfo(List<SubjectScoreInfo> insertSubjectScoreInfos) {
+    List<SubjectScoreInfo> subjectScoreInfos = new ArrayList<>();
+    if (null != insertSubjectScoreInfos && insertSubjectScoreInfos.size() > 0) {
+      Map<String, List<SubjectScoreInfo>> listMap = insertSubjectScoreInfos.stream().collect(Collectors.groupingBy(subjectScoreInfo -> {
+        String classId = subjectScoreInfo.getClassId();
+        String studentId = subjectScoreInfo.getStudentId();
+        String semesterId = subjectScoreInfo.getSemesterId();
+        String key = semesterId + INTERVAL_NUMBER + classId + INTERVAL_NUMBER + studentId;
+        return key;
+      }));
+      listMap.forEach((key, subjectScoreInfoList) -> {
+        final SubjectScoreInfo[] subjectScoreInfo = {SubjectScoreInfo.builder().build()};
+        final int[] count = {0};
+        subjectScoreInfoList.stream().forEach(info -> {
+          if (count[0] == 0) {
+            subjectScoreInfo[0] = JSON.parseObject(JSON.toJSONString(info), SubjectScoreInfo.class);
+          } else {
+            if (null != info.getSubLanguage()) {
+              subjectScoreInfo[0].setSubLanguage(info.getSubLanguage());
+            }
+            if (null != info.getSubMathematics()) {
+              subjectScoreInfo[0].setSubMathematics(info.getSubMathematics());
+            }
+            if (null != info.getSubEnglish()) {
+              subjectScoreInfo[0].setSubEnglish(info.getSubEnglish());
+            }
+            if (null != info.getSubPhysical()) {
+              subjectScoreInfo[0].setSubPhysical(info.getSubPhysical());
+            }
+            if (null != info.getSubHistory()) {
+              subjectScoreInfo[0].setSubHistory(info.getSubHistory());
+            }
+            if (null != info.getSubGeography()) {
+              subjectScoreInfo[0].setSubGeography(info.getSubGeography());
+            }
+            if (null != info.getSubBiological()) {
+              subjectScoreInfo[0].setSubBiological(info.getSubBiological());
+            }
+            if (null != info.getSubChemistry()) {
+              subjectScoreInfo[0].setSubChemistry(info.getSubChemistry());
+            }
+            if (null != info.getSubPolitical()) {
+              subjectScoreInfo[0].setSubPolitical(info.getSubPolitical());
+            }
+            if (null != info.getSubComputer()) {
+              subjectScoreInfo[0].setSubComputer(info.getSubComputer());
+            }
+            if (null != info.getSubSports()) {
+              subjectScoreInfo[0].setSubSports(info.getSubSports());
+            }
+            if (null != info.getSubArt()) {
+              subjectScoreInfo[0].setSubArt(info.getSubArt());
+            }
+            if (null != info.getSubMusic()) {
+              subjectScoreInfo[0].setSubMusic(info.getSubMusic());
+            }
+          }
+          count[0]++;
+        });
+        subjectScoreInfos.add(subjectScoreInfo[0]);
+      });
+      subjectScoreInfos.stream().forEach(subjectScoreInfo -> subjectScoreInfo.setId("score_" + GloabalUtils.ordinaryId()));
+    }
+    return subjectScoreInfos;
+  }
+
+  /**
+   * 导入时转换科目成绩
+   *
+   * @param subjectInfoMap 科目信息
+   * @param scoreInfo      成绩信息
+   * @param subjectId      科目ID
+   */
+  private void convertScoreNumber(Map<String, SubjectInfo> subjectInfoMap, SubjectScoreInfo scoreInfo, String subjectId) {
+    if (StringUtils.isNotBlank(subjectId)) {
+      Double scoreNumber = scoreInfo.getScoreNumber();
+      SubjectInfo subjectInfo = subjectInfoMap.get(subjectId);
+      switch (subjectInfo.getSubjectName()) {
+        case "语文":
+          scoreInfo.setSubLanguage(scoreNumber);
+          break;
+        case "数学":
+          scoreInfo.setSubMathematics(scoreNumber);
+          break;
+        case "英语":
+          scoreInfo.setSubEnglish(scoreNumber);
+          break;
+        case "物理":
+          scoreInfo.setSubPhysical(scoreNumber);
+          break;
+        case "历史":
+          scoreInfo.setSubHistory(scoreNumber);
+          break;
+        case "地理":
+          scoreInfo.setSubGeography(scoreNumber);
+          break;
+        case "生物":
+          scoreInfo.setSubBiological(scoreNumber);
+          break;
+        case "化学":
+          scoreInfo.setSubChemistry(scoreNumber);
+          break;
+        case "政治":
+          scoreInfo.setSubPolitical(scoreNumber);
+          break;
+        case "计算机":
+          scoreInfo.setSubComputer(scoreNumber);
+          break;
+        case "体育":
+          scoreInfo.setSubSports(scoreNumber);
+          break;
+        case "美术":
+          scoreInfo.setSubArt(scoreNumber);
+          break;
+        case "音乐":
+          scoreInfo.setSubMusic(scoreNumber);
+          break;
+      }
+    }
   }
 
   /**
    * 转换班级内最高、平均、最低成绩信息
    *
-   * @param scoreInfos 成绩结果
-   * @param scoreInfo  查询成绩信息
+   * @param subjectScoreInfos 成绩结果
+   * @param scoreInfo         查询成绩信息
    */
-  private void convertScoreInfo(List<ScoreInfo> scoreInfos, ScoreInfo scoreInfo) {
-    if (null == scoreInfos || scoreInfos.size() < 1) {
+  private void convertScoreInfo(List<SubjectScoreInfo> subjectScoreInfos, SubjectScoreInfo scoreInfo) {
+    if (null == subjectScoreInfos || subjectScoreInfos.size() < 1) {
       return;
     }
-    List<ScoreInfo> classScoreInfo = scoreInfoMapper.listClassScoreInfo(scoreInfo);
-    List<ScoreInfo> gradeScoreInfo = scoreInfoMapper.listGradeScoreInfo(scoreInfo);
-    Map<String, ScoreInfo> scoreInfoMap = listRankingMap(scoreInfo);
-    Map<String, ScoreInfo> classScoreMap = classScoreInfo.stream()
+    Map<String, SubjectScoreInfo> scoreInfoMap = listRankingMap(scoreInfo);
+
+    List<SubjectScoreInfo> classScoreInfo = subjectScoreInfoMapper.listClassScoreInfo(scoreInfo);
+    List<SubjectScoreInfo> gradeScoreInfo = subjectScoreInfoMapper.listGradeScoreInfo(scoreInfo);
+
+    Map<String, SubjectScoreInfo> classScoreMap = classScoreInfo.stream()
         .collect(Collectors.toMap(info -> {
           String classId = info.getClassId();
           String semesterId = info.getSemesterId();
           String subjectId = info.getSubjectId();
           return classId + INTERVAL_NUMBER + semesterId + INTERVAL_NUMBER + subjectId;
         }, Function.identity(), (oldValue, newValue) -> newValue));
-    Map<String, ScoreInfo> gradeScoreMap = gradeScoreInfo.stream()
+    Map<String, SubjectScoreInfo> gradeScoreMap = gradeScoreInfo.stream()
         .collect(Collectors.toMap(info -> {
           String gradeId = info.getGradeId();
           String semesterId = info.getSemesterId();
           String subjectId = info.getSubjectId();
           return gradeId + INTERVAL_NUMBER + semesterId + INTERVAL_NUMBER + subjectId;
         }, Function.identity(), (oldValue, newValue) -> newValue));
-    scoreInfos.stream().forEach(info -> {
-      String scoreId = info.getScoreId();
+    subjectScoreInfos.stream().forEach(info -> {
+      String scoreId = info.getId();
       String classId = info.getClassId();
       String gradeId = info.getGradeId();
       String semesterId = info.getSemesterId();
@@ -296,19 +413,19 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
       String classKey = classId + INTERVAL_NUMBER + semesterId + INTERVAL_NUMBER + subjectId;
       String gradeKey = gradeId + INTERVAL_NUMBER + semesterId + INTERVAL_NUMBER + subjectId;
       if (classScoreMap.containsKey(classKey)) {
-        ScoreInfo score = classScoreMap.get(classKey);
-        Double maxScore = score.getMaxScore();
-        Double minScore = score.getMinScore();
-        Double avgScore = score.getAvgScore();
+        SubjectScoreInfo subjectScoreInfo = classScoreMap.get(classKey);
+        Double maxScore = subjectScoreInfo.getMaxScore();
+        Double minScore = subjectScoreInfo.getMinScore();
+        Double avgScore = subjectScoreInfo.getAvgScore();
         info.setMaxScore(maxScore);
         info.setMinScore(minScore);
         info.setAvgScore(avgScore);
       }
       if (gradeScoreMap.containsKey(gradeKey)) {
-        ScoreInfo score = gradeScoreMap.get(gradeKey);
-        Double gradeMaxScore = score.getGradeMaxScore();
-        Double gradeMinScore = score.getGradeMinScore();
-        Double gradeAvgScore = score.getGradeAvgScore();
+        SubjectScoreInfo subjectScoreInfo = gradeScoreMap.get(gradeKey);
+        Double gradeMaxScore = subjectScoreInfo.getGradeMaxScore();
+        Double gradeMinScore = subjectScoreInfo.getGradeMinScore();
+        Double gradeAvgScore = subjectScoreInfo.getGradeAvgScore();
         info.setGradeMaxScore(gradeMaxScore);
         info.setGradeMinScore(gradeMinScore);
         info.setGradeAvgScore(gradeAvgScore);
@@ -416,20 +533,26 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
   /**
    * 上传学生成绩
    *
-   * @param scoreFile 成绩文件
-   * @param scoreInfo 成绩信息
+   * @param scoreFile        成绩文件
+   * @param subjectScoreInfo 成绩信息
    * @return ResultEntity
    */
   @Override
-  public ResultEntity importScoreByFile(MultipartFile scoreFile, ScoreInfo scoreInfo) {
+  public ResultEntity importScoreByFile(MultipartFile scoreFile, SubjectScoreInfo subjectScoreInfo) {
     Map<String, List<String[]>> readExcelMap = new HashMap<>(16);
     try {
       readExcelMap = PoiUtil.readExcel(scoreFile);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    List<ScoreInfo> scoreInfoList = convertImportToScoreInfo(readExcelMap, scoreInfo);
-    ResultEntity resultEntity = insert(scoreInfoList);
+    List<SubjectScoreInfo> scoreInfoList = convertImportToScoreInfo(readExcelMap, subjectScoreInfo);
+    Map<String, SubjectInfo> subjectInfoMap = subjectInfoService.convertRecordToMap(SubjectInfo.builder().build());
+    scoreInfoList.stream().forEach(scoreInfo -> {
+      String subjectId = scoreInfo.getSubjectId();
+      convertScoreNumber(subjectInfoMap, scoreInfo, subjectId);
+    });
+    List<SubjectScoreInfo> insertSubjectScoreInfos = convertInsertSubjectScoreInfo(scoreInfoList);
+    ResultEntity resultEntity = insert(insertSubjectScoreInfos);
     if (resultEntity.isSuccess()) {
       return ResultUtil.success(GlobalEnum.ImportSuccess, scoreInfoList);
     } else {
@@ -440,18 +563,18 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
   /**
    * 班级成绩信息
    *
-   * @param scoreInfo 成绩信息
+   * @param subjectScoreInfo 成绩信息
    * @return ResultEntity
    */
   @Override
-  public ResultEntity listByClass(ScoreInfo scoreInfo) {
-    if (null == scoreInfo) {
-      scoreInfo = ScoreInfo.builder().build();
+  public ResultEntity listByClass(SubjectScoreInfo subjectScoreInfo) {
+    if (null == subjectScoreInfo) {
+      subjectScoreInfo = SubjectScoreInfo.builder().build();
     }
-    String classId = scoreInfo.getClassId();
-    List<ScoreInfo> scoreInfos = scoreInfoMapper.listClassScoreRanking(scoreInfo);
+    String classId = subjectScoreInfo.getClassId();
+    List<SubjectScoreInfo> subjectScoreInfos = subjectScoreInfoMapper.listClassScoreRanking(subjectScoreInfo);
     Map<String, Integer> rankingMap = new HashMap<>();
-    scoreInfos.stream()
+    subjectScoreInfos.stream()
         .collect(Collectors.toMap(info -> {
           String gradeId = info.getGradeId();
           String subjectId = info.getSubjectId();
@@ -462,7 +585,7 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
         }, Function.identity(), (oldValue, newValue) -> newValue)).forEach((key, info) -> {
       rankingMap.put(key, DEFAULT_RANKING);
     });
-    scoreInfos.stream().forEach(info -> {
+    subjectScoreInfos.stream().forEach(info -> {
       String gradeId = info.getGradeId();
       String subjectId = info.getSubjectId();
       String semesterId = info.getSemesterId();
@@ -479,10 +602,10 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
       info.setGradeClassName(info.getGradeName() + DEFAULT_PREFIX + info.getClassName() + DEFAULT_SUFFIX);
     });
     if (StringUtils.isNotBlank(classId)) {
-      scoreInfos = scoreInfos.stream().filter(info -> Objects.equals(classId, info.getClassId()))
+      subjectScoreInfos = subjectScoreInfos.stream().filter(info -> Objects.equals(classId, info.getClassId()))
           .collect(Collectors.toList());
     }
-    return ResultUtil.success(GlobalEnum.QuerySuccess, scoreInfos);
+    return ResultUtil.success(GlobalEnum.QuerySuccess, subjectScoreInfos);
   }
 
   /**
@@ -527,33 +650,9 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
     if (parentOfStudentMap.isEmpty()) {
       return ResultUtil.error(GlobalEnum.ParentNoStudentInfo);
     }
-    ScoreInfo scoreInfo = JSON.parseObject(JSON.toJSONString(parentStudentScore), ScoreInfo.class);
+    SubjectScoreInfo scoreInfo = JSON.parseObject(JSON.toJSONString(parentStudentScore), SubjectScoreInfo.class);
     scoreInfo.setStudentId(studentId);
     return list(scoreInfo);
-  }
-
-  /**
-   * 班级最高、平均、最低成绩
-   *
-   * @param scoreInfo 查询成绩信息
-   * @return ResultEntity
-   */
-  @Override
-  public ResultEntity listClassScore(ScoreInfo scoreInfo) {
-    List<ScoreInfo> scoreInfos = scoreInfoMapper.listClassScoreInfo(scoreInfo);
-    return ResultUtil.success(GlobalEnum.QuerySuccess, scoreInfos);
-  }
-
-  /**
-   * 年级最高、平均、最低成绩
-   *
-   * @param scoreInfo 查询成绩信息
-   * @return ResultEntity
-   */
-  @Override
-  public ResultEntity listGradeScore(ScoreInfo scoreInfo) {
-    List<ScoreInfo> scoreInfos = scoreInfoMapper.listGradeScoreInfo(scoreInfo);
-    return ResultUtil.success(GlobalEnum.QuerySuccess, scoreInfos);
   }
 
   /**
@@ -565,15 +664,15 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
    * @return ResultEntity
    */
   @Override
-  public Map<String, ScoreInfo> listRankingMap(ScoreInfo scoreInfo) {
-    List<ScoreInfo> scoreInfoList = scoreInfoMapper.list(ScoreInfo.builder().build());
-    Map<String, List<ScoreInfo>> classScoreInfoListMap = scoreInfoList.stream().collect(Collectors.groupingBy(info -> {
+  public Map<String, SubjectScoreInfo> listRankingMap(SubjectScoreInfo scoreInfo) {
+    List<SubjectScoreInfo> scoreInfoList = subjectScoreInfoMapper.list(SubjectScoreInfo.builder().build());
+    Map<String, List<SubjectScoreInfo>> classScoreInfoListMap = scoreInfoList.stream().collect(Collectors.groupingBy(info -> {
       String classId = info.getClassId();
       String semesterId = info.getSemesterId();
       String subjectId = info.getSubjectId();
       return classId + INTERVAL_NUMBER + semesterId + INTERVAL_NUMBER + subjectId;
     }));
-    Map<String, List<ScoreInfo>> gradeScoreInfoListMap = scoreInfoList.stream().collect(Collectors.groupingBy(info -> {
+    Map<String, List<SubjectScoreInfo>> gradeScoreInfoListMap = scoreInfoList.stream().collect(Collectors.groupingBy(info -> {
       String gradeId = info.getGradeId();
       String classType = info.getClassType();
       String semesterId = info.getSemesterId();
@@ -581,11 +680,11 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
       return gradeId + INTERVAL_NUMBER + classType + INTERVAL_NUMBER + semesterId + INTERVAL_NUMBER + subjectId;
     }));
 
-    classScoreInfoListMap.forEach((key, scoreInfos) -> {
+    classScoreInfoListMap.forEach((key, subjectScoreInfos) -> {
       final Integer[] rankingCount = {1};
-      scoreInfos.stream().sorted(new Comparator<ScoreInfo>() {
+      subjectScoreInfos.stream().sorted(new Comparator<SubjectScoreInfo>() {
         @Override
-        public int compare(ScoreInfo o1, ScoreInfo o2) {
+        public int compare(SubjectScoreInfo o1, SubjectScoreInfo o2) {
           return ((int) (o2.getScoreNumber() - o1.getScoreNumber()));
         }
       }).collect(Collectors.toList()).stream().forEach(info -> {
@@ -593,11 +692,11 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
         rankingCount[0]++;
       });
     });
-    gradeScoreInfoListMap.forEach((key, scoreInfos) -> {
+    gradeScoreInfoListMap.forEach((key, subjectScoreInfos) -> {
       final Integer[] rankingCount = {1};
-      scoreInfos.stream().sorted(new Comparator<ScoreInfo>() {
+      subjectScoreInfos.stream().sorted(new Comparator<SubjectScoreInfo>() {
         @Override
-        public int compare(ScoreInfo o1, ScoreInfo o2) {
+        public int compare(SubjectScoreInfo o1, SubjectScoreInfo o2) {
           return ((int) (o2.getScoreNumber() - o1.getScoreNumber()));
         }
       }).collect(Collectors.toList()).stream().forEach(info -> {
@@ -606,7 +705,7 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
       });
     });
     scoreInfoList.stream().forEach(info -> {
-      String scoreId = info.getScoreId();
+      String scoreId = info.getId();
       String classId = info.getClassId();
       String gradeId = info.getGradeId();
       String classType = info.getClassType();
@@ -614,15 +713,15 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
       String subjectId = info.getSubjectId();
       String classKey = classId + INTERVAL_NUMBER + semesterId + INTERVAL_NUMBER + subjectId;
       String gradeKey = gradeId + INTERVAL_NUMBER + classType + INTERVAL_NUMBER + semesterId + INTERVAL_NUMBER + subjectId;
-      Integer classRanking = classScoreInfoListMap.get(classKey).stream().filter(score -> Objects.equals(scoreId, score.getScoreId()))
+      Integer classRanking = classScoreInfoListMap.get(classKey).stream().filter(subjectScoreInfo -> Objects.equals(scoreId, subjectScoreInfo.getId()))
           .collect(Collectors.toList()).get(0).getClassRanking();
-      Integer gradeRanking = gradeScoreInfoListMap.get(gradeKey).stream().filter(score -> Objects.equals(scoreId, score.getScoreId()))
+      Integer gradeRanking = gradeScoreInfoListMap.get(gradeKey).stream().filter(subjectScoreInfo -> Objects.equals(scoreId, subjectScoreInfo.getId()))
           .collect(Collectors.toList()).get(0).getGradeRanking();
       info.setGradeRanking(gradeRanking);
       info.setClassRanking(classRanking);
     });
-    Map<String, ScoreInfo> scoreInfoMap = scoreInfoList.stream().filter(info -> StringUtils.isNotBlank(info.getScoreId()))
-        .collect(Collectors.toMap(ScoreInfo::getScoreId, Function.identity(), (oldValue, newValue) -> newValue));
+    Map<String, SubjectScoreInfo> scoreInfoMap = scoreInfoList.stream().filter(info -> StringUtils.isNotBlank(info.getId()))
+        .collect(Collectors.toMap(SubjectScoreInfo::getId, Function.identity(), (oldValue, newValue) -> newValue));
     return scoreInfoMap;
   }
 
@@ -633,8 +732,8 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
    * @param scoreInfo    成绩信息
    * @return List<ScoreInfo>
    */
-  private List<ScoreInfo> convertImportToScoreInfo(Map<String, List<String[]>> scoreInfoMap, ScoreInfo scoreInfo) {
-    List<ScoreInfo> scoreInfoList = new ArrayList<>();
+  private List<SubjectScoreInfo> convertImportToScoreInfo(Map<String, List<String[]>> scoreInfoMap, SubjectScoreInfo scoreInfo) {
+    List<SubjectScoreInfo> scoreInfoList = new ArrayList<>();
     if (null != scoreInfoMap && !scoreInfoMap.isEmpty()) {
       String teacherId = scoreInfo.getTeacherId();
       final String[] classId = {scoreInfo.getClassId()};
@@ -648,7 +747,7 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
           .filter(studentInfo -> StringUtils.isNotBlank(studentInfo.getStudentNum()))
           .collect(Collectors.toMap(StudentInfo::getStudentNum, Function.identity(),
               (oldValue, newValue) -> newValue));
-      scoreInfoMap.forEach((subjectAndGradeAndClassName, scoreInfos) -> {
+      scoreInfoMap.forEach((subjectAndGradeAndClassName, subjectScoreInfos) -> {
         String subjectName = "";
         String gradeName = "";
         String className = "";
@@ -669,7 +768,6 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
         if (!subjectInfoMap.containsKey(subjectName)) {
           GloabalUtils.convertMessage(GlobalEnum.SubjectNameInfoEmpty, subjectName);
         }
-
         if (StringUtils.isNotBlank(classAndGradeName)) {
           if (!classInfoMap.containsKey(classAndGradeName)) {
             GloabalUtils.convertMessage(GlobalEnum.ClassNameInGrade, className, gradeName);
@@ -678,17 +776,17 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
           }
         }
         String subjectId = subjectInfoMap.get(subjectName).getSubjectId();
-        if (null == scoreInfos || scoreInfos.size() < 2) {
+        if (null == subjectScoreInfos || subjectScoreInfos.size() < 2) {
           GloabalUtils.convertMessage(GlobalEnum.ImportScoreInfoDataEmpty, subjectName);
         }
-        String[] headers = scoreInfos.get(0);
-        for (int i = 1; i < scoreInfos.size(); i++) {
-          String[] bodies = scoreInfos.get(i);
+        String[] headers = subjectScoreInfos.get(0);
+        for (int i = 1; i < subjectScoreInfos.size(); i++) {
+          String[] bodies = subjectScoreInfos.get(i);
           String message = String.valueOf(i + 1);
           if (headers.length != bodies.length) {
             GloabalUtils.convertMessage(GlobalEnum.ScoreInfoNoMatchFirstRow, subjectName, message);
           } else {
-            ScoreInfo newScoreInfo = ScoreInfo.builder().teacherId(teacherId).classId(classId[0]).semesterId(semesterId).subjectId(subjectId).build();
+            SubjectScoreInfo newScoreInfo = SubjectScoreInfo.builder().teacherId(teacherId).classId(classId[0]).semesterId(semesterId).subjectId(subjectId).build();
             for (int j = 0; j < headers.length; j++) {
               String header = headers[j];
               String body = bodies[j];
@@ -725,5 +823,85 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
       });
     }
     return scoreInfoList;
+  }
+
+  /**
+   * 检测学生成绩数据是否合法
+   *
+   * @author weiQiang
+   * @since
+   */
+  private class CheckSubjectScoreInfo implements Serializable {
+    private String classId;
+    private Map<String, ClassInfo> classInfoMap;
+    private SubjectScoreInfo scoreInfo;
+    private String semesterId;
+    private Map<String, SemesterInfo> semesterInfoMap;
+    private String studentId;
+    private Map<String, StudentInfo> studentInfoMap;
+    private String subjectId;
+    private Map<String, SubjectInfo> subjectInfoMap;
+    private Map<String, TeacherInfo> teacherInfoMap;
+
+    public CheckSubjectScoreInfo(Map<String, ClassInfo> classInfoMap, Map<String, StudentInfo> studentInfoMap, Map<String, SubjectInfo> subjectInfoMap, Map<String, TeacherInfo> teacherInfoMap, Map<String, SemesterInfo> semesterInfoMap, SubjectScoreInfo scoreInfo) {
+      this.classInfoMap = classInfoMap;
+      this.studentInfoMap = studentInfoMap;
+      this.subjectInfoMap = subjectInfoMap;
+      this.teacherInfoMap = teacherInfoMap;
+      this.semesterInfoMap = semesterInfoMap;
+      this.scoreInfo = scoreInfo;
+    }
+
+    public String getClassId() {
+      return classId;
+    }
+
+    public String getSemesterId() {
+      return semesterId;
+    }
+
+    public String getStudentId() {
+      return studentId;
+    }
+
+    public String getSubjectId() {
+      return subjectId;
+    }
+
+    public CheckSubjectScoreInfo invoke() {
+      classId = scoreInfo.getClassId();
+      studentId = scoreInfo.getStudentId();
+      subjectId = scoreInfo.getSubjectId();
+      String teacherId = scoreInfo.getTeacherId();
+      semesterId = scoreInfo.getSemesterId();
+      if (StringUtils.isBlank(classId)) {
+        GloabalUtils.convertMessage(GlobalEnum.ClassIdEmpty);
+      }
+      if (StringUtils.isBlank(studentId)) {
+        GloabalUtils.convertMessage(GlobalEnum.StudentIdEmpty);
+      }
+      if (StringUtils.isBlank(teacherId)) {
+        GloabalUtils.convertMessage(GlobalEnum.TeacherIdEmpty);
+      }
+      if (StringUtils.isBlank(semesterId)) {
+        GloabalUtils.convertMessage(GlobalEnum.SemesterIdEmpty);
+      }
+      if (!classInfoMap.containsKey(classId)) {
+        GloabalUtils.convertMessage(GlobalEnum.ClassInfoEmpty, classId);
+      }
+      if (!studentInfoMap.containsKey(studentId)) {
+        GloabalUtils.convertMessage(GlobalEnum.StudentInfoEmpty, studentId);
+      }
+      if (StringUtils.isNotBlank(subjectId) && !subjectInfoMap.containsKey(subjectId)) {
+        GloabalUtils.convertMessage(GlobalEnum.SubjectInfoEmpty, subjectId);
+      }
+      if (!teacherInfoMap.containsKey(teacherId)) {
+        GloabalUtils.convertMessage(GlobalEnum.TeacherInfoEmpty, teacherId);
+      }
+      if (!semesterInfoMap.containsKey(semesterId)) {
+        GloabalUtils.convertMessage(GlobalEnum.SemesterInfoEmpty, semesterId);
+      }
+      return this;
+    }
   }
 }

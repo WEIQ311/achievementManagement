@@ -180,6 +180,37 @@ CREATE TABLE `subject_info` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='学科';
 
 -- ----------------------------
+-- Table structure for subject_score_info
+-- ----------------------------
+DROP TABLE IF EXISTS `subject_score_info`;
+CREATE TABLE `subject_score_info` (
+  `id` varchar(255) NOT NULL COMMENT '主键',
+  `year_id` varchar(255) NOT NULL COMMENT '学年ID',
+  `semester_id` varchar(255) NOT NULL COMMENT '学期ID',
+  `grade_id` varchar(255) NOT NULL COMMENT '年级ID',
+  `class_id` varchar(255) NOT NULL COMMENT '班级ID',
+  `class_type` varchar(255) NOT NULL COMMENT '班级类型',
+  `student_id` varchar(255) NOT NULL COMMENT '学生ID',
+  `teacher_id` varchar(255) DEFAULT NULL COMMENT '教师ID',
+  `sub_language` double(16,2) DEFAULT NULL COMMENT '语文成绩',
+  `sub_mathematics` double(16,2) DEFAULT NULL COMMENT '数学成绩',
+  `sub_english` double(16,2) DEFAULT NULL COMMENT '英语成绩',
+  `sub_history` double(16,2) DEFAULT NULL COMMENT '历史成绩',
+  `sub_geography` double(16,2) DEFAULT NULL COMMENT '地理成绩',
+  `sub_biological` double(16,2) DEFAULT NULL COMMENT '生物成绩',
+  `sub_chemistry` double(16,2) DEFAULT NULL COMMENT '化学成绩',
+  `sub_physical` double(16,2) DEFAULT NULL COMMENT '物理成绩',
+  `sub_political` double(16,2) DEFAULT NULL COMMENT '政治成绩',
+  `sub_computer` double(16,2) DEFAULT NULL COMMENT '计算机成绩',
+  `sub_sports` double(16,2) DEFAULT NULL COMMENT '体育成绩',
+  `sub_art` double(16,2) DEFAULT NULL COMMENT '美术成绩',
+  `sub_music` double(16,2) DEFAULT NULL COMMENT '音乐成绩',
+  `insert_time` datetime DEFAULT NULL COMMENT '添加时间',
+  `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
 -- Table structure for teacher_info
 -- ----------------------------
 DROP TABLE IF EXISTS `teacher_info`;
