@@ -112,6 +112,8 @@ public class PoiUtil {
         int firstRowNum = sheet.getFirstRowNum();
         //获得当前sheet的结束行
         int lastRowNum = sheet.getLastRowNum();
+        Row firstRow = sheet.getRow(firstRowNum);
+        int numberOfCells = firstRow.getPhysicalNumberOfCells();
         //循环所有行
         for (int rowNum = firstRowNum; rowNum <= lastRowNum; rowNum++) {
           //获得当前行
@@ -122,8 +124,8 @@ public class PoiUtil {
           //获得当前行的开始列
           int firstCellNum = row.getFirstCellNum();
           //获得当前行的列数
-          int lastCellNum = lastRowNum;
-          String[] cells = new String[lastCellNum];
+          int lastCellNum = numberOfCells;
+          String[] cells = new String[numberOfCells];
           //循环当前行
           for (int cellNum = firstCellNum; cellNum < lastCellNum; cellNum++) {
             Cell cell = row.getCell(cellNum);
