@@ -759,9 +759,9 @@ public class SubjectScoreInfoServiceImpl implements SubjectScoreInfoService {
         String[] headers = subjectScoreInfos.get(0);
         for (int i = 1; i < subjectScoreInfos.size(); i++) {
           String[] bodies = subjectScoreInfos.get(i);
-          String message = String.valueOf(i + 1);
+          String rowNum = String.valueOf(i + 1);
           if (headers.length != bodies.length) {
-            GloabalUtils.convertMessage(GlobalEnum.ScoreInfoNoMatchFirstRow, message);
+            GloabalUtils.convertMessage(GlobalEnum.ScoreInfoNoMatchFirstRow, rowNum);
           } else {
             SubjectScoreInfo newScoreInfo = SubjectScoreInfo.builder().classId(classId).classType(classType).semesterId(semesterId).build();
             for (int j = 0; j < headers.length; j++) {
@@ -770,10 +770,10 @@ public class SubjectScoreInfoServiceImpl implements SubjectScoreInfoService {
               switch (header) {
                 case "学号":
                   if (StringUtils.isBlank(body)) {
-                    GloabalUtils.convertMessage(GlobalEnum.ImportStudentInfoEmpty, message);
+                    GloabalUtils.convertMessage(GlobalEnum.ImportStudentInfoEmpty, rowNum);
                   }
                   if (!studentInfoMap.containsKey(body)) {
-                    GloabalUtils.convertMessage(GlobalEnum.ImportStudentInfoNoMatch, message, body);
+                    GloabalUtils.convertMessage(GlobalEnum.ImportStudentInfoNoMatch, rowNum, body);
                   }
                   String studentId = studentInfoMap.get(body).getStudentId();
                   newScoreInfo.setStudentId(studentId);
@@ -781,43 +781,43 @@ public class SubjectScoreInfoServiceImpl implements SubjectScoreInfoService {
                 case "姓名":
                   break;
                 case "语文":
-                  newScoreInfo.setSubLanguage(convertScoreNumber(body, header, message));
+                  newScoreInfo.setSubLanguage(convertScoreNumber(body, header, rowNum));
                   break;
                 case "数学":
-                  newScoreInfo.setSubMathematics(convertScoreNumber(body, header, message));
+                  newScoreInfo.setSubMathematics(convertScoreNumber(body, header, rowNum));
                   break;
                 case "英语":
-                  newScoreInfo.setSubEnglish(convertScoreNumber(body, header, message));
+                  newScoreInfo.setSubEnglish(convertScoreNumber(body, header, rowNum));
                   break;
                 case "物理":
-                  newScoreInfo.setSubPhysical(convertScoreNumber(body, header, message));
+                  newScoreInfo.setSubPhysical(convertScoreNumber(body, header, rowNum));
                   break;
                 case "历史":
-                  newScoreInfo.setSubHistory(convertScoreNumber(body, header, message));
+                  newScoreInfo.setSubHistory(convertScoreNumber(body, header, rowNum));
                   break;
                 case "地理":
-                  newScoreInfo.setSubGeography(convertScoreNumber(body, header, message));
+                  newScoreInfo.setSubGeography(convertScoreNumber(body, header, rowNum));
                   break;
                 case "生物":
-                  newScoreInfo.setSubBiological(convertScoreNumber(body, header, message));
+                  newScoreInfo.setSubBiological(convertScoreNumber(body, header, rowNum));
                   break;
                 case "化学":
-                  newScoreInfo.setSubChemistry(convertScoreNumber(body, header, message));
+                  newScoreInfo.setSubChemistry(convertScoreNumber(body, header, rowNum));
                   break;
                 case "政治":
-                  newScoreInfo.setSubPolitical(convertScoreNumber(body, header, message));
+                  newScoreInfo.setSubPolitical(convertScoreNumber(body, header, rowNum));
                   break;
                 case "计算机":
-                  newScoreInfo.setSubComputer(convertScoreNumber(body, header, message));
+                  newScoreInfo.setSubComputer(convertScoreNumber(body, header, rowNum));
                   break;
                 case "体育":
-                  newScoreInfo.setSubSports(convertScoreNumber(body, header, message));
+                  newScoreInfo.setSubSports(convertScoreNumber(body, header, rowNum));
                   break;
                 case "美术":
-                  newScoreInfo.setSubArt(convertScoreNumber(body, header, message));
+                  newScoreInfo.setSubArt(convertScoreNumber(body, header, rowNum));
                   break;
                 case "音乐":
-                  newScoreInfo.setSubMusic(convertScoreNumber(body, header, message));
+                  newScoreInfo.setSubMusic(convertScoreNumber(body, header, rowNum));
                   break;
                 default:
                   GloabalUtils.convertMessage(GlobalEnum.SubjectNameEmpty, header);
@@ -835,80 +835,22 @@ public class SubjectScoreInfoServiceImpl implements SubjectScoreInfoService {
   /**
    * 转换与校验成绩
    *
-   * @param body
-   * @param header
-   * @param message
+   * @param body   成绩
+   * @param header 科目名称
+   * @param rowNum 行数
    * @return
    */
-  private Double convertScoreNumber(String body, String header, String message) {
+  private Double convertScoreNumber(String body, String header, String rowNum) {
     if (StringUtils.isBlank(body)) {
-      GloabalUtils.convertMessage(GlobalEnum.ImportScoreInfoEmpty, header, message);
+      return null;
     }
     Double scoreNumber = 0.0;
     try {
       scoreNumber = Double.valueOf(body);
     } catch (Exception e) {
-      GloabalUtils.convertMessage(GlobalEnum.ImportScoreInfoNoMatch, body, message);
+      GloabalUtils.convertMessage(GlobalEnum.ImportScoreInfoNoMatch, body, rowNum, header);
     }
     return scoreNumber;
-  }
-
-  /**
-   * 导入时转换科目成绩
-   *
-   * @param subjectInfoMap 科目信息
-   * @param scoreInfo      成绩信息
-   * @param subjectId      科目ID
-   */
-  private void convertScoreNumber(Map<String, SubjectInfo> subjectInfoMap, SubjectScoreInfo scoreInfo, String subjectId) {
-    if (StringUtils.isNotBlank(subjectId)) {
-      Double scoreNumber = scoreInfo.getScoreNumber();
-      SubjectInfo subjectInfo = subjectInfoMap.get(subjectId);
-      switch (subjectInfo.getSubjectName()) {
-        case "语文":
-          scoreInfo.setSubLanguage(scoreNumber);
-          break;
-        case "数学":
-          scoreInfo.setSubMathematics(scoreNumber);
-          break;
-        case "英语":
-          scoreInfo.setSubEnglish(scoreNumber);
-          break;
-        case "物理":
-          scoreInfo.setSubPhysical(scoreNumber);
-          break;
-        case "历史":
-          scoreInfo.setSubHistory(scoreNumber);
-          break;
-        case "地理":
-          scoreInfo.setSubGeography(scoreNumber);
-          break;
-        case "生物":
-          scoreInfo.setSubBiological(scoreNumber);
-          break;
-        case "化学":
-          scoreInfo.setSubChemistry(scoreNumber);
-          break;
-        case "政治":
-          scoreInfo.setSubPolitical(scoreNumber);
-          break;
-        case "计算机":
-          scoreInfo.setSubComputer(scoreNumber);
-          break;
-        case "体育":
-          scoreInfo.setSubSports(scoreNumber);
-          break;
-        case "美术":
-          scoreInfo.setSubArt(scoreNumber);
-          break;
-        case "音乐":
-          scoreInfo.setSubMusic(scoreNumber);
-          break;
-        default:
-          GloabalUtils.convertMessage(GlobalEnum.SubjectScoreInfoEmpty);
-          break;
-      }
-    }
   }
 
   /**

@@ -184,6 +184,42 @@
     <include refid="GRADE_CALCULATE_GROUP_SQL"/>
   </select>
 
+  <!--班级排名信息-->
+  <select id="listClassScoreRanking" resultMap="SubjectScoreInfoMap">
+    SELECT  GRA.GRADE_ID, GRA.GRADE_NAME, CLA.CLASS_ID,
+    CLA.CLASS_NAME, CLA.CLASS_TYPE,
+    YEA.YEAR_ID,YEA.YEAR_NAME,SEM.SEMESTER_ID,SEM.SEMESTER_NAME,
+    SUM(S.SUB_SCORE_SUM) SUM_SCORE, MAX(S.SUB_SCORE_SUM) MAX_SCORE,
+    MIN(S.SUB_SCORE_SUM) MIN_SCORE, AVG(S.SUB_SCORE_SUM) AVG_SCORE
+    FROM
+    achievement.SUBJECT_SCORE_INFO S, achievement.CLASS_INFO CLA,
+    achievement.GRADE_INFO GRA,
+    achievement.YEAR_INFO YEA,SEMESTER_INFO SEM
+    <where>
+      S.CLASS_ID = CLA.CLASS_ID
+      AND CLA.GRADE_ID = GRA.GRADE_ID
+      AND S.SEMESTER_ID=SEM.SEMESTER_ID
+      AND YEA.YEAR_ID=SEM.YEAR_ID
+      <if test="yearId!=null and yearId!=''">
+        AND YEA.YEAR_ID=#{yearId}
+      </if>
+      <if test="semesterId!=null and semesterId!=''">
+        AND S.SEMESTER_ID=#{semesterId}
+      </if>
+      <if test="gradeId!=null and gradeId!=''">
+        AND CLA.GRADE_ID=#{gradeId}
+      </if>
+      <if test="classType!=null and classType!=''">
+        AND CLA.CLASS_TYPE=#{classType}
+      </if>
+    </where>
+    GROUP BY
+    S.SEMESTER_ID, CLA.CLASS_ID,
+    GRA.GRADE_ID,CLA.CLASS_TYPE,SEM.SEMESTER_ID,
+    YEA.YEAR_ID
+    ORDER BY  SUM(S.SUB_SCORE_SUM) DESC,S.CLASS_ID
+  </select>
+
   <!--新增所有列-->
   <insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="java.util.List">
     insert into<include refid="BASE_TABLE"/>(<include refid="BASE_COLUMN"/>)

@@ -73,7 +73,7 @@ public enum GlobalEnum {
   ScoreInfoNoMatchFirstRow("学生成绩下的第%s行与表头列数不一致,请检查!"),
   ScoreInfoHasInUsed("学生\"%s\"的\"%s\"成绩已经存在!"),
   ImportScoreInfoEmpty("学科\"%s\"下的第%s行成绩为空,请检查!"),
-  ImportScoreInfoNoMatch("学科\"%s\"下的第%s行成绩不合法,请检查!"),
+  ImportScoreInfoNoMatch("学科\"%s\"下的第%s行\"%s\"成绩不合法,请检查!"),
   ImportStudentInfoEmpty("学科\"%s\"下的第%s行学生姓名为空,请检查!"),
   ImportStudentInfoNoMatch("学科\"%s\"下的第%s行学生\"%s\"不存在,请检查!"),
   ImportScoreInfoDataEmpty("学生成绩数据为空,请检查!"),
