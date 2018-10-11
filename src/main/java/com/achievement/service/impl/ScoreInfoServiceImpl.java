@@ -351,7 +351,7 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
           .map(ConfTeacherClass::getClassId)
           .distinct().collect(Collectors.toList());
       Map<String, StudentInfo> studentInfoMap = studentInfoService.convertRecordToMap(StudentInfo.builder().classIds(classIds).build());
-      Map<String, List<List<String>>> studentListMap = new HashMap<>();
+      Map<String, List<List<String>>> studentListMap = new HashMap<>(16);
       studentInfoMap.forEach((studentId, studentInfo) -> {
         List<List<String>> contentList = new ArrayList<>();
         String classId = studentInfo.getClassId();
@@ -450,7 +450,7 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
     }
     String classId = scoreInfo.getClassId();
     List<ScoreInfo> scoreInfos = scoreInfoMapper.listClassScoreRanking(scoreInfo);
-    Map<String, Integer> rankingMap = new HashMap<>();
+    Map<String, Integer> rankingMap = new HashMap<>(16);
     scoreInfos.stream()
         .collect(Collectors.toMap(info -> {
           String gradeId = info.getGradeId();
@@ -657,7 +657,7 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
           subjectName = subjectAndGradeAndClassName;
         } else {
           String[] strings = subjectAndGradeAndClassName.split(INTERVAL_NUMBER);
-          if (strings.length != 3) {
+          if (strings.length != EXCEL_SHEET_LENGTH) {
             GloabalUtils.convertMessage(GlobalEnum.SheetNameError, subjectAndGradeAndClassName);
           } else {
             subjectName = strings[0];
@@ -678,7 +678,8 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
           }
         }
         String subjectId = subjectInfoMap.get(subjectName).getSubjectId();
-        if (null == scoreInfos || scoreInfos.size() < 2) {
+        Integer fileDataSize = 2;
+        if (null == scoreInfos || scoreInfos.size() < fileDataSize) {
           GloabalUtils.convertMessage(GlobalEnum.ImportScoreInfoDataEmpty, subjectName);
         }
         String[] headers = scoreInfos.get(0);

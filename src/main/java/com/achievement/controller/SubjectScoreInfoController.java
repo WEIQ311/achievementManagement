@@ -2,19 +2,29 @@ package com.achievement.controller;
 
 import com.achievement.entity.SubjectScoreInfo;
 import com.achievement.entity.TeacherInfo;
+import com.achievement.enums.GlobalEnum;
 import com.achievement.service.SubjectScoreInfoService;
+import com.achievement.utils.GloabalUtils;
 import com.achievement.utils.ResultUtil;
 import com.achievement.vo.ObjectInfo;
 import com.achievement.vo.ParentStudentScore;
 import com.achievement.vo.ResultEntity;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
+
+import static com.achievement.constants.GlobalConstants.FORM_DATA_KEY;
 
 /**
  * (SubjectScoreInfo)表控制层
@@ -73,12 +83,29 @@ public class SubjectScoreInfoController {
   /**
    * 上传学生成绩
    *
-   * @param scoreFile        成绩文件
-   * @param subjectScoreInfo 成绩信息
+   * @param request 请求信息
    * @return ResultEntity
    */
   @RequestMapping(value = "importScore", method = RequestMethod.POST)
-  public ResultEntity importScoreByFile(MultipartFile scoreFile, SubjectScoreInfo subjectScoreInfo) {
+  public ResultEntity importScoreByFile(HttpServletRequest request) {
+    MultipartHttpServletRequest multipartHttpServletRequest = (MultipartHttpServletRequest) request;
+    MultipartFile scoreFile = multipartHttpServletRequest.getFile("scoreFile");
+    Map<String, String[]> parameterMap = multipartHttpServletRequest.getParameterMap();
+    if (null == scoreFile || scoreFile.isEmpty()) {
+      return ResultUtil.error(GlobalEnum.FileEmpty);
+    }
+    if (!parameterMap.containsKey(FORM_DATA_KEY)) {
+      GloabalUtils.convertMessage(GlobalEnum.SubjectScoreInfoEmpty);
+    }
+    String[] data = parameterMap.get(FORM_DATA_KEY);
+    JSONArray dataArray = JSON.parseArray(Arrays.deepToString(data));
+    if (null == dataArray || dataArray.size() < 1) {
+      GloabalUtils.convertMessage(GlobalEnum.SubjectScoreInfoEmpty);
+    }
+    SubjectScoreInfo subjectScoreInfo = dataArray.getObject(0, SubjectScoreInfo.class);
+    if (null == subjectScoreInfo) {
+      GloabalUtils.convertMessage(GlobalEnum.SubjectScoreInfoEmpty);
+    }
     return subjectScoreInfoService.importScoreByFile(scoreFile, subjectScoreInfo);
   }
 

@@ -36,6 +36,10 @@ public class GlobalConstants {
    */
   public static final String[] EXCEL_HEADER_TITLE = {"学号", "姓名", "成绩"};
   /**
+   * 导入文件sheet切分长度
+   */
+  public static final Integer EXCEL_SHEET_LENGTH = 3;
+  /**
    * EXCEL类型
    */
   public static final String EXCEL_TYPE_XLS = "xls";
@@ -43,6 +47,10 @@ public class GlobalConstants {
    * EXCEL类型
    */
   public static final String EXCEL_TYPE_XLSX = "xlsx";
+  /**
+   * 上传文件配置key
+   */
+  public static final String FORM_DATA_KEY = "formData";
   /**
    * 间隔号
    */

@@ -441,7 +441,7 @@ public class SubjectScoreInfoServiceImpl implements SubjectScoreInfoService {
           .map(ConfTeacherClass::getClassId)
           .distinct().collect(Collectors.toList());
       Map<String, StudentInfo> studentInfoMap = studentInfoService.convertRecordToMap(StudentInfo.builder().classIds(classIds).build());
-      Map<String, List<List<String>>> studentListMap = new HashMap<>();
+      Map<String, List<List<String>>> studentListMap = new HashMap<>(16);
       studentInfoMap.forEach((studentId, studentInfo) -> {
         List<List<String>> contentList = new ArrayList<>();
         String classId = studentInfo.getClassId();
@@ -546,7 +546,7 @@ public class SubjectScoreInfoServiceImpl implements SubjectScoreInfoService {
     }
     String classId = subjectScoreInfo.getClassId();
     List<SubjectScoreInfo> subjectScoreInfos = subjectScoreInfoMapper.listClassScoreRanking(subjectScoreInfo);
-    Map<String, Integer> rankingMap = new HashMap<>();
+    Map<String, Integer> rankingMap = new HashMap<>(16);
     subjectScoreInfos.stream()
         .collect(Collectors.toMap(info -> {
           String gradeId = info.getGradeId();
@@ -762,7 +762,7 @@ public class SubjectScoreInfoServiceImpl implements SubjectScoreInfoService {
           subjectName = subjectAndGradeAndClassName;
         } else {
           String[] strings = subjectAndGradeAndClassName.split(INTERVAL_NUMBER);
-          if (strings.length != 3) {
+          if (strings.length != EXCEL_HEADER_TITLE.length) {
             GloabalUtils.convertMessage(GlobalEnum.SheetNameError, subjectAndGradeAndClassName);
           } else {
             subjectName = strings[0];
@@ -782,7 +782,8 @@ public class SubjectScoreInfoServiceImpl implements SubjectScoreInfoService {
           }
         }
         String subjectId = subjectInfoMap.get(subjectName).getSubjectId();
-        if (null == subjectScoreInfos || subjectScoreInfos.size() < 2) {
+        Integer fileDataSize = 2;
+        if (null == subjectScoreInfos || subjectScoreInfos.size() < fileDataSize) {
           GloabalUtils.convertMessage(GlobalEnum.ImportScoreInfoDataEmpty, subjectName);
         }
         String[] headers = subjectScoreInfos.get(0);
@@ -881,6 +882,9 @@ public class SubjectScoreInfoServiceImpl implements SubjectScoreInfoService {
           break;
         case "音乐":
           scoreInfo.setSubMusic(scoreNumber);
+          break;
+        default:
+          GloabalUtils.convertMessage(GlobalEnum.SubjectScoreInfoEmpty);
           break;
       }
     }
