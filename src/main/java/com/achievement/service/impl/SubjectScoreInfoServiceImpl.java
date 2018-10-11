@@ -155,6 +155,73 @@ public class SubjectScoreInfoServiceImpl implements SubjectScoreInfoService {
   }
 
   /**
+   * 转换班级内最高、平均、最低成绩信息
+   *
+   * @param subjectScoreInfos 成绩结果
+   * @param scoreInfo         查询成绩信息
+   */
+  private void convertScoreInfo(List<SubjectScoreInfo> subjectScoreInfos, SubjectScoreInfo scoreInfo) {
+    if (null == subjectScoreInfos || subjectScoreInfos.size() < 1) {
+      return;
+    }
+    Map<String, SubjectScoreInfo> scoreInfoMap = listRankingMap(scoreInfo);
+    Map<String, StudentInfo> studentInfoMap = studentInfoService.convertRecordToMap(StudentInfo.builder().build());
+    List<SubjectScoreInfo> classScoreInfo = subjectScoreInfoMapper.listClassScoreInfo(scoreInfo);
+    List<SubjectScoreInfo> gradeScoreInfo = subjectScoreInfoMapper.listGradeScoreInfo(scoreInfo);
+    Map<String, GradeInfo> gradeInfoMap = gradeInfoService.convertRecordToMap(GradeInfo.builder().build());
+    Map<String, ClassInfo> classInfoMap = classInfoService.convertRecordToMap(ClassInfo.builder().build());
+    Map<String, SubjectScoreInfo> classScoreMap = classScoreInfo.stream()
+        .collect(Collectors.toMap(info -> {
+          String classId = info.getClassId();
+          String semesterId = info.getSemesterId();
+          return classId + INTERVAL_NUMBER + semesterId;
+        }, Function.identity(), (oldValue, newValue) -> newValue));
+    Map<String, SubjectScoreInfo> gradeScoreMap = gradeScoreInfo.stream()
+        .collect(Collectors.toMap(info -> {
+          String gradeId = info.getGradeId();
+          String semesterId = info.getSemesterId();
+          return gradeId + INTERVAL_NUMBER + semesterId;
+        }, Function.identity(), (oldValue, newValue) -> newValue));
+    subjectScoreInfos.stream().forEach(info -> {
+      String scoreId = info.getId();
+      String classId = info.getClassId();
+      String gradeId = info.getGradeId();
+      info.setClassName(classInfoMap.getOrDefault(classId, ClassInfo.builder().className(classId).build()).getClassName());
+      info.setGradeName(gradeInfoMap.getOrDefault(gradeId, GradeInfo.builder().gradeName(gradeId).build()).getGradeName());
+      String semesterId = info.getSemesterId();
+      String classKey = classId + INTERVAL_NUMBER + semesterId;
+      String gradeKey = gradeId + INTERVAL_NUMBER + semesterId;
+      if (classScoreMap.containsKey(classKey)) {
+        SubjectScoreInfo subjectScoreInfo = classScoreMap.get(classKey);
+        Double maxScore = subjectScoreInfo.getMaxScore();
+        Double minScore = subjectScoreInfo.getMinScore();
+        Double avgScore = subjectScoreInfo.getAvgScore();
+        info.setMaxScore(maxScore);
+        info.setMinScore(minScore);
+        info.setAvgScore(avgScore);
+      }
+      if (gradeScoreMap.containsKey(gradeKey)) {
+        SubjectScoreInfo subjectScoreInfo = gradeScoreMap.get(gradeKey);
+        Double gradeMaxScore = subjectScoreInfo.getGradeMaxScore();
+        Double gradeMinScore = subjectScoreInfo.getGradeMinScore();
+        Double gradeAvgScore = subjectScoreInfo.getGradeAvgScore();
+        info.setGradeMaxScore(gradeMaxScore);
+        info.setGradeMinScore(gradeMinScore);
+        info.setGradeAvgScore(gradeAvgScore);
+      }
+      Integer classRanking = scoreInfoMap.get(scoreId).getClassRanking();
+      Integer gradeRanking = scoreInfoMap.get(scoreId).getGradeRanking();
+      info.setClassRanking(classRanking);
+      info.setGradeRanking(gradeRanking);
+      String studentId = info.getStudentId();
+      StudentInfo studentInfo = studentInfoMap.getOrDefault(studentId, StudentInfo.builder().studentNum(studentId).studentName(studentId).build());
+      info.setStudentNum(studentInfo.getStudentNum());
+      info.setStudentName(studentInfo.getStudentName());
+      info.setGradeClassName(info.getGradeName() + DEFAULT_PREFIX + info.getClassName() + DEFAULT_SUFFIX);
+    });
+  }
+
+  /**
    * 根据条件查询对象
    *
    * @param subjectScoreInfo 查询参数
@@ -273,44 +340,6 @@ public class SubjectScoreInfoServiceImpl implements SubjectScoreInfoService {
   }
 
   /**
-   * 更新总成绩
-   *
-   * @param subjectScoreInfo 成绩信息
-   * @return ResultEntity
-   */
-  @Override
-  public ResultEntity updateSubjectScoreSum(SubjectScoreInfo subjectScoreInfo) {
-    List<SubjectScoreInfo> subjectScoreInfos = subjectScoreInfoMapper.list(subjectScoreInfo);
-    List<SubjectScoreInfo> updateScoreInfos = new ArrayList<>();
-    subjectScoreInfos.stream().forEach(info -> {
-      Double scoreSum = (Double) (info.getSubLanguage() +
-          info.getSubMathematics() +
-          info.getSubEnglish() +
-          info.getSubHistory() +
-          info.getSubGeography() +
-          info.getSubBiological() +
-          info.getSubChemistry() +
-          info.getSubPhysical() +
-          info.getSubPolitical() +
-          info.getSubComputer() +
-          info.getSubSports() +
-          info.getSubArt() +
-          info.getSubMusic());
-      if (!Objects.equals(info.getSubScoreSum(), scoreSum)) {
-        info.setSubScoreSum(scoreSum);
-        updateScoreInfos.add(info);
-      }
-    });
-    Integer updateCount = subjectScoreInfoMapper.update(updateScoreInfos);
-    log.info("更新学生总成绩:{}条", updateCount);
-    if (updateCount > 0) {
-      return ResultUtil.success(GlobalEnum.UpdateSuccess, updateScoreInfos);
-    } else {
-      return ResultUtil.error(GlobalEnum.DataEmpty);
-    }
-  }
-
-  /**
    * 增加成绩时将成绩合并
    *
    * @param insertSubjectScoreInfos 成绩数据
@@ -380,128 +409,6 @@ public class SubjectScoreInfoServiceImpl implements SubjectScoreInfoService {
       subjectScoreInfos.stream().forEach(subjectScoreInfo -> subjectScoreInfo.setId("score_" + GloabalUtils.ordinaryId()));
     }
     return subjectScoreInfos;
-  }
-
-  /**
-   * 导入时转换科目成绩
-   *
-   * @param subjectInfoMap 科目信息
-   * @param scoreInfo      成绩信息
-   * @param subjectId      科目ID
-   */
-  private void convertScoreNumber(Map<String, SubjectInfo> subjectInfoMap, SubjectScoreInfo scoreInfo, String subjectId) {
-    if (StringUtils.isNotBlank(subjectId)) {
-      Double scoreNumber = scoreInfo.getScoreNumber();
-      SubjectInfo subjectInfo = subjectInfoMap.get(subjectId);
-      switch (subjectInfo.getSubjectName()) {
-        case "语文":
-          scoreInfo.setSubLanguage(scoreNumber);
-          break;
-        case "数学":
-          scoreInfo.setSubMathematics(scoreNumber);
-          break;
-        case "英语":
-          scoreInfo.setSubEnglish(scoreNumber);
-          break;
-        case "物理":
-          scoreInfo.setSubPhysical(scoreNumber);
-          break;
-        case "历史":
-          scoreInfo.setSubHistory(scoreNumber);
-          break;
-        case "地理":
-          scoreInfo.setSubGeography(scoreNumber);
-          break;
-        case "生物":
-          scoreInfo.setSubBiological(scoreNumber);
-          break;
-        case "化学":
-          scoreInfo.setSubChemistry(scoreNumber);
-          break;
-        case "政治":
-          scoreInfo.setSubPolitical(scoreNumber);
-          break;
-        case "计算机":
-          scoreInfo.setSubComputer(scoreNumber);
-          break;
-        case "体育":
-          scoreInfo.setSubSports(scoreNumber);
-          break;
-        case "美术":
-          scoreInfo.setSubArt(scoreNumber);
-          break;
-        case "音乐":
-          scoreInfo.setSubMusic(scoreNumber);
-          break;
-      }
-    }
-  }
-
-  /**
-   * 转换班级内最高、平均、最低成绩信息
-   *
-   * @param subjectScoreInfos 成绩结果
-   * @param scoreInfo         查询成绩信息
-   */
-  private void convertScoreInfo(List<SubjectScoreInfo> subjectScoreInfos, SubjectScoreInfo scoreInfo) {
-    if (null == subjectScoreInfos || subjectScoreInfos.size() < 1) {
-      return;
-    }
-    Map<String, SubjectScoreInfo> scoreInfoMap = listRankingMap(scoreInfo);
-    Map<String, StudentInfo> studentInfoMap = studentInfoService.convertRecordToMap(StudentInfo.builder().build());
-    List<SubjectScoreInfo> classScoreInfo = subjectScoreInfoMapper.listClassScoreInfo(scoreInfo);
-    List<SubjectScoreInfo> gradeScoreInfo = subjectScoreInfoMapper.listGradeScoreInfo(scoreInfo);
-    Map<String, GradeInfo> gradeInfoMap = gradeInfoService.convertRecordToMap(GradeInfo.builder().build());
-    Map<String, ClassInfo> classInfoMap = classInfoService.convertRecordToMap(ClassInfo.builder().build());
-    Map<String, SubjectScoreInfo> classScoreMap = classScoreInfo.stream()
-        .collect(Collectors.toMap(info -> {
-          String classId = info.getClassId();
-          String semesterId = info.getSemesterId();
-          return classId + INTERVAL_NUMBER + semesterId;
-        }, Function.identity(), (oldValue, newValue) -> newValue));
-    Map<String, SubjectScoreInfo> gradeScoreMap = gradeScoreInfo.stream()
-        .collect(Collectors.toMap(info -> {
-          String gradeId = info.getGradeId();
-          String semesterId = info.getSemesterId();
-          return gradeId + INTERVAL_NUMBER + semesterId;
-        }, Function.identity(), (oldValue, newValue) -> newValue));
-    subjectScoreInfos.stream().forEach(info -> {
-      String scoreId = info.getId();
-      String classId = info.getClassId();
-      String gradeId = info.getGradeId();
-      info.setClassName(classInfoMap.getOrDefault(classId, ClassInfo.builder().className(classId).build()).getClassName());
-      info.setGradeName(gradeInfoMap.getOrDefault(gradeId, GradeInfo.builder().gradeName(gradeId).build()).getGradeName());
-      String semesterId = info.getSemesterId();
-      String classKey = classId + INTERVAL_NUMBER + semesterId;
-      String gradeKey = gradeId + INTERVAL_NUMBER + semesterId;
-      if (classScoreMap.containsKey(classKey)) {
-        SubjectScoreInfo subjectScoreInfo = classScoreMap.get(classKey);
-        Double maxScore = subjectScoreInfo.getMaxScore();
-        Double minScore = subjectScoreInfo.getMinScore();
-        Double avgScore = subjectScoreInfo.getAvgScore();
-        info.setMaxScore(maxScore);
-        info.setMinScore(minScore);
-        info.setAvgScore(avgScore);
-      }
-      if (gradeScoreMap.containsKey(gradeKey)) {
-        SubjectScoreInfo subjectScoreInfo = gradeScoreMap.get(gradeKey);
-        Double gradeMaxScore = subjectScoreInfo.getGradeMaxScore();
-        Double gradeMinScore = subjectScoreInfo.getGradeMinScore();
-        Double gradeAvgScore = subjectScoreInfo.getGradeAvgScore();
-        info.setGradeMaxScore(gradeMaxScore);
-        info.setGradeMinScore(gradeMinScore);
-        info.setGradeAvgScore(gradeAvgScore);
-      }
-      Integer classRanking = scoreInfoMap.get(scoreId).getClassRanking();
-      Integer gradeRanking = scoreInfoMap.get(scoreId).getGradeRanking();
-      info.setClassRanking(classRanking);
-      info.setGradeRanking(gradeRanking);
-      String studentId = info.getStudentId();
-      StudentInfo studentInfo = studentInfoMap.getOrDefault(studentId, StudentInfo.builder().studentNum(studentId).studentName(studentId).build());
-      info.setStudentNum(studentInfo.getStudentNum());
-      info.setStudentName(studentInfo.getStudentName());
-      info.setGradeClassName(info.getGradeName() + DEFAULT_PREFIX + info.getClassName() + DEFAULT_SUFFIX);
-    });
   }
 
   /**
@@ -787,6 +694,44 @@ public class SubjectScoreInfoServiceImpl implements SubjectScoreInfoService {
   }
 
   /**
+   * 更新总成绩
+   *
+   * @param subjectScoreInfo 成绩信息
+   * @return ResultEntity
+   */
+  @Override
+  public ResultEntity updateSubjectScoreSum(SubjectScoreInfo subjectScoreInfo) {
+    List<SubjectScoreInfo> subjectScoreInfos = subjectScoreInfoMapper.list(subjectScoreInfo);
+    List<SubjectScoreInfo> updateScoreInfos = new ArrayList<>();
+    subjectScoreInfos.stream().forEach(info -> {
+      Double scoreSum = (Double) (info.getSubLanguage() +
+          info.getSubMathematics() +
+          info.getSubEnglish() +
+          info.getSubHistory() +
+          info.getSubGeography() +
+          info.getSubBiological() +
+          info.getSubChemistry() +
+          info.getSubPhysical() +
+          info.getSubPolitical() +
+          info.getSubComputer() +
+          info.getSubSports() +
+          info.getSubArt() +
+          info.getSubMusic());
+      if (!Objects.equals(info.getSubScoreSum(), scoreSum)) {
+        info.setSubScoreSum(scoreSum);
+        updateScoreInfos.add(info);
+      }
+    });
+    Integer updateCount = subjectScoreInfoMapper.update(updateScoreInfos);
+    log.info("更新学生总成绩:{}条", updateCount);
+    if (updateCount > 0) {
+      return ResultUtil.success(GlobalEnum.UpdateSuccess, updateScoreInfos);
+    } else {
+      return ResultUtil.error(GlobalEnum.DataEmpty);
+    }
+  }
+
+  /**
    * 将excel文件数据转为成绩数据
    *
    * @param scoreInfoMap excel文件数据
@@ -884,6 +829,61 @@ public class SubjectScoreInfoServiceImpl implements SubjectScoreInfoService {
       });
     }
     return scoreInfoList;
+  }
+
+  /**
+   * 导入时转换科目成绩
+   *
+   * @param subjectInfoMap 科目信息
+   * @param scoreInfo      成绩信息
+   * @param subjectId      科目ID
+   */
+  private void convertScoreNumber(Map<String, SubjectInfo> subjectInfoMap, SubjectScoreInfo scoreInfo, String subjectId) {
+    if (StringUtils.isNotBlank(subjectId)) {
+      Double scoreNumber = scoreInfo.getScoreNumber();
+      SubjectInfo subjectInfo = subjectInfoMap.get(subjectId);
+      switch (subjectInfo.getSubjectName()) {
+        case "语文":
+          scoreInfo.setSubLanguage(scoreNumber);
+          break;
+        case "数学":
+          scoreInfo.setSubMathematics(scoreNumber);
+          break;
+        case "英语":
+          scoreInfo.setSubEnglish(scoreNumber);
+          break;
+        case "物理":
+          scoreInfo.setSubPhysical(scoreNumber);
+          break;
+        case "历史":
+          scoreInfo.setSubHistory(scoreNumber);
+          break;
+        case "地理":
+          scoreInfo.setSubGeography(scoreNumber);
+          break;
+        case "生物":
+          scoreInfo.setSubBiological(scoreNumber);
+          break;
+        case "化学":
+          scoreInfo.setSubChemistry(scoreNumber);
+          break;
+        case "政治":
+          scoreInfo.setSubPolitical(scoreNumber);
+          break;
+        case "计算机":
+          scoreInfo.setSubComputer(scoreNumber);
+          break;
+        case "体育":
+          scoreInfo.setSubSports(scoreNumber);
+          break;
+        case "美术":
+          scoreInfo.setSubArt(scoreNumber);
+          break;
+        case "音乐":
+          scoreInfo.setSubMusic(scoreNumber);
+          break;
+      }
+    }
   }
 
   /**

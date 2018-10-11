@@ -1,8 +1,7 @@
 package com.achievement.mapper;
 
-import com.achievement.entity.ScoreInfo;
 import com.achievement.entity.SubjectScoreInfo;
-import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**

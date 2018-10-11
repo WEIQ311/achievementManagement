@@ -73,7 +73,7 @@ public class SubjectScoreInfoController {
   /**
    * 上传学生成绩
    *
-   * @param scoreFile 成绩文件
+   * @param scoreFile        成绩文件
    * @param subjectScoreInfo 成绩信息
    * @return ResultEntity
    */

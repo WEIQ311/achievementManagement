@@ -56,10 +56,6 @@ public class SubjectInfo implements Serializable {
   @Length(max = 300, message = "科目名称不能多于300个字符")
   private String subjectName;
   /**
-   * 更新时间
-   */
-  private Date updateTime;
-  /**
    * 学科类型
    * 0:通用,
    * 1:文科,
@@ -68,4 +64,8 @@ public class SubjectInfo implements Serializable {
    */
   @NotNull(message = "学科类型不能为空!")
   private Integer subjectType;
+  /**
+   * 更新时间
+   */
+  private Date updateTime;
 }
