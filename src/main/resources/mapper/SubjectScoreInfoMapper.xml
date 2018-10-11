@@ -32,8 +32,29 @@
   <sql id="BASE_COLUMN">
       ID, YEAR_ID, SEMESTER_ID, GRADE_ID, CLASS_ID, CLASS_TYPE, STUDENT_ID, TEACHER_ID, SUB_LANGUAGE,
       SUB_MATHEMATICS, SUB_ENGLISH, SUB_HISTORY, SUB_GEOGRAPHY, SUB_BIOLOGICAL, SUB_CHEMISTRY,
-      SUB_PHYSICAL, SUB_POLITICAL, SUB_COMPUTER, SUB_SPORTS, SUB_ART, SUB_MUSIC, INSERT_TIME, UPDATE_TIME
+      SUB_PHYSICAL, SUB_POLITICAL, SUB_COMPUTER, SUB_SPORTS, SUB_ART, SUB_MUSIC, INSERT_TIME, UPDATE_TIME,SUB_SCORE_SUM
    </sql>
+
+  <!--查询列集合-->
+  <sql id="QUERY_COLUMN">
+      ID, YEAR_ID, SEMESTER_ID, GRADE_ID, CLASS_ID, CLASS_TYPE, STUDENT_ID, TEACHER_ID,
+      IFNULL(SUB_LANGUAGE,0) SUB_LANGUAGE,
+      IFNULL(SUB_MATHEMATICS,0) SUB_MATHEMATICS,
+      IFNULL(SUB_ENGLISH,0) SUB_ENGLISH,
+      IFNULL(SUB_HISTORY,0) SUB_HISTORY,
+      IFNULL(SUB_GEOGRAPHY,0) SUB_GEOGRAPHY,
+      IFNULL(SUB_BIOLOGICAL,0) SUB_BIOLOGICAL,
+      IFNULL(SUB_CHEMISTRY,0) SUB_CHEMISTRY,
+      IFNULL(SUB_PHYSICAL,0) SUB_PHYSICAL,
+      IFNULL(SUB_POLITICAL,0) SUB_POLITICAL,
+      IFNULL(SUB_COMPUTER,0) SUB_COMPUTER,
+      IFNULL(SUB_SPORTS,0)SUB_SPORTS,
+      IFNULL(SUB_ART,0)SUB_ART,
+      IFNULL(SUB_MUSIC,0)SUB_MUSIC,
+      IFNULL(SUB_SCORE_SUM,0)SUB_SCORE_SUM,
+      INSERT_TIME, UPDATE_TIME
+   </sql>
+
   <!--表名-->
   <sql id="BASE_TABLE">
 		achievement.subject_score_info
@@ -42,7 +63,7 @@
   <!--通过实体作为筛选条件查询-->
   <select id="list" resultMap="SubjectScoreInfoMap">
     select
-    <include refid="BASE_COLUMN"/>
+    <include refid="QUERY_COLUMN"/>
     from
     <include refid="BASE_TABLE"/>
     <where>
@@ -115,11 +136,52 @@
       <if test="updateTime != null">
         and update_time = #{updateTime}
       </if>
+      <if test="studentIds != null and studentIds.size >0 ">
+        and student_id in
+        <foreach collection="studentIds" item="studentId" index="no" open="(" separator="," close=")">
+          #{studentId}
+        </foreach>
+      </if>
     </where>
   </select>
 
-  <select id="listClassScoreInfo">
+  <!--班级分组信息-->
+  <sql id="CALCULATE_GROUP_SQL">
+    GROUP BY CLASS_ID, SEMESTER_ID
+  </sql>
 
+  <!--年级分组信息-->
+  <sql id="GRADE_CALCULATE_GROUP_SQL">
+    GROUP BY GRADE_ID, SEMESTER_ID,CLASS_TYPE
+  </sql>
+
+  <!--班级最高、平均、最低成绩列-->
+  <sql id="SCORE_INFO_COLUMN">
+    CLASS_ID,SEMESTER_ID ,MAX(SUB_SCORE_SUM) MAX_SCORE,AVG(SUB_SCORE_SUM) AVG_SCORE,MIN(SUB_SCORE_SUM) MIN_SCORE
+  </sql>
+
+  <!--年级最高、平均、最低成绩列-->
+  <sql id="GRADE_SCORE_INFO_COLUMN">
+    GRADE_ID,SEMESTER_ID ,MAX(SUB_SCORE_SUM) GRADE_MAX_SCORE,
+    AVG(SUB_SCORE_SUM) GRADE_AVG_SCORE,MIN(SUB_SCORE_SUM) GRADE_MIN_SCORE
+  </sql>
+
+  <!--班级最高、平均、最低成绩-->
+  <select id="listClassScoreInfo" resultMap="SubjectScoreInfoMap">
+    select
+    <include refid="SCORE_INFO_COLUMN"/>
+    from
+    <include refid="BASE_TABLE"/>
+    <include refid="CALCULATE_GROUP_SQL"/>
+  </select>
+
+  <!--年级最高、平均、最低成绩-->
+  <select id="listGradeScoreInfo" resultMap="SubjectScoreInfoMap">
+    select
+    <include refid="GRADE_SCORE_INFO_COLUMN"/>
+    from
+    <include refid="BASE_TABLE"/>
+    <include refid="GRADE_CALCULATE_GROUP_SQL"/>
   </select>
 
   <!--新增所有列-->
@@ -132,7 +194,7 @@
       #{item.studentId}, #{item.teacherId}, #{item.subLanguage}, #{item.subMathematics}, #{item.subEnglish},
       #{item.subHistory}, #{item.subGeography}, #{item.subBiological}, #{item.subChemistry}, #{item.subPhysical},
       #{item.subPolitical}, #{item.subComputer}, #{item.subSports}, #{item.subArt}, #{item.subMusic},
-      SYSDATE(),SYSDATE()
+      SYSDATE(),SYSDATE(),#{item.subScoreSum}
       )
     </foreach>
   </insert>
@@ -202,6 +264,9 @@
         </if>
         <if test="item.subMusic != null">
           sub_music = #{item.subMusic},
+        </if>
+        <if test="item.subScoreSum != null">
+          SUB_SCORE_SUM = #{item.subScoreSum},
         </if>
         <if test="item.updateTime == null">
           update_time = SYSDATE(),

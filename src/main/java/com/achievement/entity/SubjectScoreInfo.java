@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 学科成绩表
@@ -177,14 +178,27 @@ public class SubjectScoreInfo implements Serializable {
    * 年级名称
    */
   private String gradeClassName;
-
+  /**
+   * 总成绩
+   */
+  private Double subScoreSum;
+  /**
+   * 学生学号
+   */
+  private String studentNum;
+  /**
+   * 学生姓名
+   */
+  private String studentName;
   /**
    * 科目ID
    */
+  @JsonIgnore
   private String subjectId;
   /**
    * 成绩
    */
+  @JsonIgnore
   private Double scoreNumber;
   /**
    * 排序字段
@@ -196,7 +210,11 @@ public class SubjectScoreInfo implements Serializable {
    */
   @JsonIgnore
   private String orderDirection;
-
+  /**
+   * 学生ID集合
+   */
+  @JsonIgnore
+  private List<String> studentIds;
   /**
    * 添加时间
    */

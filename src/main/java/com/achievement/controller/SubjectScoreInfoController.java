@@ -24,6 +24,7 @@ import java.util.ArrayList;
  */
 @RestController
 @RequestMapping("scoreInfo")
+@CrossOrigin
 public class SubjectScoreInfoController {
   /**
    * 服务对象

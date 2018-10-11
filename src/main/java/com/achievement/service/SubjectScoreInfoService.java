@@ -57,4 +57,12 @@ public interface SubjectScoreInfoService extends BaseInfoService<SubjectScoreInf
    * @return ResultEntity
    */
   Map<String, SubjectScoreInfo> listRankingMap(SubjectScoreInfo scoreInfo);
+
+  /**
+   * 更新总成绩
+   *
+   * @param subjectScoreInfo 成绩信息
+   * @return ResultEntity
+   */
+  ResultEntity updateSubjectScoreSum(SubjectScoreInfo subjectScoreInfo);
 }
