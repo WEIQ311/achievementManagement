@@ -41,6 +41,11 @@ public class SubjectScoreInfo implements Serializable {
   private String semesterId;
 
   /**
+   * 学期名称
+   */
+  private String semesterName;
+
+  /**
    * 年级ID
    */
   private String gradeId;
