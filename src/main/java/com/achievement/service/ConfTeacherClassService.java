@@ -15,6 +15,14 @@ import java.util.Map;
 public interface ConfTeacherClassService {
 
   /**
+   * 配置班级科目信息
+   *
+   * @param confTeacherClass 班级科目信息
+   * @return ResultEntity
+   */
+  ResultEntity confTeacherSubject(ConfTeacherClass confTeacherClass);
+
+  /**
    * 教师与班级关系信息Map
    *
    * @param confTeacherClass 班级与教师关系信息

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 教师班级信息
@@ -39,6 +40,10 @@ public class ConfTeacherClass implements Serializable {
   @NotBlank(message = "学科ID不能为空!")
   private String subjectId;
   /**
+   * 科目名称
+   */
+  private String subjectName;
+  /**
    * 教师职责
    */
   @NotBlank(message = "教师职责不能为空!")
@@ -48,4 +53,12 @@ public class ConfTeacherClass implements Serializable {
    */
   @NotBlank(message = "教师ID不能为空!")
   private String teacherId;
+  /**
+   * 教师集合
+   */
+  private List<TeacherInfo> teacherInfos;
+  /**
+   * 教师名称
+   */
+  private String teacherName;
 }

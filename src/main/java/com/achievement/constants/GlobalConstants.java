@@ -28,6 +28,10 @@ public class GlobalConstants {
    */
   public static final String DEFAULT_SUFFIX = ")";
   /**
+   * 默认教师职责
+   */
+  public static final String DEFAULT_TEACHER_DUTY = "2";
+  /**
    * EXCEL首行数据
    */
   public static final String[] EXCEL_HEADER_TITLE = {"学号", "姓名", "成绩"};

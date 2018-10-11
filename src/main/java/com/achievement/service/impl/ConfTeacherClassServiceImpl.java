@@ -1,13 +1,9 @@
 package com.achievement.service.impl;
 
-import com.achievement.entity.ClassInfo;
-import com.achievement.entity.ConfTeacherClass;
-import com.achievement.entity.TeacherInfo;
+import com.achievement.entity.*;
 import com.achievement.enums.GlobalEnum;
 import com.achievement.mapper.ConfTeacherClassMapper;
-import com.achievement.service.ClassInfoService;
-import com.achievement.service.ConfTeacherClassService;
-import com.achievement.service.TeacherInfoService;
+import com.achievement.service.*;
 import com.achievement.utils.GloabalUtils;
 import com.achievement.utils.ResultUtil;
 import com.achievement.vo.ResultEntity;
@@ -38,7 +34,76 @@ public class ConfTeacherClassServiceImpl implements ConfTeacherClassService {
   @Resource
   private ConfTeacherClassMapper confTeacherClassMapper;
   @Autowired
+  private SubjectInfoService subjectInfoService;
+  @Autowired
   private TeacherInfoService teacherInfoService;
+  @Autowired
+  private ConfTeacherSubjectService teacherSubjectService;
+
+  /**
+   * 配置班级科目信息
+   *
+   * @param confTeacherClass 班级科目信息
+   * @return ResultEntity
+   */
+  @Override
+  public ResultEntity confTeacherSubject(ConfTeacherClass confTeacherClass) {
+    if (null == confTeacherClass) {
+      confTeacherClass = ConfTeacherClass.builder().build();
+    }
+    String classType = confTeacherClass.getClassType();
+    if (StringUtils.isBlank(classType)) {
+      GloabalUtils.convertMessage(GlobalEnum.ClassTypeEmpty);
+    }
+    String classId = confTeacherClass.getClassId();
+    if (StringUtils.isBlank(classId)) {
+      GloabalUtils.convertMessage(GlobalEnum.ClassIdEmpty);
+    }
+    Integer subjectType = Integer.valueOf(classType);
+    List<Integer> subjectTypes = new ArrayList<Integer>() {{
+      add(subjectType);
+      add(0);
+    }};
+    Map<String, List<ConfTeacherSubject>> subjectOfTeacherMap = teacherSubjectService.convertSubjectOfTeacherMap(ConfTeacherSubject.builder().build());
+    Map<String, TeacherInfo> teacherInfoMap = teacherInfoService.convertRecordToMap(TeacherInfo.builder().build());
+    Map<String, ConfTeacherClass> teacherClassMap = confTeacherClassMapper.list(confTeacherClass).stream()
+        .filter(info -> StringUtils.isNotBlank(info.getSubjectId()))
+        .collect(Collectors.toMap(info -> {
+          return info.getClassId() + INTERVAL_NUMBER + info.getSubjectId();
+        }, Function.identity(), (oldValue, newValue) -> newValue));
+    List<SubjectInfo> subjectInfoList = subjectInfoService.convertRecordToMap(SubjectInfo.builder().subjectTypes(subjectTypes).build())
+        .values().stream().collect(Collectors.toList());
+    List<ConfTeacherClass> confTeacherClassList = new ArrayList<ConfTeacherClass>() {{
+      subjectInfoList.forEach(subjectInfo -> {
+        String subjectId = subjectInfo.getSubjectId();
+        String subjectName = subjectInfo.getSubjectName();
+        String key = classId + INTERVAL_NUMBER + subjectId;
+        List<ConfTeacherSubject> teacherSubjects = subjectOfTeacherMap.getOrDefault(subjectId, new ArrayList<>());
+        List<TeacherInfo> teacherInfos = new ArrayList<TeacherInfo>() {{
+          teacherSubjects.stream().forEach(confTeacherSubject -> {
+            String teacherId = confTeacherSubject.getTeacherId();
+            if (StringUtils.isNotBlank(teacherId) && teacherInfoMap.containsKey(teacherId)) {
+              add(teacherInfoMap.get(teacherId));
+            }
+          });
+        }};
+        String confId = "";
+        String teacherId = "";
+        String teacherName = "";
+        String teacherDuty = "";
+        if (teacherClassMap.containsKey(key)) {
+          ConfTeacherClass teacherClass = teacherClassMap.get(key);
+          confId = teacherClass.getConfId();
+          teacherId = teacherClass.getTeacherId();
+          TeacherInfo teacherInfo = teacherInfoMap.getOrDefault(teacherId, TeacherInfo.builder().teacherName(teacherId).teacherDuty(DEFAULT_TEACHER_DUTY).build());
+          teacherName = teacherInfo.getTeacherName();
+          teacherDuty = teacherInfo.getTeacherDuty();
+        }
+        add(ConfTeacherClass.builder().confId(confId).subjectId(subjectId).teacherDuty(teacherDuty).teacherId(teacherId).teacherName(teacherName).classId(classId).subjectName(subjectName).teacherInfos(teacherInfos).build());
+      });
+    }};
+    return ResultUtil.success(GlobalEnum.QuerySuccess, confTeacherClassList);
+  }
 
   /**
    * 教师与班级关系信息Map
@@ -163,11 +228,15 @@ public class ConfTeacherClassServiceImpl implements ConfTeacherClassService {
     confTeacherClasses.stream().forEach(confTeacherClass -> {
       String teacherId = confTeacherClass.getTeacherId();
       String classId = confTeacherClass.getClassId();
+      String teacherDuty = confTeacherClass.getTeacherDuty();
       if (StringUtils.isBlank(teacherId)) {
         GloabalUtils.convertMessage(GlobalEnum.TeacherIdEmpty);
       }
       if (StringUtils.isBlank(classId)) {
         GloabalUtils.convertMessage(GlobalEnum.ClassIdEmpty);
+      }
+      if (StringUtils.isBlank(teacherDuty)) {
+        GloabalUtils.convertMessage(GlobalEnum.TeacherDutyEmpty);
       }
       if (!teacherInfoMap.containsKey(teacherId)) {
         GloabalUtils.convertMessage(GlobalEnum.TeacherInfoEmpty, teacherId);

@@ -61,6 +61,9 @@ public class TeacherInfo implements Serializable {
   private Integer subjectType;
   /**
    * 教师职责
+   * 0：管理员
+   * 1：班主任
+   * 2：教师
    */
   @NotBlank(message = "教师职责不能为空!")
   private String teacherDuty;

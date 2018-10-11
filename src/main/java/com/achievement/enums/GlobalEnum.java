@@ -45,6 +45,7 @@ public enum GlobalEnum {
   StudentIdEmpty("学生ID为空!"),
   SubjectIdEmpty("学科ID为空!"),
   TeacherIdEmpty("教师ID为空!"),
+  TeacherDutyEmpty("教师职责为空!"),
   TeacherHeadInUsed("该班级班主任已经选配,为:\"%s\"!"),
   TeacherNoHead("该教师\"%s\"不具有班主任职责!"),
   SemesterIdEmpty("轮次ID为空!"),

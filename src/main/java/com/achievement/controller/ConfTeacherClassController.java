@@ -27,6 +27,17 @@ public class ConfTeacherClassController {
   private ConfTeacherClassService confTeacherClassService;
 
   /**
+   * 配置班级科目信息
+   *
+   * @param confTeacherClass 班级科目信息
+   * @return ResultEntity
+   */
+  @RequestMapping(value = "confTeacherSubject", method = RequestMethod.GET)
+  public ResultEntity confTeacherSubject(ConfTeacherClass confTeacherClass) {
+    return confTeacherClassService.confTeacherSubject(confTeacherClass);
+  }
+
+  /**
    * 根据主键集合删除教师与班级关系
    *
    * @param objectInfo    主键集合

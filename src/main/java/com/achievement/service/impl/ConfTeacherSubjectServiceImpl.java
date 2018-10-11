@@ -139,6 +139,7 @@ public class ConfTeacherSubjectServiceImpl implements ConfTeacherSubjectService 
         GloabalUtils.convertMessage(GlobalEnum.TeacherIdEmpty);
       }
       String subjectId = teacherInfo.getSubjectId();
+      String teacherDuty = teacherInfo.getTeacherDuty();
       String key = teacherId + INTERVAL_NUMBER + subjectId;
       if (!teacherOfSubjectMap.containsKey(key) && StringUtils.isNotBlank(subjectId)) {
         insertTeacherSubjectList.add(ConfTeacherSubject.builder().teacherId(teacherId).subjectId(subjectId).build());
