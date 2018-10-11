@@ -221,6 +221,11 @@ public class SubjectScoreInfo implements Serializable {
   private Double avgScoreSum;
 
   /**
+   * 考试时间
+   */
+  private Date examTime;
+
+  /**
    * 最高成绩
    */
   private Double maxScore;

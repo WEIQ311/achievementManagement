@@ -220,7 +220,9 @@ public class SubjectScoreInfoServiceImpl implements SubjectScoreInfoService {
       info.setStudentName(studentInfo.getStudentName());
       info.setGradeClassName(info.getGradeName() + DEFAULT_PREFIX + info.getClassName() + DEFAULT_SUFFIX);
       if (semesterInfoMap.containsKey(semesterId)) {
-        info.setSemesterName(semesterInfoMap.get(semesterId).getSemesterName());
+        SemesterInfo semesterInfo = semesterInfoMap.get(semesterId);
+        info.setSemesterName(semesterInfo.getSemesterName());
+        info.setExamTime(semesterInfo.getExamTime());
       }
     });
   }
