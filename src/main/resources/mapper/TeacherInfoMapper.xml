@@ -82,6 +82,12 @@
       <if test="subjectId != null and subjectId != ''">
         and subject_id = #{subjectId}
       </if>
+      <if test="teacherIds != null and teacherIds.size >0 ">
+        and teacher_id in
+        <foreach collection="teacherIds" item="teacherId" index="no" open="(" separator="," close=")">
+          #{teacherId}
+        </foreach>
+      </if>
     </where>
   </select>
 
@@ -141,10 +147,10 @@
           teacher_num = #{item.teacherNum},
         </if>
         <if test="item.teacherDuty != null and item.teacherDuty != ''">
-          teacher_duty =  #{item.teacherDuty},
+          teacher_duty = #{item.teacherDuty},
         </if>
         <if test="item.subjectId != null and item.subjectId != ''">
-          subject_id =  #{item.subjectId},
+          subject_id = #{item.subjectId},
         </if>
         <if test="item.updateTime==null">
           update_time = SYSDATE(),

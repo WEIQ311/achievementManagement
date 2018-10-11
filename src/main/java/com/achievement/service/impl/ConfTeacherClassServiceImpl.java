@@ -12,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -72,7 +69,12 @@ public class ConfTeacherClassServiceImpl implements ConfTeacherClassService {
           return info.getClassId() + INTERVAL_NUMBER + info.getSubjectId();
         }, Function.identity(), (oldValue, newValue) -> newValue));
     List<SubjectInfo> subjectInfoList = subjectInfoService.convertRecordToMap(SubjectInfo.builder().subjectTypes(subjectTypes).build())
-        .values().stream().collect(Collectors.toList());
+        .values().stream().sorted(new Comparator<SubjectInfo>() {
+          @Override
+          public int compare(SubjectInfo o1, SubjectInfo o2) {
+            return o1.getSubjectOrd() - o2.getSubjectOrd();
+          }
+        }).collect(Collectors.toList());
     List<ConfTeacherClass> confTeacherClassList = new ArrayList<ConfTeacherClass>() {{
       subjectInfoList.forEach(subjectInfo -> {
         String subjectId = subjectInfo.getSubjectId();

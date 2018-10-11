@@ -1,5 +1,6 @@
 package com.achievement.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -71,6 +72,11 @@ public class TeacherInfo implements Serializable {
    * 主键
    */
   private String teacherId;
+  /**
+   * 教师ID集合
+   */
+  @JsonIgnore
+  private List<String> teacherIds;
   /**
    * 教师名称
    */

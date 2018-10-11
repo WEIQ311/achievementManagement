@@ -1,6 +1,7 @@
 package com.achievement.service.impl;
 
 import com.achievement.entity.ConfTeacherClass;
+import com.achievement.entity.ConfTeacherSubject;
 import com.achievement.entity.TeacherInfo;
 import com.achievement.enums.GlobalEnum;
 import com.achievement.mapper.TeacherInfoMapper;
@@ -114,11 +115,33 @@ public class TeacherInfoServiceImpl implements TeacherInfoService {
    */
   @Override
   public ResultEntity list(TeacherInfo teacherInfo, int pageNum, int pageSize) {
+    teacherInfo = convertQueryParam(teacherInfo);
     PageHelper.startPage(pageNum, pageSize);
     List<TeacherInfo> teacherInfoPage = teacherInfoMapper.list(teacherInfo);
     convertTeacherInfo(teacherInfoPage);
     PageInfo pageInfo = new PageInfo(teacherInfoPage);
     return ResultUtil.success(GlobalEnum.QuerySuccess, pageInfo);
+  }
+
+  /**
+   * 转换请求参数
+   *
+   * @param teacherInfo 教师信息
+   * @return TeacherInfo
+   */
+  private TeacherInfo convertQueryParam(TeacherInfo teacherInfo) {
+    if (null == teacherInfo) {
+      teacherInfo = TeacherInfo.builder().build();
+    }
+    String subjectId = teacherInfo.getSubjectId();
+    if (StringUtils.isNotBlank(subjectId)) {
+      Map<String, List<ConfTeacherSubject>> subjectOfTeacherMap = confTeacherSubjectService.convertSubjectOfTeacherMap(ConfTeacherSubject.builder().subjectId(subjectId).build());
+      List<String> teacherIds = subjectOfTeacherMap.get(subjectId).stream().filter(info -> StringUtils.isNotBlank(info.getTeacherId()))
+          .map(ConfTeacherSubject::getTeacherId)
+          .distinct().collect(Collectors.toList());
+      teacherInfo.setTeacherIds(teacherIds);
+    }
+    return teacherInfo;
   }
 
   /**
@@ -148,6 +171,7 @@ public class TeacherInfoServiceImpl implements TeacherInfoService {
    */
   @Override
   public ResultEntity list(TeacherInfo teacherInfo) {
+    teacherInfo = convertQueryParam(teacherInfo);
     List<TeacherInfo> teacherInfos = teacherInfoMapper.list(teacherInfo);
     convertTeacherInfo(teacherInfos);
     return ResultUtil.success(GlobalEnum.QuerySuccess, teacherInfos);
