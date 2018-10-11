@@ -49,6 +49,12 @@
       <if test="subjectType != null">
         and subject_type = #{subjectType}
       </if>
+      <if test="subjectTypes != null and subjectTypes.size >0 ">
+        and subject_type in
+        <foreach collection="subjectTypes" item="subjectType" index="no" open="(" separator="," close=")">
+          #{subjectType}
+        </foreach>
+      </if>
     </where>
   </select>
 

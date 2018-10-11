@@ -68,4 +68,10 @@ public class SubjectInfo implements Serializable {
    * 更新时间
    */
   private Date updateTime;
+
+  /**
+   * 学科类型
+   */
+  @JsonIgnore
+  private List<Integer> subjectTypes;
 }

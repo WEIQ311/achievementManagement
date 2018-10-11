@@ -1,9 +1,11 @@
 package com.achievement.service.impl;
 
+import com.achievement.entity.GradeInfo;
 import com.achievement.entity.SemesterInfo;
 import com.achievement.entity.YearInfo;
 import com.achievement.enums.GlobalEnum;
 import com.achievement.mapper.SemesterInfoMapper;
+import com.achievement.service.GradeInfoService;
 import com.achievement.service.SemesterInfoService;
 import com.achievement.service.YearInfoService;
 import com.achievement.utils.GloabalUtils;
@@ -38,6 +40,8 @@ public class SemesterInfoServiceImpl implements SemesterInfoService {
   private SemesterInfoMapper semesterInfoMapper;
   @Autowired
   private YearInfoService yearInfoService;
+  @Autowired
+  private GradeInfoService gradeInfoService;
 
   /**
    * 学期(SemesterInfo)信息Map
@@ -81,18 +85,24 @@ public class SemesterInfoServiceImpl implements SemesterInfoService {
     if (null == semesterInfoList || semesterInfoList.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
+    Map<String, GradeInfo> gradeInfoMap = gradeInfoService.convertRecordToMap(GradeInfo.builder().build());
     Map<String, YearInfo> yearInfoMap = yearInfoService.convertRecordToMap(YearInfo.builder().build());
     Map<String, SemesterInfo> semesterInfoMap = convertSemesterNameAndYearIdMap(SemesterInfo.builder().build());
     semesterInfoList.stream().forEach(semesterInfo -> {
       String yearId = semesterInfo.getYearId();
+      String gradeId = semesterInfo.getGradeId();
       String semesterName = semesterInfo.getSemesterName();
       if (!yearInfoMap.containsKey(yearId)) {
         GloabalUtils.convertMessage(GlobalEnum.YearIdError, semesterName);
       }
+      if (!gradeInfoMap.containsKey(gradeId)) {
+        GloabalUtils.convertMessage(GlobalEnum.GradeIdEmpty, gradeId);
+      }
+      String gradeName = gradeInfoMap.get(gradeId).getGradeName();
       String yearName = yearInfoMap.get(yearId).getYearName();
-      String key = semesterName + INTERVAL_NUMBER + yearId;
+      String key = semesterName + INTERVAL_NUMBER + yearId + INTERVAL_NUMBER + gradeId;
       if (semesterInfoMap.containsKey(key)) {
-        GloabalUtils.convertMessage(GlobalEnum.SemesterNameInUsed, semesterName, yearName);
+        GloabalUtils.convertMessage(GlobalEnum.SemesterNameInUsed, gradeName, yearName, semesterName);
       }
       convertDeadLineTime(semesterInfo);
       semesterInfo.setSemesterId("semester_" + GloabalUtils.ordinaryId());
@@ -185,11 +195,13 @@ public class SemesterInfoServiceImpl implements SemesterInfoService {
     if (null == semesterInfoList || semesterInfoList.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
+    Map<String, GradeInfo> gradeInfoMap = gradeInfoService.convertRecordToMap(GradeInfo.builder().build());
     Map<String, YearInfo> yearInfoMap = yearInfoService.convertRecordToMap(YearInfo.builder().build());
     Map<String, SemesterInfo> semesterInfoMap = convertSemesterNameAndYearIdMap(SemesterInfo.builder().build());
     semesterInfoList.stream().forEach(semesterInfo -> {
       String semesterId = semesterInfo.getSemesterId();
       String yearId = semesterInfo.getYearId();
+      String gradeId = semesterInfo.getGradeId();
       String semesterName = semesterInfo.getSemesterName();
       if (StringUtils.isBlank(semesterId)) {
         GloabalUtils.convertMessage(GlobalEnum.PkIdEmpty);
@@ -197,10 +209,14 @@ public class SemesterInfoServiceImpl implements SemesterInfoService {
       if (!yearInfoMap.containsKey(yearId)) {
         GloabalUtils.convertMessage(GlobalEnum.YearIdError, semesterName);
       }
+      if (!gradeInfoMap.containsKey(gradeId)) {
+        GloabalUtils.convertMessage(GlobalEnum.GradeIdEmpty, gradeId);
+      }
+      String gradeName = gradeInfoMap.get(gradeId).getGradeName();
       String yearName = yearInfoMap.get(yearId).getYearName();
-      String key = semesterName + INTERVAL_NUMBER + yearId;
+      String key = semesterName + INTERVAL_NUMBER + yearId + INTERVAL_NUMBER + gradeId;
       if (semesterInfoMap.containsKey(key) && !Objects.equals(semesterId, semesterInfoMap.get(key).getSemesterId())) {
-        GloabalUtils.convertMessage(GlobalEnum.SemesterNameInUsed, semesterName, yearName);
+        GloabalUtils.convertMessage(GlobalEnum.SemesterNameInUsed, gradeName, yearName, semesterName);
       }
       convertDeadLineTime(semesterInfo);
     });
@@ -220,11 +236,16 @@ public class SemesterInfoServiceImpl implements SemesterInfoService {
     if (null == semesterInfoList || semesterInfoList.size() < 1) {
       return;
     }
+    Map<String, GradeInfo> gradeInfoMap = gradeInfoService.convertRecordToMap(GradeInfo.builder().build());
     Map<String, YearInfo> yearInfoMap = yearInfoService.convertRecordToMap(YearInfo.builder().build());
     semesterInfoList.stream().forEach(semesterInfo -> {
       String yearId = semesterInfo.getYearId();
+      String gradeId = semesterInfo.getGradeId();
       if (yearInfoMap.containsKey(yearId)) {
         semesterInfo.setYearInfo(yearInfoMap.get(yearId));
+      }
+      if (gradeInfoMap.containsKey(gradeId)) {
+        semesterInfo.setGradeName(gradeInfoMap.get(gradeId).getGradeName());
       }
     });
   }

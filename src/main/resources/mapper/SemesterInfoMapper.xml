@@ -13,11 +13,13 @@
     <result property="scoreBeginDeadline" column="score_begin_deadline" jdbcType="TIMESTAMP"/>
     <result property="examTime" column="exam_time" jdbcType="TIMESTAMP"/>
     <result property="yearId" column="year_id" jdbcType="VARCHAR"/>
+    <result property="gradeId" column="grade_id" jdbcType="VARCHAR"/>
   </resultMap>
 
   <!--列集合-->
   <sql id="BASE_COLUMN">
-      SEMESTER_ID, INSERT_TIME, REMARK, SEMESTER_NAME, STATUS, UPDATE_TIME, YEAR_ID,SCORE_END_DEADLINE,SCORE_BEGIN_DEADLINE,EXAM_TIME
+      SEMESTER_ID, INSERT_TIME, REMARK, SEMESTER_NAME, STATUS, UPDATE_TIME, YEAR_ID,
+      SCORE_END_DEADLINE,SCORE_BEGIN_DEADLINE,EXAM_TIME,GRADE_ID
   </sql>
   <!--表名-->
   <sql id="BASE_TABLE">
@@ -61,6 +63,9 @@
       <if test="yearId != null and yearId != ''">
         and year_id = #{yearId}
       </if>
+      <if test="gradeId != null and gradeId != ''">
+        and grade_id = #{gradeId}
+      </if>
       <if test="yearIds != null and yearIds.size >0 ">
         and year_id in
         <foreach collection="yearIds" item="yearId" index="no" open="(" separator="," close=")">
@@ -80,7 +85,7 @@
       (
       #{item.semesterId}, SYSDATE(), #{item.remark}, #{item.semesterName},
       #{item.status}, SYSDATE(), #{item.yearId},#{item.scoreEndDeadline},
-      #{item.scoreBeginDeadline},#{item.examTime} )
+      #{item.scoreBeginDeadline},#{item.examTime},#{item.gradeId} )
     </foreach>
   </insert>
 
@@ -101,6 +106,9 @@
         </if>
         <if test="item.yearId != null and item.yearId != ''">
           year_id = #{item.yearId},
+        </if>
+        <if test="item.gradeId != null and item.gradeId != ''">
+          grade_id = #{item.gradeId},
         </if>
         <if test="item.updateTime==null">
           update_time = SYSDATE(),

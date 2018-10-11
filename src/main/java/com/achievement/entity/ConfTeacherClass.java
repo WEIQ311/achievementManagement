@@ -44,4 +44,9 @@ public class ConfTeacherClass implements Serializable {
    */
   @NotBlank(message = "教师ID不能为空!")
   private String teacherId;
+
+  /**
+   * 班级类型
+   */
+  private String classType;
 }
