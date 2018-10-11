@@ -80,4 +80,14 @@ public class ParentInfo implements Serializable {
    * 微博
    */
   private String xlWb;
+  /**
+   * 家庭地址
+   */
+  @Length(max = 4000, message = "家庭地址不能超过4000个字符")
+  private String familyAddress;
+  /**
+   * 工作单位
+   */
+  @Length(max = 4000, message = "工作单位不能超过4000个字符")
+  private String officeAddress;
 }

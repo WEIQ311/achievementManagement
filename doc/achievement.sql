@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50719
 File Encoding         : 65001
 
-Date: 2018-10-11 18:30:21
+Date: 2018-10-11 19:34:42
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -93,6 +93,8 @@ CREATE TABLE `parent_info` (
   `tx_wx` varchar(255) DEFAULT NULL,
   `xl_wb` varchar(255) DEFAULT NULL,
   `remark` varchar(4000) DEFAULT NULL COMMENT '备注',
+  `family_address` varchar(4000) DEFAULT NULL COMMENT '家庭住址',
+  `office_address` varchar(4000) DEFAULT NULL COMMENT '办公单位',
   `status` int(10) DEFAULT '1',
   `insert_time` datetime DEFAULT NULL,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,

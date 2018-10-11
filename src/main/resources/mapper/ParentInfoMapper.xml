@@ -13,11 +13,15 @@
     <result property="txWx" column="tx_wx" jdbcType="VARCHAR"/>
     <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
     <result property="xlWb" column="xl_wb" jdbcType="VARCHAR"/>
+    <result property="familyAddress" column="family_address" jdbcType="VARCHAR"/>
+    <result property="officeAddress" column="office_address" jdbcType="VARCHAR"/>
   </resultMap>
 
   <!--列集合-->
   <sql id="BASE_COLUMN">
-      parent_id, insert_time, parent_name, remark, status, tel_phone, tx_qq, tx_wx, update_time, xl_wb    </sql>
+      PARENT_ID, INSERT_TIME, PARENT_NAME, REMARK, STATUS, TEL_PHONE, TX_QQ, TX_WX,
+      UPDATE_TIME, XL_WB,FAMILY_ADDRESS,OFFICE_ADDRESS
+  </sql>
   <!--表名-->
   <sql id="BASE_TABLE">
 		achievement.parent_info
@@ -61,6 +65,12 @@
       <if test="xlWb != null and xlWb != ''">
         and xl_wb = #{xlWb}
       </if>
+      <if test="familyAddress != null and familyAddress != ''">
+        and family_address = #{familyAddress}
+      </if>
+      <if test="officeAddress != null and officeAddress != ''">
+        and OFFICE_ADDRESS = #{officeAddress}
+      </if>
       <if test="parentIds != null and parentIds.size >0 ">
         and parent_id in
         <foreach collection="parentIds" item="parentId" index="no" open="(" separator="," close=")">
@@ -79,7 +89,7 @@
     <foreach collection="list" item="item" index="index" separator=",">
       (
       #{item.parentId}, SYSDATE(), #{item.parentName}, #{item.remark}, #{item.status}, #{item.telPhone},
-      #{item.txQq}, #{item.txWx}, SYSDATE(), #{item.xlWb} )
+      #{item.txQq}, #{item.txWx}, SYSDATE(), #{item.xlWb},#{item.familyAddress},#{item.officeAddress} )
     </foreach>
   </insert>
 
@@ -116,6 +126,12 @@
         </if>
         <if test="item.updateTime != null">
           update_time = #{item.updateTime},
+        </if>
+        <if test="item.familyAddress != null and item.familyAddress != ''">
+          family_address = #{item.familyAddress},
+        </if>
+        <if test="item.officeAddress != null and item.officeAddress != ''">
+          office_address = #{item.officeAddress},
         </if>
       </set>
       where parent_id = #{item.parentId}
