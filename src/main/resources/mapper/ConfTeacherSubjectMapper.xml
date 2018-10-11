@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.achievement.mapper.ConfTeacherSubjectMapper">
+
+  <resultMap type="com.achievement.entity.ConfTeacherSubject" id="ConfTeacherSubjectMap">
+    <result property="confId" column="conf_id" jdbcType="VARCHAR"/>
+    <result property="teacherId" column="teacher_id" jdbcType="VARCHAR"/>
+    <result property="subjectId" column="subject_id" jdbcType="VARCHAR"/>
+  </resultMap>
+
+  <!--列集合-->
+  <sql id="BASE_COLUMN">
+      CONF_ID, TEACHER_ID, SUBJECT_ID
+  </sql>
+  <!--表名-->
+  <sql id="BASE_TABLE">
+		achievement.conf_teacher_subject
+	</sql>
+
+
+  <!--通过实体作为筛选条件查询-->
+  <select id="list" resultMap="ConfTeacherSubjectMap">
+    select
+    <include refid="BASE_COLUMN"/>
+    from
+    <include refid="BASE_TABLE"/>
+    <where>
+      <if test="confId != null and confId != ''">
+        and conf_id = #{confId}
+      </if>
+      <if test="teacherId != null and teacherId != ''">
+        and teacher_id = #{teacherId}
+      </if>
+      <if test="subjectId != null and subjectId != ''">
+        and subject_id = #{subjectId}
+      </if>
+    </where>
+  </select>
+
+  <!--新增所有列-->
+  <insert id="insert" keyProperty="confId" useGeneratedKeys="true" parameterType="java.util.List">
+    insert into<include refid="BASE_TABLE"/>(<include refid="BASE_COLUMN"/>)
+    VALUES
+    <foreach collection="list" item="item" index="index" separator=",">
+      (
+      #{item.confId}, #{item.teacherId}, #{item.subjectId} )
+    </foreach>
+  </insert>
+
+  <!--通过主键修改数据-->
+  <update id="update" parameterType="java.util.List">
+    <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+      UPDATE
+      <include refid="BASE_TABLE"/>
+      <set>
+        <if test="item.teacherId != null and item.teacherId != ''">
+          teacher_id = #{item.teacherId},
+        </if>
+        <if test="item.subjectId != null and item.subjectId != ''">
+          subject_id = #{item.subjectId}
+        </if>
+      </set>
+      where conf_id = #{item.confId}
+    </foreach>
+  </update>
+
+  <!--通过主键删除-->
+  <delete id="delete">
+    delete from
+    <include refid="BASE_TABLE"/>
+    where conf_id in
+    <foreach collection="list" item="item" index="no" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </delete>
+
+  <!--通过教师ID删除-->
+  <delete id="deleteByTeacherId">
+    delete from
+    <include refid="BASE_TABLE"/>
+    where teacher_id in
+    <foreach collection="list" item="teacherId" index="no" open="(" separator="," close=")">
+      #{teacherId}
+    </foreach>
+  </delete>
+
+</mapper>
+

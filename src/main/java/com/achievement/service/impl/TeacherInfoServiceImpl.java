@@ -5,12 +5,14 @@ import com.achievement.entity.TeacherInfo;
 import com.achievement.enums.GlobalEnum;
 import com.achievement.mapper.TeacherInfoMapper;
 import com.achievement.service.ConfTeacherClassService;
+import com.achievement.service.ConfTeacherSubjectService;
 import com.achievement.service.TeacherInfoService;
 import com.achievement.utils.GloabalUtils;
 import com.achievement.utils.ResultUtil;
 import com.achievement.vo.ResultEntity;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,10 +31,13 @@ import java.util.stream.Collectors;
  * @author weiQiang
  * @since 2018-10-02 17:52:27
  */
+@Slf4j
 @Service("teacherInfoService")
 public class TeacherInfoServiceImpl implements TeacherInfoService {
   @Autowired
   private ConfTeacherClassService confTeacherClassService;
+  @Autowired
+  private ConfTeacherSubjectService confTeacherSubjectService;
   @Resource
   private TeacherInfoMapper teacherInfoMapper;
 
@@ -63,6 +68,7 @@ public class TeacherInfoServiceImpl implements TeacherInfoService {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
     teacherInfoMapper.delete(teacherIds);
+    confTeacherSubjectService.deleteByTeacherId(teacherIds);
     return ResultUtil.success(GlobalEnum.DeleteSuccess, teacherIds);
   }
 
@@ -91,6 +97,8 @@ public class TeacherInfoServiceImpl implements TeacherInfoService {
     });
     Integer insertCount = teacherInfoMapper.insert(teacherInfoList);
     if (insertCount > 0) {
+      ResultEntity resultEntity = confTeacherSubjectService.insertOrUpdateTeacherSubject(teacherInfoList);
+      log.info("增加教师与科目信息:{}", resultEntity);
       return ResultUtil.success(GlobalEnum.InsertSuccess, teacherInfoList);
     }
     return ResultUtil.error(GlobalEnum.InsertError);
@@ -173,6 +181,8 @@ public class TeacherInfoServiceImpl implements TeacherInfoService {
     });
     Integer updateCount = teacherInfoMapper.update(teacherInfoList);
     if (updateCount > 0) {
+      ResultEntity resultEntity = confTeacherSubjectService.insertOrUpdateTeacherSubject(teacherInfoList);
+      log.info("更新教师与科目信息:{}", resultEntity);
       return ResultUtil.success(GlobalEnum.UpdateSuccess, teacherInfoList);
     }
     return ResultUtil.error(GlobalEnum.UpdateError);

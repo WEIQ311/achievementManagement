@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50719
 File Encoding         : 65001
 
-Date: 2018-10-11 10:49:44
+Date: 2018-10-11 12:42:54
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -52,6 +52,17 @@ CREATE TABLE `conf_teacher_class` (
   `teacher_id` varchar(255) NOT NULL COMMENT '教师ID',
   `class_id` varchar(255) NOT NULL COMMENT '班级ID',
   `teacher_duty` varchar(255) NOT NULL DEFAULT '代课教师' COMMENT '教师职责',
+  `subject_id` varchar(255) NOT NULL DEFAULT '1' COMMENT '学科ID',
+  PRIMARY KEY (`conf_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for conf_teacher_subject
+-- ----------------------------
+DROP TABLE IF EXISTS `conf_teacher_subject`;
+CREATE TABLE `conf_teacher_subject` (
+  `conf_id` varchar(255) NOT NULL COMMENT '主键',
+  `teacher_id` varchar(255) NOT NULL COMMENT '教师ID',
   `subject_id` varchar(255) NOT NULL DEFAULT '1' COMMENT '学科ID',
   PRIMARY KEY (`conf_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -130,6 +141,7 @@ CREATE TABLE `semester_info` (
   `semester_id` varchar(255) NOT NULL,
   `year_id` varchar(255) DEFAULT NULL,
   `semester_name` varchar(4000) DEFAULT NULL COMMENT '学期名称',
+  `grade_id` varchar(255) NOT NULL DEFAULT '' COMMENT '年级ID',
   `remark` varchar(4000) DEFAULT NULL COMMENT '备注',
   `status` int(10) DEFAULT '1',
   `exam_time` datetime DEFAULT NULL COMMENT '考试时间',

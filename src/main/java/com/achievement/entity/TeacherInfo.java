@@ -56,6 +56,10 @@ public class TeacherInfo implements Serializable {
    */
   private String subjectId;
   /**
+   * 学科类型
+   */
+  private Integer subjectType;
+  /**
    * 教师职责
    */
   @NotBlank(message = "教师职责不能为空!")
@@ -95,9 +99,4 @@ public class TeacherInfo implements Serializable {
    * 微博
    */
   private String xlWb;
-
-  /**
-   * 学科类型
-   */
-  private Integer subjectType;
 }

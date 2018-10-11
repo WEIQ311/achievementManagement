@@ -36,12 +36,12 @@ import static com.achievement.constants.GlobalConstants.INTERVAL_NUMBER;
  */
 @Service("semesterInfoService")
 public class SemesterInfoServiceImpl implements SemesterInfoService {
+  @Autowired
+  private GradeInfoService gradeInfoService;
   @Resource
   private SemesterInfoMapper semesterInfoMapper;
   @Autowired
   private YearInfoService yearInfoService;
-  @Autowired
-  private GradeInfoService gradeInfoService;
 
   /**
    * 学期(SemesterInfo)信息Map

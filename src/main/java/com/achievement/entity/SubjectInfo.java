@@ -65,13 +65,12 @@ public class SubjectInfo implements Serializable {
   @NotNull(message = "学科类型不能为空!")
   private Integer subjectType;
   /**
-   * 更新时间
-   */
-  private Date updateTime;
-
-  /**
    * 学科类型
    */
   @JsonIgnore
   private List<Integer> subjectTypes;
+  /**
+   * 更新时间
+   */
+  private Date updateTime;
 }
