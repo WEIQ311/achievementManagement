@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50719
 File Encoding         : 65001
 
-Date: 2018-10-10 15:45:51
+Date: 2018-10-11 10:49:44
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -207,6 +207,7 @@ CREATE TABLE `subject_score_info` (
   `sub_music` double(16,2) DEFAULT NULL COMMENT '音乐成绩',
   `insert_time` datetime DEFAULT NULL COMMENT '添加时间',
   `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `sub_score_sum` double DEFAULT '0' COMMENT '总成绩',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -247,4 +248,3 @@ CREATE TABLE `year_info` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`year_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='学年';
-SET FOREIGN_KEY_CHECKS=1;
