@@ -38,7 +38,7 @@ public class PoiUtil {
    * @param result     （表格的数据）
    * @throws Exception
    */
-  public static void exportExcel(HSSFWorkbook workbook, int sheetNum, String sheetTitle, String[] headers, List<List<String>> result) {
+  public static void exportExcel(HSSFWorkbook workbook, int sheetNum, String sheetTitle, List<String> headers, List<List<String>> result) {
     // 生成一个表格
     HSSFSheet sheet = workbook.createSheet();
     workbook.setSheetName(sheetNum, sheetTitle);
@@ -65,10 +65,10 @@ public class PoiUtil {
     style.setWrapText(true);
     // 产生表格标题行
     HSSFRow row = sheet.createRow(0);
-    for (int i = 0; i < headers.length; i++) {
+    for (int i = 0; i < headers.size(); i++) {
       HSSFCell cell = row.createCell(i);
       cell.setCellStyle(style);
-      HSSFRichTextString text = new HSSFRichTextString(headers[i]);
+      HSSFRichTextString text = new HSSFRichTextString(headers.get(i));
       cell.setCellValue(text.toString());
     }
     // 遍历集合数据，产生数据行
@@ -122,8 +122,8 @@ public class PoiUtil {
           //获得当前行的开始列
           int firstCellNum = row.getFirstCellNum();
           //获得当前行的列数
-          int lastCellNum = row.getPhysicalNumberOfCells();
-          String[] cells = new String[row.getPhysicalNumberOfCells()];
+          int lastCellNum = lastRowNum;
+          String[] cells = new String[lastCellNum];
           //循环当前行
           for (int cellNum = firstCellNum; cellNum < lastCellNum; cellNum++) {
             Cell cell = row.getCell(cellNum);

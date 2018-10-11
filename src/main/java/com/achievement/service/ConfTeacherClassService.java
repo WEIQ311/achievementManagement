@@ -23,6 +23,14 @@ public interface ConfTeacherClassService {
   ResultEntity confTeacherSubject(ConfTeacherClass confTeacherClass);
 
   /**
+   * 班级班主任
+   *
+   * @param confTeacherClass 班级与教师关系信息
+   * @return Map
+   */
+  Map<String, ConfTeacherClass> convertClassIdAdminMap(ConfTeacherClass confTeacherClass);
+
+  /**
    * 教师与班级关系信息Map
    *
    * @param confTeacherClass 班级与教师关系信息

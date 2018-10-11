@@ -1,7 +1,7 @@
 package com.achievement.service;
 
+import com.achievement.entity.ConfTeacherClass;
 import com.achievement.entity.SubjectScoreInfo;
-import com.achievement.entity.TeacherInfo;
 import com.achievement.vo.ParentStudentScore;
 import com.achievement.vo.ResultEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,10 +20,10 @@ public interface SubjectScoreInfoService extends BaseInfoService<SubjectScoreInf
   /**
    * 导出当前教师所带班级科目的学生成绩模板
    *
-   * @param teacherInfo 教师信息
-   * @param response    响应
+   * @param confTeacherClass 教师班级信息
+   * @param response         响应
    */
-  void exportScoreTemplate(TeacherInfo teacherInfo, HttpServletResponse response);
+  void exportScoreTemplate(ConfTeacherClass confTeacherClass, HttpServletResponse response);
 
   /**
    * 上传学生成绩

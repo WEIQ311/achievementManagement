@@ -390,13 +390,13 @@ public class ScoreInfoServiceImpl implements ScoreInfoService {
         Integer sheetNum = i;
         String sheetName = subjectName + INTERVAL_NUMBER + gradeName + INTERVAL_NUMBER + className;
         List<List<String>> contentList = studentListMap.getOrDefault(classId, new ArrayList<>());
-        PoiUtil.exportExcel(workbook, sheetNum, sheetName, EXCEL_HEADER_TITLE, contentList);
+        PoiUtil.exportExcel(workbook, sheetNum, sheetName, Arrays.asList(EXCEL_HEADER_TITLE), contentList);
       }
       fileNameBuilder.append(teacherName);
     } else {
       Integer sheetNum = 0;
       String sheetName = "请填写科目";
-      PoiUtil.exportExcel(workbook, sheetNum, sheetName, EXCEL_HEADER_TITLE, new ArrayList<>());
+      PoiUtil.exportExcel(workbook, sheetNum, sheetName, Arrays.asList(EXCEL_HEADER_TITLE), new ArrayList<>());
       fileNameBuilder.append(System.currentTimeMillis());
     }
     fileNameBuilder.append(INTERVAL_POINT);

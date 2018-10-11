@@ -7,6 +7,7 @@
     <result property="insertTime" column="insert_time" jdbcType="TIMESTAMP"/>
     <result property="remark" column="remark" jdbcType="VARCHAR"/>
     <result property="status" column="status" jdbcType="INTEGER"/>
+    <result property="subjectOrd" column="subject_ord" jdbcType="INTEGER"/>
     <result property="subjectType" column="subject_type" jdbcType="INTEGER"/>
     <result property="subjectName" column="subject_name" jdbcType="VARCHAR"/>
     <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
@@ -14,7 +15,7 @@
 
   <!--列集合-->
   <sql id="BASE_COLUMN">
-     SUBJECT_ID, INSERT_TIME, REMARK, STATUS, SUBJECT_NAME, UPDATE_TIME,SUBJECT_TYPE
+     SUBJECT_ID, INSERT_TIME, REMARK, STATUS, SUBJECT_NAME, UPDATE_TIME,SUBJECT_TYPE,SUBJECT_ORD
   </sql>
   <!--表名-->
   <sql id="BASE_TABLE">
@@ -40,6 +41,9 @@
       <if test="status != null">
         and status = #{status}
       </if>
+      <if test="subjectOrd != null">
+        and subject_ord = #{subjectOrd}
+      </if>
       <if test="subjectName != null and subjectName != ''">
         and subject_name = #{subjectName}
       </if>
@@ -56,6 +60,7 @@
         </foreach>
       </if>
     </where>
+    ORDER BY SUBJECT_ORD ASC
   </select>
 
   <!--新增所有列-->
@@ -69,7 +74,7 @@
     <foreach collection="list" item="item" index="index" separator=",">
       (
       #{item.subjectId},SYSDATE(), #{item.remark}, #{item.status}, #{item.subjectName},
-      SYSDATE(),#{item.subjectType}
+      SYSDATE(),#{item.subjectType},#{item.subjectOrd}
       )
     </foreach>
   </insert>
@@ -97,6 +102,9 @@
         </if>
         <if test="item.subjectType != null">
           subject_type = #{item.subjectType},
+        </if>
+        <if test="item.subjectOrd != null">
+          subject_ord = #{item.subjectOrd},
         </if>
       </set>
       where subject_id = #{item.subjectId}

@@ -56,6 +56,10 @@ public class SubjectInfo implements Serializable {
   @Length(max = 300, message = "科目名称不能多于300个字符")
   private String subjectName;
   /**
+   * 科目显示优先级
+   */
+  private Integer subjectOrd;
+  /**
    * 学科类型
    * 0:通用,
    * 1:文科,

@@ -1,7 +1,7 @@
 package com.achievement.controller;
 
+import com.achievement.entity.ConfTeacherClass;
 import com.achievement.entity.SubjectScoreInfo;
-import com.achievement.entity.TeacherInfo;
 import com.achievement.enums.GlobalEnum;
 import com.achievement.service.SubjectScoreInfoService;
 import com.achievement.utils.GloabalUtils;
@@ -72,12 +72,12 @@ public class SubjectScoreInfoController {
   /**
    * 导出当前教师所带班级科目的学生成绩模板
    *
-   * @param teacherInfo 教师信息
-   * @param response    响应
+   * @param confTeacherClass 教师班级信息
+   * @param response         响应
    */
   @RequestMapping(value = "exportScoreTemplate", method = RequestMethod.GET)
-  public void exportScoreTemplate(TeacherInfo teacherInfo, HttpServletResponse response) {
-    subjectScoreInfoService.exportScoreTemplate(teacherInfo, response);
+  public void exportScoreTemplate(ConfTeacherClass confTeacherClass, HttpServletResponse response) {
+    subjectScoreInfoService.exportScoreTemplate(confTeacherClass, response);
   }
 
   /**

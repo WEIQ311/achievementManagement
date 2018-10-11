@@ -34,7 +34,7 @@ public class GlobalConstants {
   /**
    * EXCEL首行数据
    */
-  public static final String[] EXCEL_HEADER_TITLE = {"学号", "姓名", "成绩"};
+  public static final String[] EXCEL_HEADER_TITLE = {"学号", "姓名"};
   /**
    * 导入文件sheet切分长度
    */

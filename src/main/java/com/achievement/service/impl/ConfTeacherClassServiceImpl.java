@@ -106,6 +106,23 @@ public class ConfTeacherClassServiceImpl implements ConfTeacherClassService {
   }
 
   /**
+   * 班级班主任
+   *
+   * @param confTeacherClass 班级与教师关系信息
+   * @return Map
+   */
+  @Override
+  public Map<String, ConfTeacherClass> convertClassIdAdminMap(ConfTeacherClass confTeacherClass) {
+    if (null == confTeacherClass) {
+      confTeacherClass = ConfTeacherClass.builder().build();
+    }
+    confTeacherClass.setTeacherDuty(TEACHER_ROLE_HEAD);
+    List<ConfTeacherClass> confTeacherClassList = confTeacherClassMapper.list(confTeacherClass);
+    return confTeacherClassList.stream().filter(info -> StringUtils.isNotBlank(info.getClassId()))
+        .collect(Collectors.toMap(ConfTeacherClass::getClassId, Function.identity(), (oldValue, newValue) -> newValue));
+  }
+
+  /**
    * 教师与班级关系信息Map
    *
    * @param confTeacherClass 班级与教师关系信息
