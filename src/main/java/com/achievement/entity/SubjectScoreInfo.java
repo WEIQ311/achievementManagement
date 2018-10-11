@@ -151,6 +151,76 @@ public class SubjectScoreInfo implements Serializable {
   private Double subMusic;
 
   /**
+   * 语文平均成绩
+   */
+  private Double avgLanguage;
+
+  /**
+   * 数学平均成绩
+   */
+  private Double avgMathematics;
+
+  /**
+   * 英语平均成绩
+   */
+  private Double avgEnglish;
+
+  /**
+   * 历史平均成绩
+   */
+  private Double avgHistory;
+
+  /**
+   * 地理平均成绩
+   */
+  private Double avgGeography;
+
+  /**
+   * 生物平均成绩
+   */
+  private Double avgBiological;
+
+  /**
+   * 化学平均成绩
+   */
+  private Double avgChemistry;
+
+  /**
+   * 物理平均成绩
+   */
+  private Double avgPhysical;
+
+  /**
+   * 政治平均成绩
+   */
+  private Double avgPolitical;
+
+  /**
+   * 计算机平均成绩
+   */
+  private Double avgComputer;
+
+  /**
+   * 体育平均成绩
+   */
+  private Double avgSports;
+
+  /**
+   * 美术平均成绩
+   */
+  private Double avgArt;
+
+  /**
+   * 音乐平均成绩
+   */
+  private Double avgMusic;
+
+  /**
+   * 总成绩平均成绩
+   */
+  private Double avgScoreSum;
+
+  /**
    * 最高成绩
    */
   private Double maxScore;
