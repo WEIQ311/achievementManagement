@@ -3,6 +3,7 @@ package com.achievement.aspect;
 
 import com.achievement.utils.GloabalUtils;
 import com.achievement.vo.ResultEntity;
+import com.alibaba.fastjson.JSON;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * AOP处理
@@ -50,6 +52,11 @@ public class ScoreAspect {
         ((ResultEntity) object).setTotalTime((System.currentTimeMillis() - beginTime));
         if (null != ((ResultEntity) object).getData() && (((ResultEntity) object).getData() instanceof ArrayList) && !((ResultEntity) object).isPageable()) {
           ((ResultEntity) object).setTotal((long) ((ResultEntity) object).getData().size());
+        }
+        List<?> resultData = ((ResultEntity) object).getData();
+        if (null != resultData && resultData.size() > 0) {
+          //空值字段不返回
+          ((ResultEntity) object).setData(JSON.parseArray(JSON.toJSONString(resultData)));
         }
       }
       LOGGER.debug("response:{}", object);
