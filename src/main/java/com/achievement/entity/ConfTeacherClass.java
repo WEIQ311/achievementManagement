@@ -37,7 +37,6 @@ public class ConfTeacherClass implements Serializable {
   /**
    * 学科ID
    */
-  @NotBlank(message = "学科ID不能为空!")
   private String subjectId;
   /**
    * 科目名称

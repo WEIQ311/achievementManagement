@@ -67,10 +67,10 @@
           class_id = #{item.classId},
         </if>
         <if test="item.teacherDuty != null and item.teacherDuty != ''">
-          teacher_duty = #{item.teacherDuty}
+          teacher_duty = #{item.teacherDuty},
         </if>
         <if test="item.subjectId != null and item.subjectId != ''">
-          subject_id = #{item.subjectId}
+          subject_id = #{item.subjectId},
         </if>
       </set>
       where conf_id = #{item.confId}

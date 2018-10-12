@@ -231,7 +231,7 @@ public class ConfTeacherClassServiceImpl implements ConfTeacherClassService {
     if (null != insertList && insertList.size() > 0) {
       return insert(insertList);
     } else {
-      return update(insertList);
+      return update(updateList);
     }
   }
 
@@ -248,20 +248,25 @@ public class ConfTeacherClassServiceImpl implements ConfTeacherClassService {
       String teacherId = confTeacherClass.getTeacherId();
       String classId = confTeacherClass.getClassId();
       String teacherDuty = confTeacherClass.getTeacherDuty();
+      String subjectId = confTeacherClass.getSubjectId();
       if (StringUtils.isBlank(teacherId)) {
         GloabalUtils.convertMessage(GlobalEnum.TeacherIdEmpty);
       }
       if (StringUtils.isBlank(classId)) {
         GloabalUtils.convertMessage(GlobalEnum.ClassIdEmpty);
       }
-      if (StringUtils.isBlank(teacherDuty)) {
-        GloabalUtils.convertMessage(GlobalEnum.TeacherDutyEmpty);
-      }
       if (!teacherInfoMap.containsKey(teacherId)) {
         GloabalUtils.convertMessage(GlobalEnum.TeacherInfoEmpty, teacherId);
       }
+      teacherDuty = teacherInfoMap.get(teacherId).getTeacherDuty();
+      if (StringUtils.isBlank(teacherDuty)) {
+        GloabalUtils.convertMessage(GlobalEnum.TeacherDutyEmpty);
+      }
       if (!classInfoMap.containsKey(classId)) {
         GloabalUtils.convertMessage(GlobalEnum.ClassInfoEmpty, classId);
+      }
+      if (!Objects.equals(TEACHER_ROLE_HEAD, teacherDuty) && StringUtils.isBlank(subjectId)) {
+        GloabalUtils.convertMessage(GlobalEnum.SubjectIdEmpty);
       }
       if (Objects.equals(OPERATE_TYPE_INSERT, operateType)) {
         confTeacherClass.setConfId("conf_tc_" + GloabalUtils.ordinaryId());
