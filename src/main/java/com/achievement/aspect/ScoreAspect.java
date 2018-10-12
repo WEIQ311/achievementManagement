@@ -1,6 +1,7 @@
 package com.achievement.aspect;
 
 
+import com.achievement.service.TokenInfoService;
 import com.achievement.utils.GloabalUtils;
 import com.achievement.vo.ResultEntity;
 import com.alibaba.fastjson.JSON;
@@ -8,11 +9,13 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,11 +29,12 @@ import java.util.List;
 public class ScoreAspect {
 
   private final static Logger LOGGER = LoggerFactory.getLogger(ScoreAspect.class);
-
   /**
    * 开始时间,用于记录请求耗时
    */
   private static long beginTime = System.currentTimeMillis();
+  @Autowired
+  private TokenInfoService tokenInfoService;
 
   /**
    * 请求之后拦截
@@ -74,9 +78,10 @@ public class ScoreAspect {
   public void doBefore(JoinPoint joinPoint) {
     ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
     HttpServletRequest request = attributes.getRequest();
+    HttpServletResponse response = attributes.getResponse();
     beginTime = System.currentTimeMillis();
     LOGGER.info("url:{},方法:{},请求ip:{},类和方法:{}(),参数:{}", request.getRequestURL(), request.getMethod(), GloabalUtils.getIpAddress(request), joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName(), joinPoint.getArgs());
-
+    GloabalUtils.checkRequestInfo(request, response, tokenInfoService);
   }
 
   /**

@@ -23,6 +23,10 @@ public enum GlobalEnum {
   DeleteNoSupport("删除不被允许!"),
   UpdateSuccess("更新成功!"),
   UpdateError("更新失败!"),
+  LoginSuccess("登陆成功!"),
+  LoginError("登陆失败!"),
+  LogoutSuccess("登出成功!"),
+  LogoutError("登出失败!"),
   SendSuccess("发送成功!"),
   SendError("发送成功!"),
   BadTel("请输入正确的手机号!"),
@@ -83,6 +87,17 @@ public enum GlobalEnum {
   BeginDeadlineExamTime("考试时间不能大于成绩录入开始时间"),
   NoBeginTime("还没有到录入成绩时间(\"%s\")!"),
   NoEndTime("成绩录入时间(\"%s\")已经过!"),
+  TokenEmpty("用户授权认证没有通过!客户端请求参数中无token信息"),
+  TokenOvertime("token信息已经过期,请重新登陆!"),
+  TokenSignError("token sign解析失败!"),
+  UserLoginOtherIp("您的账号已经在其他终端登陆,建议您重新登陆或修改密码!"),
+  UserNameError("帐户名不正确，请重新输入!"),
+  PasswordError("登录密码不正确，请重新输入!"),
+  UserNoLogin("账号\"%s\"未开启,请联系管理员!"),
+  UserNameInUsed("账号\"%s\"已经存在!"),
+  UserInfoEmpty("账号\"%s\"不存在!"),
+  NoResetPassword("您非当前登陆用户不能修改密码!"),
+  OldPasswordError("旧密码错误!"),
   ;
   private String message;
 

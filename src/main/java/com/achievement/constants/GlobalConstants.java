@@ -8,6 +8,22 @@ package com.achievement.constants;
  */
 public class GlobalConstants {
   /**
+   * false
+   */
+  public static final Integer BOOLEAN_FALSE = 0;
+  /**
+   * true
+   */
+  public static final Integer BOOLEAN_TRUE = 1;
+  /**
+   * 当前登陆客户端用户信息
+   */
+  public static final String CLIENT_INFO = "clientInfo";
+  /**
+   * 客户端Ip
+   */
+  public static final String CLIENT_IP = "clientIp";
+  /**
    * 格式化时间格式
    */
   public static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
@@ -52,6 +68,10 @@ public class GlobalConstants {
    */
   public static final String FORM_DATA_KEY = "formData";
   /**
+   * 忽略校验token URI
+   */
+  public static final String[] IGNORE_URI = {"user/login"};
+  /**
    * 间隔号
    */
   public static final String INTERVAL_NUMBER = "`";
@@ -60,6 +80,10 @@ public class GlobalConstants {
    */
   public static final String INTERVAL_POINT = ".";
   /**
+   * token密钥
+   */
+  public static final String LEXICAL_XSD_BASE64_BINARY = "scoreInfo";
+  /**
    * linux
    */
   public static final String LINUX_NAME = "linux";
@@ -67,6 +91,10 @@ public class GlobalConstants {
    * ok
    */
   public static final String OK = "OK";
+  /**
+   * 请求类型options
+   */
+  public static final String OPERATE_METHOD = "OPTIONS";
   /**
    * 增加方法
    */
@@ -88,9 +116,29 @@ public class GlobalConstants {
    */
   public static final String QUERY_MARK = "?";
   /**
+   * 一天(毫秒)
+   */
+  public static final Integer SECONDS_ONE_DAY = 1000 * 60 * 60 * 24;
+  /**
+   * 一小时(毫秒)
+   */
+  public static final Integer SECONDS_ONE_HOUR = 1000 * 60 * 60 * 24;
+  /**
+   * 一分钟(毫秒)
+   */
+  public static final Integer SECONDS_ONE_MINUTE = 60000;
+  /**
+   * 两天(毫秒)
+   */
+  public static final Integer SECONDS_TWO_DAY = 1000 * 60 * 60 * 48;
+  /**
    * 空格
    */
   public static final String SPACE = " ";
+  /**
+   * 成功
+   */
+  public static final String SUCCESS = "success";
   /**
    * 教师管理员
    */
@@ -104,6 +152,22 @@ public class GlobalConstants {
    */
   public static final String TEACHER_ROLE_ORDINARY = "2";
   /**
+   * token再请求头中的Key
+   */
+  public static final String TOKEN_HEADER = "token";
+  /**
+   * token拥有者
+   */
+  public static final String TOKEN_ISSUER = "campus.picp.net/score/";
+  /**
+   * token再请求头中的Key
+   */
+  public static final String TOKEN_NEW_HEADER = "newToken";
+  /**
+   * token超时时间
+   */
+  public static final Integer TOKEN_TIME_OUT = SECONDS_TWO_DAY + SECONDS_ONE_MINUTE;
+  /**
    * 下划线
    */
   public static final String UNDER_LINE = "_";
@@ -111,6 +175,10 @@ public class GlobalConstants {
    * 常量:未知
    */
   public static final String UNKNOWN = "unknown";
+  /**
+   * 更新
+   */
+  public static final String UPDATE = "update";
   /**
    * xml请求
    */

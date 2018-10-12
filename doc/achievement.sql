@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50719
 File Encoding         : 65001
 
-Date: 2018-10-11 19:34:42
+Date: 2018-10-12 18:43:15
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -52,7 +52,7 @@ CREATE TABLE `conf_teacher_class` (
   `teacher_id` varchar(255) NOT NULL COMMENT '教师ID',
   `class_id` varchar(255) NOT NULL COMMENT '班级ID',
   `teacher_duty` varchar(255) NOT NULL DEFAULT '代课教师' COMMENT '教师职责',
-  `subject_id` varchar(255) NOT NULL DEFAULT '1' COMMENT '学科ID',
+  `subject_id` varchar(255) DEFAULT '1' COMMENT '学科ID',
   PRIMARY KEY (`conf_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -134,6 +134,21 @@ CREATE TABLE `score_info` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`score_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='成绩';
+
+-- ----------------------------
+-- Table structure for score_user_info
+-- ----------------------------
+DROP TABLE IF EXISTS `score_user_info`;
+CREATE TABLE `score_user_info` (
+  `user_id` varchar(255) NOT NULL COMMENT '用户ID',
+  `login_name` varchar(500) NOT NULL COMMENT '登陆名',
+  `password` varchar(500) NOT NULL COMMENT '密码',
+  `user_type` varchar(255) NOT NULL COMMENT '用户类型\r\n0：管理员\r\n1：班主任\r\n2：教师\r\n3：学生\r\n4：家长\r\n5：其他',
+  `status` int(11) NOT NULL DEFAULT '1' COMMENT '状态',
+  `insert_time` datetime DEFAULT NULL COMMENT '注册时间',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for semester_info
@@ -249,6 +264,20 @@ CREATE TABLE `teacher_info` (
   PRIMARY KEY (`teacher_id`),
   UNIQUE KEY `uq_teacher_num` (`teacher_num`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='教师';
+
+-- ----------------------------
+-- Table structure for token_info
+-- ----------------------------
+DROP TABLE IF EXISTS `token_info`;
+CREATE TABLE `token_info` (
+  `id` varchar(255) NOT NULL COMMENT '主键',
+  `subject` varchar(1000) NOT NULL COMMENT '登陆用户信息',
+  `issuer` varchar(255) NOT NULL COMMENT '拥有者',
+  `issued_at` datetime NOT NULL COMMENT '产生时间',
+  `expiration` datetime NOT NULL COMMENT '过期时间',
+  `token` varchar(4000) NOT NULL COMMENT 'token',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for year_info

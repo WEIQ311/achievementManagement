@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.achievement.mapper.TokenInfoMapper">
+
+  <resultMap type="com.achievement.entity.TokenInfo" id="TokenInfoMap">
+    <result property="id" column="id" jdbcType="VARCHAR"/>
+    <result property="subject" column="subject" jdbcType="VARCHAR"/>
+    <result property="issuer" column="issuer" jdbcType="VARCHAR"/>
+    <result property="issuedAt" column="issued_at" jdbcType="TIMESTAMP"/>
+    <result property="expiration" column="expiration" jdbcType="TIMESTAMP"/>
+    <result property="token" column="token" jdbcType="VARCHAR"/>
+  </resultMap>
+
+  <!--列集合-->
+  <sql id="BASE_COLUMN">
+      ID, SUBJECT, ISSUER, ISSUED_AT, EXPIRATION, TOKEN
+  </sql>
+  <!--表名-->
+  <sql id="BASE_TABLE">
+		achievement.token_info
+	</sql>
+
+  <!--通过实体作为筛选条件查询-->
+  <select id="list" resultMap="TokenInfoMap">
+    select
+    <include refid="BASE_COLUMN"/>
+    from
+    <include refid="BASE_TABLE"/>
+    <where>
+      <if test="id != null and id != ''">
+        and id = #{id}
+      </if>
+      <if test="subject != null and subject != ''">
+        and subject = #{subject}
+      </if>
+      <if test="issuer != null and issuer != ''">
+        and issuer = #{issuer}
+      </if>
+      <if test="issuedAt != null">
+        and issued_at = #{issuedAt}
+      </if>
+      <if test="expiration != null">
+        and expiration = #{expiration}
+      </if>
+      <if test="token != null and token != ''">
+        and token = #{token}
+      </if>
+    </where>
+  </select>
+
+  <!--新增所有列-->
+  <insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="java.util.List">
+    insert into<include refid="BASE_TABLE"/>(<include refid="BASE_COLUMN"/>)
+    VALUES
+    <foreach collection="list" item="item" index="index" separator=",">
+      (
+      #{item.id}, #{item.subject}, #{item.issuer}, #{item.issuedAt}, #{item.expiration}, #{item.token}
+      )
+    </foreach>
+  </insert>
+
+  <!--通过主键修改数据-->
+  <update id="update" parameterType="java.util.List">
+    <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+      UPDATE
+      <include refid="BASE_TABLE"/>
+      <set>
+        <if test="item.subject != null and item.subject != ''">
+          subject = #{item.subject},
+        </if>
+        <if test="item.issuer != null and item.issuer != ''">
+          issuer = #{item.issuer},
+        </if>
+        <if test="item.issuedAt != null">
+          issued_at = #{item.issuedAt},
+        </if>
+        <if test="item.expiration != null">
+          expiration = #{item.expiration},
+        </if>
+        <if test="item.token != null and item.token != ''">
+          token = #{item.token},
+        </if>
+      </set>
+      where id = #{item.id}
+    </foreach>
+  </update>
+
+  <!--通过主键删除-->
+  <delete id="delete">
+    delete from
+    <include refid="BASE_TABLE"/>
+    where id in
+    <foreach collection="list" item="item" index="no" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </delete>
+
+</mapper>
+

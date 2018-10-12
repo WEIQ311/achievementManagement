@@ -32,9 +32,19 @@ public class ParentInfo implements Serializable {
    */
   private String connectionType;
   /**
+   * 家庭地址
+   */
+  @Length(max = 4000, message = "家庭地址不能超过4000个字符")
+  private String familyAddress;
+  /**
    * 创建时间
    */
   private Date insertTime;
+  /**
+   * 工作单位
+   */
+  @Length(max = 4000, message = "工作单位不能超过4000个字符")
+  private String officeAddress;
   /**
    * 家长ID
    */
@@ -80,14 +90,4 @@ public class ParentInfo implements Serializable {
    * 微博
    */
   private String xlWb;
-  /**
-   * 家庭地址
-   */
-  @Length(max = 4000, message = "家庭地址不能超过4000个字符")
-  private String familyAddress;
-  /**
-   * 工作单位
-   */
-  @Length(max = 4000, message = "工作单位不能超过4000个字符")
-  private String officeAddress;
 }

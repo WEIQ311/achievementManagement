@@ -31,6 +31,7 @@
     <commons.version>[2.6,)</commons.version>
     <!--<poi.version>[3.14,)</poi.version>-->
     <poi.version>3.14</poi.version>
+    <jjwt.version>[0.9.0,)</jjwt.version>
   </properties>
   <dependencies>
     <!--jpa-->
@@ -123,6 +124,11 @@
       <groupId>org.apache.poi</groupId>
       <artifactId>poi-ooxml</artifactId>
       <version>${poi.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt</artifactId>
+      <version>${jjwt.version}</version>
     </dependency>
   </dependencies>
   <build>
