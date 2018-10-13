@@ -110,6 +110,7 @@ public class ScoreUserInfoController {
    * @param response      响应
    * @return ResultEntity
    */
+  @RequestMapping(value = {"resetPassword"}, method = RequestMethod.POST)
   public ResultEntity resetPassword(@Valid @RequestBody ScoreUser scoreUser, BindingResult bindingResult, HttpServletRequest request, HttpServletResponse response) {
     if (bindingResult.hasErrors()) {
       return ResultUtil.error(bindingResult.getFieldError().getDefaultMessage());
