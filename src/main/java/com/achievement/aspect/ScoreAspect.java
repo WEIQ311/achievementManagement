@@ -82,6 +82,7 @@ public class ScoreAspect {
     beginTime = System.currentTimeMillis();
     LOGGER.info("url:{},方法:{},请求ip:{},类和方法:{}(),参数:{}", request.getRequestURL(), request.getMethod(), GloabalUtils.getIpAddress(request), joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName(), joinPoint.getArgs());
     GloabalUtils.checkRequestInfo(request, response, tokenInfoService);
+    response.setHeader("Access-Control-Expose-Headers","Authorization,token,newToken");
   }
 
   /**
