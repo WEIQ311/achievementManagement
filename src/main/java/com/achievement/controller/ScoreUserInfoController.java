@@ -26,6 +26,7 @@ import static com.achievement.constants.GlobalConstants.TOKEN_HEADER;
  */
 @RestController
 @RequestMapping("user")
+@CrossOrigin
 public class ScoreUserInfoController {
 
   /**
