@@ -72,7 +72,6 @@ public class GloabalUtils {
     if (null == token || token.isEmpty()) {
       GloabalUtils.convertMessage(GlobalEnum.TokenEmpty);
     }
-    log.info("当前token:{}", token);
     TokenInfo tokenInfo = GloabalUtils.parseJWT(token);
     if (null != tokenInfo && StringUtils.isNotBlank(tokenInfo.getTokenType())) {
       boolean success = tokenInfo.isSuccess();
@@ -80,19 +79,18 @@ public class GloabalUtils {
       if (success) {
         ResultEntity resultEntity = tokenInfoService.tokenValid(token, request);
         if (!resultEntity.isSuccess()) {
-          log.info("token已过期!");
+          response.reset();
           GloabalUtils.convertMessage(resultEntity.getMessage());
         }
         if (Objects.equals(UPDATE, tokenType)) {
-          log.info("token的有效期小与2天!");
           String newToken = tokenInfoService.updateToken(tokenType);
-          log.info("已生成新的token:{}", newToken);
           response.setHeader(TOKEN_HEADER, token);
           response.setHeader(TOKEN_NEW_HEADER, newToken);
         } else {
           log.info("用户授权认证通过!");
         }
       } else {
+        response.reset();
         if (Objects.equals(ExpiredJwtException.class.getName(), tokenType)) {
           log.info("token已过期!");
           GloabalUtils.convertMessage(GlobalEnum.TokenOvertime);
@@ -148,8 +146,6 @@ public class GloabalUtils {
       Long exp = claims.getExpiration().getTime();
       //现在的时间
       long nowMillis = System.currentTimeMillis();
-      Date now = new Date(nowMillis);
-      log.info("currenTime:{}", now);
       //剩余的时间 ，若剩余的时间小与48小时，就返回一个新的token给APP
       long seconds = exp - nowMillis;
       long days = seconds / SECONDS_ONE_DAY;
@@ -157,21 +153,18 @@ public class GloabalUtils {
       long minutes = (seconds - days * SECONDS_ONE_DAY - hour * SECONDS_ONE_HOUR) / SECONDS_ONE_MINUTE;
       long remainingSeconds = seconds % 60;
       log.info(seconds + " seconds is " + days + " days " + hour + " hours " + minutes + " minutes and " + remainingSeconds + " seconds");
-      if (seconds <= SECONDS_TWO_DAY) {
-        log.info("token的有效期小与48小时，请更新token!");
+      if (seconds <= SECONDS_ONE_HOUR) {
+        log.info("token的有效期小于1小时，请更新token!");
         tokenInfo.setTokenType(UPDATE);
       } else {
         tokenInfo.setTokenType(SUCCESS);
       }
       tokenInfo.setSuccess(true);
-      log.info("------解析token----:{}", tokenInfo);
       return tokenInfo;
     } catch (ExpiredJwtException e) {
-      log.error("解析异常:{}", e.getMessage());
       tokenInfo.setTokenType(ExpiredJwtException.class.getName());
       return tokenInfo;
     } catch (MalformedJwtException e) {
-      log.error("解析异常:{}", e.getMessage());
       tokenInfo.setTokenType(MalformedJwtException.class.getName());
       return tokenInfo;
     }

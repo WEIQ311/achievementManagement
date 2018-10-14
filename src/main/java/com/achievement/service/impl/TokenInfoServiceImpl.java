@@ -105,13 +105,14 @@ public class TokenInfoServiceImpl implements TokenInfoService {
   public ResultEntity tokenValid(String token, HttpServletRequest request) {
     String ipAddress = GloabalUtils.getIpAddress(request);
     TokenInfo tokenInfo = GloabalUtils.parseJWT(token);
-    List<TokenInfo> tokenInfos = tokenInfoMapper.list(tokenInfo);
+    List<TokenInfo> tokenInfos = tokenInfoMapper.list(TokenInfo.builder().id(tokenInfo.getId()).build());
     if (null == tokenInfos || tokenInfos.size() < 1) {
       return ResultUtil.error(GlobalEnum.TokenOvertime);
     }
     String subject = tokenInfo.getSubject();
     String clientIp = JSON.parseObject(subject).getString(CLIENT_IP);
     boolean success = Objects.equals(ipAddress, clientIp);
+    success = success ? Objects.equals(token, tokenInfos.get(0).getToken()) : success;
     String message = success ? GlobalEnum.QuerySuccess.getMessage() : GlobalEnum.UserLoginOtherIp.getMessage();
     return ResultEntity.builder().success(success).message(message).build();
   }

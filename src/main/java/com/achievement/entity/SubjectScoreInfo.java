@@ -1,10 +1,13 @@
 package com.achievement.entity;
 
+import com.achievement.constants.GlobalConstants;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
@@ -223,6 +226,7 @@ public class SubjectScoreInfo implements Serializable {
   /**
    * 考试时间
    */
+  @JsonFormat(pattern = GlobalConstants.DATE_TIME_FORMAT)
   private Date examTime;
 
   /**
