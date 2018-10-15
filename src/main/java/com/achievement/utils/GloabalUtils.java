@@ -146,13 +146,8 @@ public class GloabalUtils {
       Long exp = claims.getExpiration().getTime();
       //现在的时间
       long nowMillis = System.currentTimeMillis();
-      //剩余的时间 ，若剩余的时间小与48小时，就返回一个新的token给APP
+      //剩余的时间 ，若剩余的时间小于1小时，就返回update,产生一个新的token给APP
       long seconds = exp - nowMillis;
-      long days = seconds / SECONDS_ONE_DAY;
-      long hour = (seconds - days * SECONDS_ONE_DAY) / SECONDS_ONE_HOUR;
-      long minutes = (seconds - days * SECONDS_ONE_DAY - hour * SECONDS_ONE_HOUR) / SECONDS_ONE_MINUTE;
-      long remainingSeconds = seconds % 60;
-      log.info(seconds + " seconds is " + days + " days " + hour + " hours " + minutes + " minutes and " + remainingSeconds + " seconds");
       if (seconds <= SECONDS_ONE_HOUR) {
         log.info("token的有效期小于1小时，请更新token!");
         tokenInfo.setTokenType(UPDATE);
