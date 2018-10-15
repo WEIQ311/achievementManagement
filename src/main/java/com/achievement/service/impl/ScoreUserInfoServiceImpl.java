@@ -87,6 +87,18 @@ public class ScoreUserInfoServiceImpl implements ScoreUserInfoService {
     scoreUserInfoMapper.delete(pkIds);
     tokenInfoService.delete(pkIds);
     return ResultUtil.success(GlobalEnum.DeleteSuccess);
+  }
+
+  /**
+   * 增加对象
+   *
+   * @param scoreUserInfos 对象参数
+   * @return ResultEntity
+   */
+  @Override
+  @Transactional(rollbackFor = RuntimeException.class)
+  public ResultEntity insert(List<ScoreUserInfo> scoreUserInfos) {
+    return insertOrUpdateScoreUserInfo(scoreUserInfos, OPERATE_TYPE_INSERT);
   }  /**
    * 用户登陆
    *
@@ -122,18 +134,6 @@ public class ScoreUserInfoServiceImpl implements ScoreUserInfoService {
     }
     tokenInfoService.initToken(request, scoreUserInfo, response);
     return ResultUtil.success(GlobalEnum.LoginSuccess);
-  }
-
-  /**
-   * 增加对象
-   *
-   * @param scoreUserInfos 对象参数
-   * @return ResultEntity
-   */
-  @Override
-  @Transactional(rollbackFor = RuntimeException.class)
-  public ResultEntity insert(List<ScoreUserInfo> scoreUserInfos) {
-    return insertOrUpdateScoreUserInfo(scoreUserInfos, OPERATE_TYPE_INSERT);
   }
 
   /**
@@ -195,19 +195,6 @@ public class ScoreUserInfoServiceImpl implements ScoreUserInfoService {
       }
     }
     return ResultUtil.success(GlobalEnum.UpdateError, scoreUserInfos);
-  }  /**
-   * 登出
-   *
-   * @param token token
-   * @return ResultEntity
-   */
-  @Override
-  public ResultEntity logout(String token) {
-    ResultEntity resultEntity = tokenInfoService.deleteToken(token);
-    if (resultEntity.isSuccess()) {
-      resultEntity.setMessage(GlobalEnum.LogoutSuccess.getMessage());
-    }
-    return resultEntity;
   }
 
   /**
@@ -225,7 +212,46 @@ public class ScoreUserInfoServiceImpl implements ScoreUserInfoService {
     List<ScoreUserInfo> scoreUserInfos = scoreUserInfoMapper.list(scoreUserInfo);
     PageInfo pageInfo = new PageInfo(scoreUserInfos);
     return ResultUtil.success(GlobalEnum.QuerySuccess, pageInfo);
+  }
+
+  /**
+   * 根据条件查询对象
+   *
+   * @param scoreUserInfo 查询参数
+   * @return ResultEntity
+   */
+  @Override
+  public ResultEntity list(ScoreUserInfo scoreUserInfo) {
+    scoreUserInfo = convertQueryParam(scoreUserInfo);
+    List<ScoreUserInfo> scoreUserInfos = scoreUserInfoMapper.list(scoreUserInfo);
+    return ResultUtil.success(GlobalEnum.QuerySuccess, scoreUserInfos);
   }  /**
+   * 登出
+   *
+   * @param token token
+   * @return ResultEntity
+   */
+  @Override
+  public ResultEntity logout(String token) {
+    ResultEntity resultEntity = tokenInfoService.deleteToken(token);
+    if (resultEntity.isSuccess()) {
+      resultEntity.setMessage(GlobalEnum.LogoutSuccess.getMessage());
+    }
+    return resultEntity;
+  }
+
+  /**
+   * 更新对象
+   *
+   * @param scoreUserInfos 更新参数
+   * @return ResultEntity
+   */
+  @Override
+  public ResultEntity update(List<ScoreUserInfo> scoreUserInfos) {
+    return insertOrUpdateScoreUserInfo(scoreUserInfos, OPERATE_TYPE_UPDATE);
+  }
+
+  /**
    * 重置用户密码
    *
    * @param scoreUser 用户信息
@@ -278,29 +304,11 @@ public class ScoreUserInfoServiceImpl implements ScoreUserInfoService {
     return ResultUtil.error(GlobalEnum.UpdateError);
   }
 
-  /**
-   * 根据条件查询对象
-   *
-   * @param scoreUserInfo 查询参数
-   * @return ResultEntity
-   */
-  @Override
-  public ResultEntity list(ScoreUserInfo scoreUserInfo) {
-    scoreUserInfo = convertQueryParam(scoreUserInfo);
-    List<ScoreUserInfo> scoreUserInfos = scoreUserInfoMapper.list(scoreUserInfo);
-    return ResultUtil.success(GlobalEnum.QuerySuccess, scoreUserInfos);
-  }
+
+
+
 
   /**
-   * 更新对象
-   *
-   * @param scoreUserInfos 更新参数
-   * @return ResultEntity
-   */
-  @Override
-  public ResultEntity update(List<ScoreUserInfo> scoreUserInfos) {
-    return insertOrUpdateScoreUserInfo(scoreUserInfos, OPERATE_TYPE_UPDATE);
-  }  /**
    * 对象信息Map
    *
    * @param scoreUserInfo 查询参数
@@ -314,14 +322,6 @@ public class ScoreUserInfoServiceImpl implements ScoreUserInfoService {
           return info.getLoginName() + INTERVAL_NUMBER + info.getUserType();
         }, Function.identity(), (oldValue, newValue) -> newValue));
   }
-
-
-
-
-
-
-
-
 
 
 }
