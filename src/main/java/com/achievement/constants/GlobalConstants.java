@@ -122,7 +122,7 @@ public class GlobalConstants {
   /**
    * 一小时(毫秒)
    */
-  public static final Integer SECONDS_ONE_HOUR = 1000 * 60 * 60 * 24;
+  public static final Integer SECONDS_ONE_HOUR = 1000 * 60 * 60;
   /**
    * 一分钟(毫秒)
    */
