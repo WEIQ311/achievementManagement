@@ -139,7 +139,7 @@ public class StudentInfoServiceImpl implements StudentInfoService {
       String studentNum = studentInfo.getStudentNum();
       if (studentInfoMap.containsKey(studentNum)) {
         String studentName = studentInfoMap.get(studentNum).getStudentName();
-        GloabalUtils.convertMessage(GlobalEnum.TeacherNumInUsed, studentName, studentNum);
+        GloabalUtils.convertMessage(GlobalEnum.StudentNumInUsed, studentName, studentNum);
       }
       studentInfo.setStudentId("student_" + GloabalUtils.ordinaryId());
     });
@@ -205,7 +205,7 @@ public class StudentInfoServiceImpl implements StudentInfoService {
       String studentNum = studentInfo.getStudentNum();
       if (studentInfoMap.containsKey(studentNum) && !Objects.equals(studentId, studentInfoMap.get(studentNum).getStudentId())) {
         String studentName = studentInfoMap.get(studentNum).getStudentName();
-        GloabalUtils.convertMessage(GlobalEnum.TeacherNumInUsed, studentName, studentNum);
+        GloabalUtils.convertMessage(GlobalEnum.StudentNumInUsed, studentName, studentNum);
       }
     });
     Integer updateCount = studentInfoMapper.update(studentInfoList);

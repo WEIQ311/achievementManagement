@@ -143,7 +143,7 @@ public class GloabalUtils {
       tokenInfo.setExpiration(expiration);
       tokenInfo.setToken(jwt);
       //过期的时间
-      Long exp = claims.getExpiration().getTime();
+      Long exp = expiration.getTime();
       //现在的时间
       long nowMillis = System.currentTimeMillis();
       //剩余的时间 ，若剩余的时间小于1小时，就返回update,产生一个新的token给APP

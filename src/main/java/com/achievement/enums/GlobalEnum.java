@@ -44,6 +44,7 @@ public enum GlobalEnum {
   YearNameInSemester("该学年中存在轮次!"),
   SemesterNameInUsed("\"%s\"第\"%s\"学年，第\"%s\"轮次中已经存在!"),
   TeacherNumInUsed("教师编码\"%s\"已经被教师\"%s\"使用!"),
+  StudentNumInUsed("学生编码\"%s\"已经被学生\"%s\"使用!"),
   SubjectNameInUsed("学科\"%s\"已经被使用!"),
   ClassIdEmpty("班级ID为空!"),
   ClassTypeEmpty("班级类型为空!"),

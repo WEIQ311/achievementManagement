@@ -65,18 +65,16 @@ public class ScoreUserInfoController {
   /**
    * 增加用户(ScoreUserInfo)
    *
-   * @param scoreUserInfo 插入参数
+   * @param scoreUserInfos 插入参数
    * @param bindingResult 参数绑定校验
    * @return ResultEntity
    */
   @RequestMapping(value = "insert", method = RequestMethod.POST)
-  public ResultEntity insert(@Valid @RequestBody ScoreUserInfo scoreUserInfo, BindingResult bindingResult) {
+  public ResultEntity insert(@Valid @RequestBody List<ScoreUserInfo> scoreUserInfos, BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {
       return ResultUtil.error(bindingResult.getFieldError().getDefaultMessage());
     }
-    return scoreUserInfoService.insert(new ArrayList<ScoreUserInfo>() {{
-      add(scoreUserInfo);
-    }});
+    return scoreUserInfoService.insert(scoreUserInfos);
   }
 
   /**
