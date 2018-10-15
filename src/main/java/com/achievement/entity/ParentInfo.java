@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -72,6 +73,7 @@ public class ParentInfo implements Serializable {
   /**
    * 电话号码
    */
+  @NotBlank(message = "家长电话号码不能为空!")
   @Length(max = 12, message = "电话号码不能多于12个字符")
   private String telPhone;
   /**

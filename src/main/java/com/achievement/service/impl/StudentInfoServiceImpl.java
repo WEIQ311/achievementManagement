@@ -121,8 +121,21 @@ public class StudentInfoServiceImpl implements StudentInfoService {
     if (null == studentIds || studentIds.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
+    Map<String, StudentInfo> studentInfoMap = convertRecordToMap(StudentInfo.builder().build());
+    List<ScoreUserInfo> scoreUserInfos = new ArrayList<>();
+    studentIds.stream().forEach(studentId -> {
+      if (!studentInfoMap.containsKey(studentId)) {
+        GloabalUtils.convertMessage(GlobalEnum.StudentInfoEmpty, studentId);
+      } else {
+        String studentNum = studentInfoMap.get(studentId).getStudentNum();
+        if (StringUtils.isNotBlank(studentNum)) {
+          scoreUserInfos.add(ScoreUserInfo.builder().loginName(studentNum).userType(USER_ROLE_STUDENT).build());
+        }
+      }
+    });
     confStudentParentService.deleteByStudentId(studentIds);
     studentInfoMapper.delete(studentIds);
+    scoreUserInfoService.deleteByLoginName(scoreUserInfos);
     return ResultUtil.success(GlobalEnum.DeleteSuccess, studentIds);
   }
 

@@ -2,11 +2,13 @@ package com.achievement.service.impl;
 
 import com.achievement.entity.ConfStudentParent;
 import com.achievement.entity.ParentInfo;
+import com.achievement.entity.ScoreUserInfo;
 import com.achievement.entity.StudentInfo;
 import com.achievement.enums.GlobalEnum;
 import com.achievement.mapper.ParentInfoMapper;
 import com.achievement.service.ConfStudentParentService;
 import com.achievement.service.ParentInfoService;
+import com.achievement.service.ScoreUserInfoService;
 import com.achievement.service.StudentInfoService;
 import com.achievement.utils.GloabalUtils;
 import com.achievement.utils.ResultUtil;
@@ -22,8 +24,11 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static com.achievement.constants.GlobalConstants.USER_ROLE_PARENT;
 
 /**
  * 家长(ParentInfo)ServiceImpl
@@ -37,6 +42,8 @@ public class ParentInfoServiceImpl implements ParentInfoService {
   private ConfStudentParentService confStudentParentService;
   @Resource
   private ParentInfoMapper parentInfoMapper;
+  @Autowired
+  private ScoreUserInfoService scoreUserInfoService;
   @Autowired
   private StudentInfoService studentInfoService;
 
@@ -66,8 +73,21 @@ public class ParentInfoServiceImpl implements ParentInfoService {
     if (null == parentIds || parentIds.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
+    List<ScoreUserInfo> deleteUserInfoList = new ArrayList<>();
+    Map<String, ParentInfo> parentInfoMap = convertRecordToMap(ParentInfo.builder().build());
+    parentIds.stream().forEach(parentId -> {
+      if (!parentInfoMap.containsKey(parentId)) {
+        GloabalUtils.convertMessage(GlobalEnum.ParentInfoEmpty, parentId);
+      } else {
+        String telPhone = parentInfoMap.get(parentId).getTelPhone();
+        if (StringUtils.isNotBlank(telPhone)) {
+          deleteUserInfoList.add(ScoreUserInfo.builder().loginName(telPhone).userType(USER_ROLE_PARENT).build());
+        }
+      }
+    });
     confStudentParentService.deleteByParentId(parentIds);
     parentInfoMapper.delete(parentIds);
+    scoreUserInfoService.deleteByLoginName(deleteUserInfoList);
     return ResultUtil.success(GlobalEnum.DeleteSuccess, parentIds);
   }
 
@@ -83,13 +103,29 @@ public class ParentInfoServiceImpl implements ParentInfoService {
     if (null == parentInfoList || parentInfoList.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
+    Map<String, ParentInfo> parentInfoMap = convertRecordToMap(ParentInfo.builder().build()).values().stream()
+        .filter(parentInfo -> StringUtils.isNotBlank(parentInfo.getTelPhone()))
+        .collect(Collectors.toMap(ParentInfo::getTelPhone, Function.identity(), (oldValue, newValue) -> newValue));
     parentInfoList.stream().forEach(parentInfo -> {
+      String telPhone = parentInfo.getTelPhone();
+      if (StringUtils.isNotBlank(telPhone) && parentInfoMap.containsKey(telPhone)) {
+        String parentName = parentInfoMap.get(telPhone).getParentName();
+        GloabalUtils.convertMessage(GlobalEnum.TelPhoneInUsed, parentName);
+      }
       if (StringUtils.isBlank(parentInfo.getParentId())) {
         parentInfo.setParentId("parent_" + GloabalUtils.ordinaryId());
       }
     });
     Integer insertCount = parentInfoMapper.insert(parentInfoList);
     if (insertCount > 0) {
+      scoreUserInfoService.insert(new ArrayList<ScoreUserInfo>() {{
+        parentInfoList.stream().forEach(parentInfo -> {
+          String telPhone = parentInfo.getTelPhone();
+          if (StringUtils.isNotBlank(telPhone)) {
+            add(ScoreUserInfo.builder().loginName(telPhone).password(telPhone).userType(USER_ROLE_PARENT).build());
+          }
+        });
+      }});
       return ResultUtil.success(GlobalEnum.InsertSuccess, parentInfoList);
     }
     return ResultUtil.error(GlobalEnum.InsertError);
@@ -180,14 +216,38 @@ public class ParentInfoServiceImpl implements ParentInfoService {
     if (null == parentInfoList || parentInfoList.size() < 1) {
       return ResultUtil.error(GlobalEnum.DataEmpty);
     }
+    Map<String, ParentInfo> recordToMap = convertRecordToMap(ParentInfo.builder().build());
+    Map<String, ParentInfo> parentInfoMap = recordToMap.values().stream()
+        .filter(parentInfo -> StringUtils.isNotBlank(parentInfo.getTelPhone()))
+        .collect(Collectors.toMap(ParentInfo::getTelPhone, Function.identity(), (oldValue, newValue) -> newValue));
+    List<ScoreUserInfo> insertUserInfoList = new ArrayList<>();
+    List<ScoreUserInfo> updateUserInfoList = new ArrayList<>();
+    List<ScoreUserInfo> deleteUserInfoList = new ArrayList<>();
     parentInfoList.stream().forEach(parentInfo -> {
       String parentId = parentInfo.getParentId();
       if (StringUtils.isBlank(parentId)) {
         GloabalUtils.convertMessage(GlobalEnum.PkIdEmpty);
       }
+      String telPhone = parentInfo.getTelPhone();
+      if (StringUtils.isNotBlank(telPhone) && parentInfoMap.containsKey(telPhone) && !Objects.equals(parentId, parentInfoMap.get(telPhone).getParentId())) {
+        String parentName = parentInfoMap.get(telPhone).getParentName();
+        GloabalUtils.convertMessage(GlobalEnum.TelPhoneInUsed, parentName);
+      }
+      //家长更换手机号码时将已经有的家长用户登陆名更换
+      String oldTelPhone = recordToMap.get(parentId).getTelPhone();
+      if (StringUtils.isBlank(oldTelPhone) && StringUtils.isNotBlank(telPhone)) {
+        insertUserInfoList.add(ScoreUserInfo.builder().loginName(telPhone).password(telPhone).userType(USER_ROLE_PARENT).build());
+      } else if (StringUtils.isNotBlank(oldTelPhone) && StringUtils.isBlank(telPhone)) {
+        deleteUserInfoList.add(ScoreUserInfo.builder().loginName(oldTelPhone).userType(USER_ROLE_PARENT).build());
+      } else if (!Objects.equals(oldTelPhone, telPhone)) {
+        updateUserInfoList.add(ScoreUserInfo.builder().loginName(telPhone).userType(USER_ROLE_PARENT).build());
+      }
     });
     Integer updateCount = parentInfoMapper.update(parentInfoList);
     if (updateCount > 0) {
+      scoreUserInfoService.insert(insertUserInfoList);
+      scoreUserInfoService.update(insertUserInfoList);
+      scoreUserInfoService.deleteByLoginName(deleteUserInfoList);
       return ResultUtil.success(GlobalEnum.UpdateSuccess, parentInfoList);
     }
     return ResultUtil.error(GlobalEnum.UpdateError);

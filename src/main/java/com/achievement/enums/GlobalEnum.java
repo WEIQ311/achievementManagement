@@ -57,6 +57,7 @@ public enum GlobalEnum {
   SemesterIdEmpty("轮次ID为空!"),
   ParentIdEmpty("家长ID为空!"),
   ParentInfoQueryEmpty("家长信息为空!"),
+  TelPhoneInUsed("该电话号码已经被\"%s\"使用!"),
   ParentNameEmpty("家长姓名不能为空!"),
   ParentAndStudentTypeEmpty("家长\"%s\"与学生\"%s\"的关系不能为空!"),
   StudentInfoQueryEmpty("学生信息为空!"),
@@ -99,6 +100,7 @@ public enum GlobalEnum {
   UserLoginNameEmpty("账号为空!"),
   UserPasswordEmpty("密码为空!"),
   UserInfoEmpty("账号\"%s\"不存在!"),
+  UserRoleEmpty("用户角色不能为空!"),
   NoResetPassword("您非当前登陆用户不能修改密码!"),
   OldPasswordError("旧密码错误!"),
   ;

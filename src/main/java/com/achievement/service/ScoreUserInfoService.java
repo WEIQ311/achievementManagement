@@ -6,6 +6,7 @@ import com.achievement.vo.ScoreUser;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,6 +22,14 @@ public interface ScoreUserInfoService extends BaseInfoService<ScoreUserInfo, Str
    * @return Map
    */
   Map<String, ScoreUserInfo> convertUserNameAndType(ScoreUserInfo scoreUserInfo);
+
+  /**
+   * 通过登陆名称删除用户
+   *
+   * @param scoreUserInfoList 用户信息
+   * @return ResultEntity
+   */
+  ResultEntity deleteByLoginName(List<ScoreUserInfo> scoreUserInfoList);
 
   /**
    * 用户登陆

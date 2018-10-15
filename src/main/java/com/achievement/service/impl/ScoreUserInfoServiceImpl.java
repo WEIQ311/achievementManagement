@@ -1,11 +1,9 @@
 package com.achievement.service.impl;
 
-import com.achievement.entity.ScoreUserInfo;
-import com.achievement.entity.TokenInfo;
+import com.achievement.entity.*;
 import com.achievement.enums.GlobalEnum;
 import com.achievement.mapper.ScoreUserInfoMapper;
-import com.achievement.service.ScoreUserInfoService;
-import com.achievement.service.TokenInfoService;
+import com.achievement.service.*;
 import com.achievement.utils.GloabalUtils;
 import com.achievement.utils.ResultUtil;
 import com.achievement.vo.ResultEntity;
@@ -21,10 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -37,8 +32,14 @@ import static com.achievement.constants.GlobalConstants.*;
 @Slf4j
 @Service(value = "scoreUserInfoService")
 public class ScoreUserInfoServiceImpl implements ScoreUserInfoService {
+  @Autowired
+  private ParentInfoService parentInfoService;
   @Resource
   private ScoreUserInfoMapper scoreUserInfoMapper;
+  @Autowired
+  private StudentInfoService studentInfoService;
+  @Autowired
+  private TeacherInfoService teacherInfoService;
   @Autowired
   private TokenInfoService tokenInfoService;
 
@@ -177,11 +178,43 @@ public class ScoreUserInfoServiceImpl implements ScoreUserInfoService {
    */
   @Override
   public Map<String, ScoreUserInfo> convertUserNameAndType(ScoreUserInfo scoreUserInfo) {
-    return scoreUserInfoMapper.list(scoreUserInfo).stream().filter(info -> StringUtils.isNotBlank(info.getUserId())
+    return scoreUserInfoMapper.list(scoreUserInfo).stream().filter(info -> StringUtils.isNotBlank(info.getLoginName())
         && StringUtils.isNotBlank(info.getUserType()))
         .collect(Collectors.toMap(info -> {
           return info.getLoginName() + INTERVAL_NUMBER + info.getUserType();
         }, Function.identity(), (oldValue, newValue) -> newValue));
+  }
+
+  /**
+   * 通过登陆名称删除用户
+   *
+   * @param scoreUserInfoList 用户信息
+   * @return ResultEntity
+   */
+  @Override
+  public ResultEntity deleteByLoginName(List<ScoreUserInfo> scoreUserInfoList) {
+    if (null == scoreUserInfoList || scoreUserInfoList.size() < 1) {
+      return ResultUtil.error(GlobalEnum.DataEmpty);
+    }
+    Map<String, ScoreUserInfo> scoreUserInfoMap = convertUserNameAndType(ScoreUserInfo.builder().build());
+    List<String> pkIds = new ArrayList<>();
+    scoreUserInfoList.stream().forEach(scoreUserInfo -> {
+      String loginName = scoreUserInfo.getLoginName();
+      String userType = scoreUserInfo.getUserType();
+      if (StringUtils.isBlank(loginName)) {
+        GloabalUtils.convertMessage(GlobalEnum.UserLoginNameEmpty);
+      }
+      if (StringUtils.isBlank(userType)) {
+        GloabalUtils.convertMessage(GlobalEnum.UserRoleEmpty);
+      }
+      String key = loginName + INTERVAL_NUMBER + userType;
+      if (!scoreUserInfoMap.containsKey(key)) {
+        GloabalUtils.convertMessage(GlobalEnum.UserInfoEmpty, loginName);
+      } else {
+        pkIds.add(scoreUserInfoMap.get(key).getUserId());
+      }
+    });
+    return delete(pkIds);
   }
 
   /**
@@ -217,8 +250,42 @@ public class ScoreUserInfoServiceImpl implements ScoreUserInfoService {
     if (!verify) {
       GloabalUtils.convertMessage(GlobalEnum.PasswordError);
     }
+    List<?> resultInfoList = convertLoginUser(scoreUserInfo);
     tokenInfoService.initToken(request, scoreUserInfo, response);
-    return ResultUtil.success(GlobalEnum.LoginSuccess);
+    return ResultUtil.success(GlobalEnum.LoginSuccess, resultInfoList);
+  }
+
+  /**
+   * 登陆成功之后返回用户信息
+   *
+   * @param scoreUserInfo 用户信息
+   * @return List
+   */
+  private List<?> convertLoginUser(ScoreUserInfo scoreUserInfo) {
+    List results = new ArrayList();
+    Map<String, ?> userObject = new HashMap<>(1);
+    String userNum = scoreUserInfo.getLoginName();
+    switch (scoreUserInfo.getUserType()) {
+      case USER_ROLE_ADMIN:
+      case USER_ROLE_TEACHER:
+      case USER_ROLE_TEACHER_HEAD:
+        userObject = teacherInfoService.convertRecordToMap(TeacherInfo.builder().teacherNum(userNum).build());
+        break;
+      case USER_ROLE_STUDENT:
+        userObject = studentInfoService.convertRecordToMap(StudentInfo.builder().studentNum(userNum).build());
+        break;
+      case USER_ROLE_PARENT:
+        userObject = parentInfoService.convertRecordToMap(ParentInfo.builder().telPhone(userNum).build());
+        break;
+      default:
+        GloabalUtils.convertMessage(GlobalEnum.UserNoLogin, userNum);
+        break;
+    }
+    if (userObject.isEmpty()) {
+      GloabalUtils.convertMessage(GlobalEnum.UserNoLogin, userNum);
+    }
+    results = userObject.values().stream().collect(Collectors.toList());
+    return results;
   }
 
   /**
