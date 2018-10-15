@@ -62,7 +62,6 @@
     </foreach>
   </insert>
 
-
   <!--通过主键修改数据-->
   <update id="update" parameterType="java.util.List">
     <foreach collection="list" item="item" index="index" open="" close="" separator=";">

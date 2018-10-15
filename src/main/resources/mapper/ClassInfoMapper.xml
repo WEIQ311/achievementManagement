@@ -15,7 +15,7 @@
   <!--列集合-->
   <sql id="BASE_COLUMN">
       CLASS_ID, CLASS_NAME, GRADE_ID, INSERT_TIME, REMARK, STATUS, UPDATE_TIME,CLASS_TYPE
-    </sql>
+  </sql>
   <!--表名-->
   <sql id="BASE_TABLE">
     CLASS_INFO

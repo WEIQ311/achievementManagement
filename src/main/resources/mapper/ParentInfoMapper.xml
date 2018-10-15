@@ -27,7 +27,6 @@
 		achievement.parent_info
 	</sql>
 
-
   <!--通过实体作为筛选条件查询-->
   <select id="list" resultMap="ParentInfoMap">
     select

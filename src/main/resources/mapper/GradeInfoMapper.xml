@@ -19,7 +19,6 @@
 		achievement.grade_info
 	</sql>
 
-
   <!--通过实体作为筛选条件查询-->
   <select id="list" resultMap="GradeInfoMap">
     select
@@ -59,7 +58,6 @@
       #{item.gradeId}, #{item.gradeName}, SYSDATE(), #{item.remark}, #{item.status}, SYSDATE() )
     </foreach>
   </insert>
-
 
   <!--通过主键修改数据-->
   <update id="update" parameterType="java.util.List">
