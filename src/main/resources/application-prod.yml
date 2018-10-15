@@ -9,6 +9,14 @@ spring:
     maximum-pool-size: 35
     test-while-idle: true
     type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      stat-view-servlet:
+        #        添加可以访问的ip
+        #        allow: 190.168.0.105
+        #        正确登陆之后访问
+        login-password: scoreInfo
+        login-username: scoreInfo
+
   social:
     auto-connection-views: true
 
