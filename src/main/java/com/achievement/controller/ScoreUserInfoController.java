@@ -66,7 +66,7 @@ public class ScoreUserInfoController {
    * 增加用户(ScoreUserInfo)
    *
    * @param scoreUserInfos 插入参数
-   * @param bindingResult 参数绑定校验
+   * @param bindingResult  参数绑定校验
    * @return ResultEntity
    */
   @RequestMapping(value = "insert", method = RequestMethod.POST)

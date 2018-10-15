@@ -2,11 +2,13 @@ package com.achievement.service.impl;
 
 import com.achievement.entity.ConfStudentParent;
 import com.achievement.entity.ParentInfo;
+import com.achievement.entity.ScoreUserInfo;
 import com.achievement.entity.StudentInfo;
 import com.achievement.enums.GlobalEnum;
 import com.achievement.mapper.StudentInfoMapper;
 import com.achievement.service.ConfStudentParentService;
 import com.achievement.service.ParentInfoService;
+import com.achievement.service.ScoreUserInfoService;
 import com.achievement.service.StudentInfoService;
 import com.achievement.utils.GloabalUtils;
 import com.achievement.utils.ResultUtil;
@@ -27,6 +29,8 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.achievement.constants.GlobalConstants.USER_ROLE_STUDENT;
+
 /**
  * 学生(StudentInfo)ServiceImpl
  *
@@ -40,6 +44,8 @@ public class StudentInfoServiceImpl implements StudentInfoService {
   private ConfStudentParentService confStudentParentService;
   @Autowired
   private ParentInfoService parentInfoService;
+  @Autowired
+  private ScoreUserInfoService scoreUserInfoService;
   @Resource
   private StudentInfoMapper studentInfoMapper;
 
@@ -146,6 +152,11 @@ public class StudentInfoServiceImpl implements StudentInfoService {
     Integer insertCount = studentInfoMapper.insert(studentInfoList);
     insertOrUpdateParent(studentInfoList);
     if (insertCount > 0) {
+      scoreUserInfoService.insert(new ArrayList<ScoreUserInfo>() {{
+        studentInfoList.forEach(studentInfo -> {
+          add(ScoreUserInfo.builder().loginName(studentInfo.getStudentNum()).password(studentInfo.getStudentNum()).userType(USER_ROLE_STUDENT).build());
+        });
+      }});
       return ResultUtil.success(GlobalEnum.InsertSuccess, studentInfoList);
     }
     return ResultUtil.error(GlobalEnum.InsertError);

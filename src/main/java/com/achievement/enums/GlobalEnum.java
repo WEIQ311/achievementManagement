@@ -96,6 +96,8 @@ public enum GlobalEnum {
   PasswordError("登录密码不正确，请重新输入!"),
   UserNoLogin("账号\"%s\"未开启,请联系管理员!"),
   UserNameInUsed("账号\"%s\"已经存在!"),
+  UserLoginNameEmpty("账号为空!"),
+  UserPasswordEmpty("密码为空!"),
   UserInfoEmpty("账号\"%s\"不存在!"),
   NoResetPassword("您非当前登陆用户不能修改密码!"),
   OldPasswordError("旧密码错误!"),

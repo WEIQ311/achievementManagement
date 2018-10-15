@@ -2,11 +2,13 @@ package com.achievement.service.impl;
 
 import com.achievement.entity.ConfTeacherClass;
 import com.achievement.entity.ConfTeacherSubject;
+import com.achievement.entity.ScoreUserInfo;
 import com.achievement.entity.TeacherInfo;
 import com.achievement.enums.GlobalEnum;
 import com.achievement.mapper.TeacherInfoMapper;
 import com.achievement.service.ConfTeacherClassService;
 import com.achievement.service.ConfTeacherSubjectService;
+import com.achievement.service.ScoreUserInfoService;
 import com.achievement.service.TeacherInfoService;
 import com.achievement.utils.GloabalUtils;
 import com.achievement.utils.ResultUtil;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -39,6 +42,8 @@ public class TeacherInfoServiceImpl implements TeacherInfoService {
   private ConfTeacherClassService confTeacherClassService;
   @Autowired
   private ConfTeacherSubjectService confTeacherSubjectService;
+  @Autowired
+  private ScoreUserInfoService scoreUserInfoService;
   @Resource
   private TeacherInfoMapper teacherInfoMapper;
 
@@ -98,6 +103,11 @@ public class TeacherInfoServiceImpl implements TeacherInfoService {
     });
     Integer insertCount = teacherInfoMapper.insert(teacherInfoList);
     if (insertCount > 0) {
+      scoreUserInfoService.insert(new ArrayList<ScoreUserInfo>() {{
+        teacherInfoList.forEach(teacherInfo -> {
+          add(ScoreUserInfo.builder().loginName(teacherInfo.getTeacherName()).password(teacherInfo.getTeacherNum()).userType(teacherInfo.getTeacherDuty()).build());
+        });
+      }});
       ResultEntity resultEntity = confTeacherSubjectService.insertOrUpdateTeacherSubject(teacherInfoList);
       log.info("增加教师与科目信息:{}", resultEntity);
       return ResultUtil.success(GlobalEnum.InsertSuccess, teacherInfoList);

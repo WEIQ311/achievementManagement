@@ -99,7 +99,92 @@ public class ScoreUserInfoServiceImpl implements ScoreUserInfoService {
   @Transactional(rollbackFor = RuntimeException.class)
   public ResultEntity insert(List<ScoreUserInfo> scoreUserInfos) {
     return insertOrUpdateScoreUserInfo(scoreUserInfos, OPERATE_TYPE_INSERT);
-  }  /**
+  }
+
+  /**
+   * 增加或更新用户信息
+   *
+   * @param scoreUserInfos 用户信息
+   * @param operateType    操作类型
+   * @return
+   */
+  private ResultEntity insertOrUpdateScoreUserInfo(List<ScoreUserInfo> scoreUserInfos, String operateType) {
+    if (null == scoreUserInfos || scoreUserInfos.size() < 1) {
+      return ResultUtil.error(GlobalEnum.DataEmpty);
+    }
+    Map<String, ScoreUserInfo> scoreUserInfoMap = convertUserNameAndType(ScoreUserInfo.builder().build());
+    Map<String, ScoreUserInfo> userInfoMap = scoreUserInfoMap.values().stream().collect(Collectors.toList()).stream()
+        .filter(scoreUserInfo -> StringUtils.isNotBlank(scoreUserInfo.getUserId()))
+        .collect(Collectors.toMap(ScoreUserInfo::getUserId, Function.identity(), (oldValue, newValue) -> newValue));
+    List<ScoreUserInfo> insertScoreUserInfos = new ArrayList<>();
+    List<ScoreUserInfo> updateScoreUserInfos = new ArrayList<>();
+    scoreUserInfos.stream().forEach(scoreUserInfo -> {
+      String loginName = scoreUserInfo.getLoginName();
+      String password = scoreUserInfo.getPassword();
+      String userType = scoreUserInfo.getUserType();
+      String key = loginName + INTERVAL_NUMBER + userType;
+      if (Objects.equals(OPERATE_TYPE_INSERT, operateType)) {
+        if (StringUtils.isBlank(loginName)) {
+          GloabalUtils.convertMessage(GlobalEnum.UserLoginNameEmpty);
+        }
+        if (StringUtils.isBlank(password)) {
+          GloabalUtils.convertMessage(GlobalEnum.UserPasswordEmpty);
+        }
+        if (scoreUserInfoMap.containsKey(key)) {
+          GloabalUtils.convertMessage(GlobalEnum.UserNameInUsed, loginName);
+        }
+        scoreUserInfo.setUserId("user_" + GloabalUtils.ordinaryId());
+        scoreUserInfo.setPassword(GloabalUtils.md5(password, TOKEN_ISSUER));
+        scoreUserInfo.setStatus(null == scoreUserInfo.getStatus() ? BOOLEAN_TRUE : scoreUserInfo.getStatus());
+        insertScoreUserInfos.add(scoreUserInfo);
+      } else {
+        String userId = scoreUserInfo.getUserId();
+        if (StringUtils.isBlank(userId)) {
+          GloabalUtils.convertMessage(GlobalEnum.PkIdEmpty);
+        }
+        if (!userInfoMap.containsKey(userId)) {
+          GloabalUtils.convertMessage(GlobalEnum.UserInfoEmpty, loginName);
+        }
+        if (scoreUserInfoMap.containsKey(key) && !Objects.equals(scoreUserInfoMap.get(key).getUserId(), userId)) {
+          GloabalUtils.convertMessage(GlobalEnum.UserNameInUsed, loginName);
+        }
+        scoreUserInfo.setPassword(null);
+        updateScoreUserInfos.add(scoreUserInfo);
+      }
+    });
+    if (null != insertScoreUserInfos && insertScoreUserInfos.size() > 0) {
+      Integer updateCount = scoreUserInfoMapper.insert(insertScoreUserInfos);
+      log.info("增加用户:{}条", updateCount);
+      if (updateCount > 0) {
+        return ResultUtil.success(GlobalEnum.UpdateSuccess, insertScoreUserInfos);
+      }
+    }
+    if (null != updateScoreUserInfos && updateScoreUserInfos.size() > 0) {
+      Integer updateCount = scoreUserInfoMapper.update(updateScoreUserInfos);
+      log.info("更新用户:{}条", updateCount);
+      if (updateCount > 0) {
+        return ResultUtil.success(GlobalEnum.UpdateSuccess, updateScoreUserInfos);
+      }
+    }
+    return ResultUtil.success(GlobalEnum.UpdateError, scoreUserInfos);
+  }
+
+  /**
+   * 对象信息Map
+   *
+   * @param scoreUserInfo 查询参数
+   * @return Map
+   */
+  @Override
+  public Map<String, ScoreUserInfo> convertUserNameAndType(ScoreUserInfo scoreUserInfo) {
+    return scoreUserInfoMapper.list(scoreUserInfo).stream().filter(info -> StringUtils.isNotBlank(info.getUserId())
+        && StringUtils.isNotBlank(info.getUserType()))
+        .collect(Collectors.toMap(info -> {
+          return info.getLoginName() + INTERVAL_NUMBER + info.getUserType();
+        }, Function.identity(), (oldValue, newValue) -> newValue));
+  }
+
+  /**
    * 用户登陆
    *
    * @param userInfo 用户信息
@@ -137,95 +222,6 @@ public class ScoreUserInfoServiceImpl implements ScoreUserInfoService {
   }
 
   /**
-   * 增加或更新用户信息
-   *
-   * @param scoreUserInfos 用户信息
-   * @param operateType    操作类型
-   * @return
-   */
-  private ResultEntity insertOrUpdateScoreUserInfo(List<ScoreUserInfo> scoreUserInfos, String operateType) {
-    if (null == scoreUserInfos || scoreUserInfos.size() < 1) {
-      return ResultUtil.error(GlobalEnum.DataEmpty);
-    }
-    Map<String, ScoreUserInfo> scoreUserInfoMap = convertUserNameAndType(ScoreUserInfo.builder().build());
-    Map<String, ScoreUserInfo> userInfoMap = scoreUserInfoMap.values().stream().collect(Collectors.toList()).stream()
-        .filter(scoreUserInfo -> StringUtils.isNotBlank(scoreUserInfo.getUserId()))
-        .collect(Collectors.toMap(ScoreUserInfo::getUserId, Function.identity(), (oldValue, newValue) -> newValue));
-    List<ScoreUserInfo> insertScoreUserInfos = new ArrayList<>();
-    List<ScoreUserInfo> updateScoreUserInfos = new ArrayList<>();
-    scoreUserInfos.stream().forEach(scoreUserInfo -> {
-      String loginName = scoreUserInfo.getLoginName();
-      String userType = scoreUserInfo.getUserType();
-      String key = loginName + INTERVAL_NUMBER + userType;
-      if (Objects.equals(OPERATE_TYPE_INSERT, operateType)) {
-        if (scoreUserInfoMap.containsKey(key)) {
-          GloabalUtils.convertMessage(GlobalEnum.UserNameInUsed, loginName);
-        }
-        String password = scoreUserInfo.getPassword();
-        scoreUserInfo.setUserId("user_" + GloabalUtils.ordinaryId());
-        scoreUserInfo.setPassword(GloabalUtils.md5(password, TOKEN_ISSUER));
-        insertScoreUserInfos.add(scoreUserInfo);
-      } else {
-        String userId = scoreUserInfo.getUserId();
-        if (StringUtils.isBlank(userId)) {
-          GloabalUtils.convertMessage(GlobalEnum.PkIdEmpty);
-        }
-        if (!userInfoMap.containsKey(userId)) {
-          GloabalUtils.convertMessage(GlobalEnum.UserInfoEmpty, loginName);
-        }
-        if (scoreUserInfoMap.containsKey(key) && !Objects.equals(scoreUserInfoMap.get(key).getUserId(), userId)) {
-          GloabalUtils.convertMessage(GlobalEnum.UserNameInUsed, loginName);
-        }
-        scoreUserInfo.setPassword(null);
-        updateScoreUserInfos.add(scoreUserInfo);
-      }
-    });
-    if (null != insertScoreUserInfos && insertScoreUserInfos.size() > 0) {
-      Integer updateCount = scoreUserInfoMapper.insert(insertScoreUserInfos);
-      log.info("增加用户:{}条", updateCount);
-      if (updateCount > 0) {
-        return ResultUtil.success(GlobalEnum.UpdateSuccess, insertScoreUserInfos);
-      }
-    }
-    if (null != updateScoreUserInfos && updateScoreUserInfos.size() > 0) {
-      Integer updateCount = scoreUserInfoMapper.update(updateScoreUserInfos);
-      log.info("更新用户:{}条", updateCount);
-      if (updateCount > 0) {
-        return ResultUtil.success(GlobalEnum.UpdateSuccess, updateScoreUserInfos);
-      }
-    }
-    return ResultUtil.success(GlobalEnum.UpdateError, scoreUserInfos);
-  }
-
-  /**
-   * 根据条件分页查询对象
-   *
-   * @param scoreUserInfo 查询参数
-   * @param pageNum       开始页数
-   * @param pageSize      每页显示的数据条数
-   * @return ResultEntity
-   */
-  @Override
-  public ResultEntity list(ScoreUserInfo scoreUserInfo, int pageNum, int pageSize) {
-    scoreUserInfo = convertQueryParam(scoreUserInfo);
-    PageHelper.startPage(pageNum, pageSize);
-    List<ScoreUserInfo> scoreUserInfos = scoreUserInfoMapper.list(scoreUserInfo);
-    PageInfo pageInfo = new PageInfo(scoreUserInfos);
-    return ResultUtil.success(GlobalEnum.QuerySuccess, pageInfo);
-  }
-
-  /**
-   * 根据条件查询对象
-   *
-   * @param scoreUserInfo 查询参数
-   * @return ResultEntity
-   */
-  @Override
-  public ResultEntity list(ScoreUserInfo scoreUserInfo) {
-    scoreUserInfo = convertQueryParam(scoreUserInfo);
-    List<ScoreUserInfo> scoreUserInfos = scoreUserInfoMapper.list(scoreUserInfo);
-    return ResultUtil.success(GlobalEnum.QuerySuccess, scoreUserInfos);
-  }  /**
    * 登出
    *
    * @param token token
@@ -238,17 +234,6 @@ public class ScoreUserInfoServiceImpl implements ScoreUserInfoService {
       resultEntity.setMessage(GlobalEnum.LogoutSuccess.getMessage());
     }
     return resultEntity;
-  }
-
-  /**
-   * 更新对象
-   *
-   * @param scoreUserInfos 更新参数
-   * @return ResultEntity
-   */
-  @Override
-  public ResultEntity update(List<ScoreUserInfo> scoreUserInfos) {
-    return insertOrUpdateScoreUserInfo(scoreUserInfos, OPERATE_TYPE_UPDATE);
   }
 
   /**
@@ -304,23 +289,45 @@ public class ScoreUserInfoServiceImpl implements ScoreUserInfoService {
     return ResultUtil.error(GlobalEnum.UpdateError);
   }
 
-
-
-
-
   /**
-   * 对象信息Map
+   * 根据条件分页查询对象
    *
    * @param scoreUserInfo 查询参数
-   * @return Map
+   * @param pageNum       开始页数
+   * @param pageSize      每页显示的数据条数
+   * @return ResultEntity
    */
   @Override
-  public Map<String, ScoreUserInfo> convertUserNameAndType(ScoreUserInfo scoreUserInfo) {
-    return scoreUserInfoMapper.list(scoreUserInfo).stream().filter(info -> StringUtils.isNotBlank(info.getUserId())
-        && StringUtils.isNotBlank(info.getUserType()))
-        .collect(Collectors.toMap(info -> {
-          return info.getLoginName() + INTERVAL_NUMBER + info.getUserType();
-        }, Function.identity(), (oldValue, newValue) -> newValue));
+  public ResultEntity list(ScoreUserInfo scoreUserInfo, int pageNum, int pageSize) {
+    scoreUserInfo = convertQueryParam(scoreUserInfo);
+    PageHelper.startPage(pageNum, pageSize);
+    List<ScoreUserInfo> scoreUserInfos = scoreUserInfoMapper.list(scoreUserInfo);
+    PageInfo pageInfo = new PageInfo(scoreUserInfos);
+    return ResultUtil.success(GlobalEnum.QuerySuccess, pageInfo);
+  }
+
+  /**
+   * 根据条件查询对象
+   *
+   * @param scoreUserInfo 查询参数
+   * @return ResultEntity
+   */
+  @Override
+  public ResultEntity list(ScoreUserInfo scoreUserInfo) {
+    scoreUserInfo = convertQueryParam(scoreUserInfo);
+    List<ScoreUserInfo> scoreUserInfos = scoreUserInfoMapper.list(scoreUserInfo);
+    return ResultUtil.success(GlobalEnum.QuerySuccess, scoreUserInfos);
+  }
+
+  /**
+   * 更新对象
+   *
+   * @param scoreUserInfos 更新参数
+   * @return ResultEntity
+   */
+  @Override
+  public ResultEntity update(List<ScoreUserInfo> scoreUserInfos) {
+    return insertOrUpdateScoreUserInfo(scoreUserInfos, OPERATE_TYPE_UPDATE);
   }
 
 

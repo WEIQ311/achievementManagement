@@ -180,6 +180,26 @@ public class GlobalConstants {
    */
   public static final String UPDATE = "update";
   /**
+   * 管理员
+   */
+  public static final String USER_ROLE_ADMIN = "0";
+  /**
+   * 家长
+   */
+  public static final String USER_ROLE_PARENT = "4";
+  /**
+   * 学生
+   */
+  public static final String USER_ROLE_STUDENT = "3";
+  /**
+   * 教师
+   */
+  public static final String USER_ROLE_TEACHER = "2";
+  /**
+   * 班主任
+   */
+  public static final String USER_ROLE_TEACHER_HEAD = "1";
+  /**
    * xml请求
    */
   public static final String XML_HTTP_REQUEST = "XMLHttpRequest";
