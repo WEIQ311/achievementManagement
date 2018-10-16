@@ -89,7 +89,7 @@ public class GloabalUtils {
         } else {
           for (String ignoreUri : NO_TOKEN_URI) {
             if (requestURI.endsWith(ignoreUri)) {
-              response.reset();
+              response.setHeader(TOKEN_HEADER, new String());
             } else {
               response.setHeader(TOKEN_HEADER, token);
             }
