@@ -23,15 +23,26 @@ public class ScoreUserInfo implements Serializable {
 
   private static final long serialVersionUID = 3778777049882402948L;
   /**
+   * 首次登陆时间
+   */
+  private Date firstLogin;
+  /**
    * 添加时间
    */
   private Date insertTime;
+  /**
+   * 登陆ip
+   */
+  private String ipAddress;
+  /**
+   * 登陆次数
+   */
+  private Integer loginCount;
   /**
    * 用户登陆名称
    */
   @NotBlank(message = "用户登陆名称不能为空!")
   private String loginName;
-
   /**
    * 登陆密码
    */
@@ -62,5 +73,4 @@ public class ScoreUserInfo implements Serializable {
    */
   @NotBlank(message = "用户角色不能为空!")
   private String userType;
-
 }

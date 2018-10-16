@@ -159,6 +159,6 @@ public class ScoreUserInfoController {
   @RequestMapping(value = "logout", method = RequestMethod.GET)
   public ResultEntity userLogout(HttpServletRequest request) {
     String token = request.getHeader(TOKEN_HEADER);
-    return scoreUserInfoService.logout(token);
+    return scoreUserInfoService.logout(token, request);
   }
 }

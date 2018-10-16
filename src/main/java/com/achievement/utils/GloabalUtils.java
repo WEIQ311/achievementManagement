@@ -87,7 +87,14 @@ public class GloabalUtils {
           response.setHeader(TOKEN_HEADER, token);
           response.setHeader(TOKEN_NEW_HEADER, newToken);
         } else {
-          log.info("用户授权认证通过!");
+          for (String ignoreUri : NO_TOKEN_URI) {
+            if (requestURI.endsWith(ignoreUri)) {
+              response.reset();
+            } else {
+              response.setHeader(TOKEN_HEADER, token);
+            }
+          }
+          log.debug("用户授权认证通过!");
         }
       } else {
         response.reset();
@@ -280,6 +287,9 @@ public class GloabalUtils {
     }
     if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
       ip = request.getRemoteAddr();
+    }
+    if (ip.contains(INTERVAL_COMMA) && ip.split(INTERVAL_COMMA).length > 1) {
+      ip = ip.split(INTERVAL_COMMA)[0];
     }
     return ip;
   }

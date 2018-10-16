@@ -44,10 +44,11 @@ public interface ScoreUserInfoService extends BaseInfoService<ScoreUserInfo, Str
   /**
    * 登出
    *
-   * @param token token
+   * @param token   token
+   * @param request 请求
    * @return ResultEntity
    */
-  ResultEntity logout(String token);
+  ResultEntity logout(String token, HttpServletRequest request);
 
   /**
    * 重置用户密码

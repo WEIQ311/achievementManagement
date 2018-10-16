@@ -68,9 +68,21 @@ public class GlobalConstants {
    */
   public static final String FORM_DATA_KEY = "formData";
   /**
+   * 5次登陆失败
+   */
+  public static final int FREQUENTLY_LOGIN_COUNT = 5;
+  /**
+   * 最大尝试登陆失败次数
+   */
+  public static final int FREQUENTLY_MAX_LOGIN_ERROR_COUNT = 15;
+  /**
    * 忽略校验token URI
    */
   public static final String[] IGNORE_URI = {"user/login"};
+  /**
+   * 逗号
+   */
+  public static final String INTERVAL_COMMA = ",";
   /**
    * 间隔号
    */
@@ -87,6 +99,10 @@ public class GlobalConstants {
    * linux
    */
   public static final String LINUX_NAME = "linux";
+  /**
+   * 请求头中不设置tokenUri
+   */
+  public static final String[] NO_TOKEN_URI = {"user/logout"};
   /**
    * ok
    */
@@ -131,6 +147,10 @@ public class GlobalConstants {
    * 两天(毫秒)
    */
   public static final Integer SECONDS_TWO_DAY = 1000 * 60 * 60 * 48;
+  /**
+   * 两分钟(毫秒)
+   */
+  public static final Integer SECONDS_TWO_MINUTE = 2 * 60 * 1000;
   /**
    * 空格
    */
@@ -182,7 +202,7 @@ public class GlobalConstants {
   /**
    * 管理员
    */
-  public static final String USER_ROLE_ADMIN = "0";
+  public static final String USER_ROLE_ADMIN = TEACHER_ROLE_ADMIN;
   /**
    * 家长
    */
@@ -194,11 +214,11 @@ public class GlobalConstants {
   /**
    * 教师
    */
-  public static final String USER_ROLE_TEACHER = "2";
+  public static final String USER_ROLE_TEACHER = TEACHER_ROLE_ORDINARY;
   /**
    * 班主任
    */
-  public static final String USER_ROLE_TEACHER_HEAD = "1";
+  public static final String USER_ROLE_TEACHER_HEAD = TEACHER_ROLE_HEAD;
   /**
    * xml请求
    */

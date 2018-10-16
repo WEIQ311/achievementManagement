@@ -13,6 +13,8 @@ import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +36,8 @@ import static com.achievement.constants.GlobalConstants.*;
 public class ScoreUserInfoServiceImpl implements ScoreUserInfoService {
   @Autowired
   private ParentInfoService parentInfoService;
+  @Autowired
+  private RedisTemplate redisTemplate;
   @Resource
   private ScoreUserInfoMapper scoreUserInfoMapper;
   @Autowired
@@ -232,6 +236,7 @@ public class ScoreUserInfoServiceImpl implements ScoreUserInfoService {
     String password = userInfo.getPassword();
     String userType = userInfo.getUserType();
     String key = loginName + INTERVAL_NUMBER + userType;
+    String realIpAddress = checkFrequentlyLogin(request, userInfo);
     Map<String, ScoreUserInfo> userInfoMap = convertUserNameAndType(ScoreUserInfo.builder().loginName(loginName).userType(userType).build());
     if (userInfoMap.isEmpty() || !userInfoMap.containsKey(key)) {
       GloabalUtils.convertMessage(GlobalEnum.UserNameError, loginName);
@@ -252,7 +257,46 @@ public class ScoreUserInfoServiceImpl implements ScoreUserInfoService {
     }
     List<?> resultInfoList = convertLoginUser(scoreUserInfo);
     tokenInfoService.initToken(request, scoreUserInfo, response);
+    redisTemplate.delete(realIpAddress);
     return ResultUtil.success(GlobalEnum.LoginSuccess, resultInfoList);
+  }
+
+  /**
+   * 检测是否频繁登陆
+   *
+   * @param request       请求
+   * @param scoreUserInfo 用户信息
+   */
+  private String checkFrequentlyLogin(HttpServletRequest request, ScoreUserInfo scoreUserInfo) {
+    String ipAddress = GloabalUtils.getIpAddress(request);
+    String realIpAddress = ipAddress.replaceAll(INTERVAL_POINT, "");
+    ValueOperations<String, ScoreUserInfo> valueOperations = redisTemplate.opsForValue();
+    ScoreUserInfo info = null;
+    if (null != valueOperations.get(realIpAddress)) {
+      info = valueOperations.get(realIpAddress);
+    }
+    Date current = new Date();
+    boolean frequentlyLogin = false;
+    if (null != info) {
+      Integer loginCount = info.getLoginCount();
+      Date firstLogin = info.getFirstLogin();
+      long currentTime = current.getTime();
+      long firstLoginTime = firstLogin.getTime();
+      long frequentlyTime = currentTime - firstLoginTime;
+      loginCount += 1;
+      frequentlyLogin = (FREQUENTLY_LOGIN_COUNT <= loginCount && frequentlyTime < SECONDS_TWO_MINUTE) || FREQUENTLY_MAX_LOGIN_ERROR_COUNT <= loginCount;
+      info.setLoginCount(loginCount);
+    } else {
+      info = scoreUserInfo;
+      info.setFirstLogin(current);
+      info.setLoginCount(1);
+    }
+    info.setIpAddress(ipAddress);
+    valueOperations.set(realIpAddress, info);
+    if (frequentlyLogin) {
+      GloabalUtils.convertMessage(GlobalEnum.FrequentlyLogin, scoreUserInfo.getLoginName(), info.getLoginCount().toString());
+    }
+    return realIpAddress;
   }
 
   /**
@@ -291,12 +335,17 @@ public class ScoreUserInfoServiceImpl implements ScoreUserInfoService {
   /**
    * 登出
    *
-   * @param token token
+   * @param token   token
+   * @param request 请求
    * @return ResultEntity
    */
   @Override
-  public ResultEntity logout(String token) {
-    ResultEntity resultEntity = tokenInfoService.deleteToken(token);
+  public ResultEntity logout(String token, HttpServletRequest request) {
+    ResultEntity resultEntity = tokenInfoService.tokenValid(token, request);
+    if (!resultEntity.isSuccess()) {
+      return resultEntity;
+    }
+    resultEntity = tokenInfoService.deleteToken(token);
     if (resultEntity.isSuccess()) {
       resultEntity.setMessage(GlobalEnum.LogoutSuccess.getMessage());
     }
