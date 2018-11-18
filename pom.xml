@@ -5,7 +5,7 @@
 
   <groupId>com.achievement</groupId>
   <artifactId>achievement</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.1</version>
   <packaging>jar</packaging>
 
   <name>achievement</name>
@@ -14,7 +14,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.0.5.RELEASE</version>
+    <version>2.1.0.RELEASE</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
 
@@ -32,6 +32,11 @@
     <!--<poi.version>[3.14,)</poi.version>-->
     <poi.version>3.14</poi.version>
     <jjwt.version>[0.9.0,)</jjwt.version>
+    <swagger2.version>[2.6.1,)</swagger2.version>
+    <swagger.bootstrap.version>[1.8.7,)</swagger.bootstrap.version>
+    <elastic-job.version>[2.1.5,)</elastic-job.version>
+    <mybatis.plus.version>[1.3.2,)</mybatis.plus.version>
+    <!--https://www.cnblogs.com/scode2/p/8718553.html-->
   </properties>
   <dependencies>
     <!--jpa-->
@@ -70,7 +75,7 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-devtools</artifactId>
-      <scope>runtime</scope>
+      <scope>provided</scope>
     </dependency>
     <!--mysql-->
     <dependency>
@@ -95,18 +100,39 @@
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
+    <!--actuator-->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
     <!--mockmvc-->
     <dependency>
       <groupId>org.springframework.restdocs</groupId>
       <artifactId>spring-restdocs-mockmvc</artifactId>
       <scope>test</scope>
     </dependency>
-    <!--druid-->
-    <!-- <dependency>
-       <groupId>com.alibaba</groupId>
-       <artifactId>druid</artifactId>
-       <version>${druid.version}</version>
-     </dependency>-->
+    <dependency>
+      <groupId>com.baomidou</groupId>
+      <artifactId>mybatis-plus-boot-starter</artifactId>
+      <version>${mybatis.plus.version}</version>
+    </dependency>
+    <!--swagger2-->
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-swagger2</artifactId>
+      <version>${swagger2.version}</version>
+    </dependency>
+    <!--swagger2-ui-->
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-swagger-ui</artifactId>
+      <version>${swagger2.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.xiaoymin</groupId>
+      <artifactId>swagger-bootstrap-ui</artifactId>
+      <version>${swagger.bootstrap.version}</version>
+    </dependency>
     <!--fastjson-->
     <dependency>
       <groupId>com.alibaba</groupId>
@@ -135,6 +161,12 @@
       <artifactId>jjwt</artifactId>
       <version>${jjwt.version}</version>
     </dependency>
+    <!--ElasticJobAutoConfiguration-->
+    <!-- <dependency>
+       <groupId>com.github.kuhn-he</groupId>
+       <artifactId>elastic-job-lite-spring-boot-starter</artifactId>
+       <version>${elastic-job.version}</version>
+     </dependency>-->
   </dependencies>
   <build>
     <plugins>
@@ -158,11 +190,29 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>${maven.compiler.version}</version>
         <configuration>
           <source>${java.version}</source>
           <target>${java.version}</target>
         </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <!--<version>3.0.0</version>-->
+        <configuration>
+          <appendAssemblyId>false</appendAssemblyId>
+          <descriptors>
+            <descriptor>src/main/assembly/assembly.xml</descriptor>
+          </descriptors>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
     <resources>
