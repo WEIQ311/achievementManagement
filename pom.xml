@@ -171,11 +171,25 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
         <configuration>
-          <!--fork :  如果没有该项配置，devtools不会起作用，即应用不会restart -->
-          <fork>true</fork>
+          <archive>
+            <manifest>
+              <!--运行jar包时运行的主类，要求类全名-->
+              <mainClass>com.achievement.AchievementApplication</mainClass>
+              <!-- 是否指定项目classpath下的依赖 -->
+              <addClasspath>true</addClasspath>
+              <!-- 指定依赖的时候声明前缀 -->
+              <classpathPrefix>lib/</classpathPrefix>
+            </manifest>
+            <manifestEntries>
+              <Class-Path>./</Class-Path>
+            </manifestEntries>
+          </archive>
+          <excludes>
+            <exclude>config/*</exclude>
+          </excludes>
         </configuration>
       </plugin>
       <plugin>
